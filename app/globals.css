@@ -2,10 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+@layer base {
+  :root {
+    --tw-text-opacity: 1;
+    --color-primary-50: 235,242,254;
+    --color-primary-100: 215,230,253;
+    --color-primary-200: 176,205,251;
+    --color-primary-300: 137,180,250;
+    --color-primary-400: 98,155,248;
+    --color-primary-500: 59,130,246;
+    --color-primary-600: 11,97,238;
+    --color-primary-700: 8,75,184;
+    --color-primary-800: 6,53,131;
+    --color-primary-900: 4,31,77;
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

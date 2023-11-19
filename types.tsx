@@ -55,4 +55,8 @@ export type GetProposalCallResponse = {
   isLoading: boolean;
 }
 
-
+export type ProposalMetadata = {
+  title: string;
+  summary: string;
+  resources: string[];
+}

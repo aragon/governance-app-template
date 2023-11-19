@@ -9,7 +9,7 @@ import { InjectedConnector } from 'wagmi/connectors/injected'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
-
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 // 1. Get projectId
 const projectId: string = process.env.NEXT_PUBLIC_WC_PROJECT_ID || "";
@@ -50,6 +50,15 @@ const wagmiConfig = createConfig({
 // 3. Create modal
 createWeb3Modal({ wagmiConfig, projectId, chains })
 
+const queryClient = new QueryClient();
+
+
 export function Web3Modal({ children }: any) {
-  return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>;
+  return (
+    <WagmiConfig config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    </WagmiConfig>
+  );
 }

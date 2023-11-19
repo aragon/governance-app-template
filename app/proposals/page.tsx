@@ -22,8 +22,8 @@ export default function Proposals() {
   })
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1>Proposals</h1>
+    <main className="bg-gray-50 flex min-h-screen flex-col items-center justify-between p-24">
+      <h1 className="text-2xl font-black w-5/6">Proposals</h1>
       {numProposals && [...Array(numProposals)].map((_, i) => (
         <Proposal key={i} proposalId={BigInt(numProposals - 1 - i)} />
       )

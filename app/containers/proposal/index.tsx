@@ -17,14 +17,14 @@ type ProposalInputs = {
   proposalId: bigint;
 }
 
-function getPath(hexedIpfs) {
+function getPath(hexedIpfs: Address) {
   const ipfsPath = fromHex(hexedIpfs, 'string')
   const path = ipfsPath.includes('ipfs://') ? ipfsPath.substring(7) : ipfsPath
   return path
 }
 async function fetchFromIPFS(ipfsPath: string | undefined) {
   if (!ipfsPath) return
-  const path = getPath(ipfsPath)
+  const path = getPath((ipfsPath as Address))
   const response = await fetch(`${ipfsEndpoint}${path}`, {
     method: 'POST',
     headers: {
@@ -88,10 +88,30 @@ export default function Proposal(props: ProposalInputs) {
   }, [proposal]);
 
   if (proposalLogs) return (
-    <div className="">
-      <h1>Proposal {props.proposalId.toLocaleString()} - {ipfsResponse && ipfsResponse.title}</h1>
-      <p>{ipfsResponse && ipfsResponse.summary}</p>
-    </div>
+    <section className="pb-6 pt-10 dark:bg-dark lg:pb-[15px] lg:pt-[20px] w-5/6">
+      <div className="container mx-auto">
+        <div className="bg-blue-50 flex flex-wrap items-center justify-between rounded-lg border border-stroke bg-gray-2 px-6 py-8 dark:border-dark-3 dark:bg-dark-2 xs:px-10 md:px-8 lg:px-10">
+          <div className="w-full md:w-7/12 lg:w-2/3">
+            <div className="mb-6 md:mb-0">
+              <h4 className="mb-1 text-l font-semibold text-dark dark:text-white xs:text-xl md:text-l lg:text-xl">
+                {props.proposalId.toLocaleString()} - {ipfsResponse && ipfsResponse.title}
+              </h4>
+              <p className="text-base text-body-color dark:text-dark-6">
+                {ipfsResponse && ipfsResponse.summary}
+              </p>
+            </div>
+          </div>
+
+          <div className="w-full md:w-5/12 lg:w-1/3">
+            <div className="flex items-center space-x-3 md:justify-end">
+              <button className="inline-flex items-center justify-center rounded-md bg-white px-7 py-3 text-center text-base font-medium text-body-color shadow-1 dark:bg-dark dark:text-dark-6 dark:shadow-none">
+                {proposal?.open ? 'Open' : proposal?.executed ? 'Executed' : proposal?.tally.no >= proposal?.tally.yes ? 'Defeated' : 'To Execute'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   )
   else return (<></>)
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { useEffect, useCallback, useState } from 'react';
 import { useContractRead, usePublicClient } from 'wagmi';
 import { getAbiItem, Address } from 'viem'
@@ -13,10 +14,6 @@ import { fromHex } from 'viem'
 const pluginAddress: Address = `0x${process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || ""}`
 const ipfsEndpoint = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
 const ipfsKey = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
-
-type ProposalInputs = {
-  proposalId: bigint;
-}
 
 function getPath(hexedIpfs: Address) {
   const ipfsPath = fromHex(hexedIpfs, 'string')
@@ -39,13 +36,13 @@ async function fetchFromIPFS(ipfsPath: string | undefined) {
   return response.json(); // or .text(), .blob(), etc., depending on the data format
 }
 
-export default function Proposal(props: ProposalInputs) {
+export default function Proposal({ params }: { params: { proposals: string } }) {
   const publicClient = usePublicClient()
   const [proposal, setProposal] = useState<Proposal>();
   const [proposalLogs, setProposalLogs] = useState<ProposalCreatedLogResponse>();
   const [proposalMetadata, setProposalMetadata] = useState<string>();
   const { data: ipfsResponse, isLoading: ipfsLoading, error } = useQuery<ProposalMetadata, Error>(
-    `ipfsData${props.proposalId}`,
+    `ipfsData${params.proposals}`,
     () => fetchFromIPFS(proposalMetadata),
     { enabled: proposalMetadata ? true : false }
   );
@@ -54,7 +51,7 @@ export default function Proposal(props: ProposalInputs) {
     address: pluginAddress,
     abi: TokenVotingAbi,
     functionName: 'getProposal',
-    args: [props.proposalId],
+    args: [params.proposals],
     onSuccess(data) {
       setProposal({
         open: (data as Array<boolean>)[0],
@@ -75,7 +72,7 @@ export default function Proposal(props: ProposalInputs) {
       address: pluginAddress,
       event,
       args: {
-        proposalId: props.proposalId,
+        proposalId: params.proposals,
       } as any,
       fromBlock: (proposal as Proposal).parameters.snapshotBlock,
       toBlock: (proposal as Proposal).parameters.startDate,
@@ -90,10 +87,10 @@ export default function Proposal(props: ProposalInputs) {
 
   if (proposalLogs) return (
     <section className="pb-6 pt-10 dark:bg-dark lg:pb-[15px] lg:pt-[20px] w-5/6">
-      <Link href={`/proposals/${props.proposalId}`} className="bg-blue-50 flex justify-between rounded-lg border border-stroke px-4 py-5 dark:border-dark-3 dark:bg-dark-2 xs:px-10 md:px-6 lg:px-7 cursor-pointer">
+      <div className="bg-blue-50 flex justify-between rounded-lg border border-stroke px-4 py-5 dark:border-dark-3 dark:bg-dark-2 xs:px-10 md:px-6 lg:px-7 cursor-pointer">
         <div className="">
           <h4 className="mb-1 text-l font-semibold text-dark dark:text-white xs:text-xl md:text-l lg:text-xl">
-            {props.proposalId.toLocaleString()} - {ipfsResponse && ipfsResponse.title}
+            {params.proposals?.toLocaleString()} - {ipfsResponse && ipfsResponse.title}
           </h4>
           <p className="text-base text-body-color dark:text-dark-6">
             {ipfsResponse && ipfsResponse.summary}
@@ -110,7 +107,7 @@ export default function Proposal(props: ProposalInputs) {
             </p>
           </div>
         </div>
-      </Link>
+      </div>
     </section>
   )
   else return (<></>)

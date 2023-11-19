@@ -55,5 +55,5 @@ export function useProposal(publicClient: any, address: Address, proposalId: str
       { enabled: proposalMetadata ? true : false }
     );
   
-    return { proposal, proposalLogs, ipfsResponse };
+    return { ...proposal, ...proposalLogs, ...ipfsResponse };
   }

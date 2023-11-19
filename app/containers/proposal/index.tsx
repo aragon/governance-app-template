@@ -21,7 +21,7 @@ export default function Proposal(props: ProposalInputs) {
       <Link href={`/proposals/${props.proposalId}`} className="bg-blue-50 flex justify-between rounded-lg border border-stroke px-4 py-5 dark:border-dark-3 dark:bg-dark-2 xs:px-10 md:px-6 lg:px-7 cursor-pointer">
         <div className="">
           <h4 className="mb-1 text-l font-semibold text-dark dark:text-white xs:text-xl md:text-l lg:text-xl">
-            {props.proposalId.toLocaleString()} - {proposal.title}
+            {Number(props.proposalId)+1} - {proposal.title}
           </h4>
           <p className="text-base text-body-color dark:text-dark-6">
             {proposal.summary}

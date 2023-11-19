@@ -20,9 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-primary-500`}>
+        <Header />
         <Web3Modal>
-          <Header/>
-          <main>{children}</main>
+          {children}
         </Web3Modal>
       </body>
     </html>

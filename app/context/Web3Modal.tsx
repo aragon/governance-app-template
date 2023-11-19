@@ -1,12 +1,19 @@
 "use client";
 
-import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react'
+import { createWeb3Modal } from '@web3modal/wagmi/react'
 
 import { WagmiConfig } from 'wagmi'
-import { sepolia, mainnet } from 'viem/chains'
+import { createConfig, configureChains, mainnet, sepolia } from 'wagmi'
+import { publicProvider } from 'wagmi/providers/public'
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
+import { alchemyProvider } from 'wagmi/providers/alchemy'
+
 
 // 1. Get projectId
-const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
+const projectId: string = process.env.NEXT_PUBLIC_WC_PROJECT_ID || "";
+const alchemyKey: string = process.env.NEXT_PUBLIC_ALCHEMY || "";
 
 // 2. Create wagmiConfig
 const metadata = {
@@ -16,13 +23,33 @@ const metadata = {
   icons: ['https://avatars.githubusercontent.com/u/37784886']
 }
 
-const chains = [mainnet, sepolia]
-const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
+
+const { chains, publicClient, webSocketPublicClient } = configureChains(
+  [mainnet, sepolia],
+  [alchemyProvider({ apiKey: alchemyKey })],
+)
+
+// const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
+const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors: [
+    new InjectedConnector({ chains }),
+    new CoinbaseWalletConnector({ chains, options: { appName: metadata.name } }),
+    new WalletConnectConnector({
+      chains,
+      options: {
+        projectId,
+        metadata,
+      },
+    }),
+  ],
+  publicClient,
+  webSocketPublicClient,
+})
 
 // 3. Create modal
-console.log("Project Id: ", projectId);
 createWeb3Modal({ wagmiConfig, projectId, chains })
 
-export function Web3Modal({ children }) {
+export function Web3Modal({ children }: any) {
   return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>;
 }

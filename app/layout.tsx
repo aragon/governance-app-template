@@ -2,11 +2,14 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Web3Modal } from "./context/Web3Modal";
 import Header from "./containers/header";
+import Sidebar from "./containers/sidebar";
 
 import '@aragon/ods/index.css';
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin']
+})
 
 export const metadata: Metadata = {
   title: 'Aragonette UI',
@@ -20,11 +23,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className}`}>
-        <Header />
-        <Web3Modal>
-          {children}
-        </Web3Modal>
+      <body className={`${inter.className} bg-white`}>
+        <div className="w-full h-full">
+          <div className="flex flex-no-wrap h-full">
+            <Sidebar />
+            <div className="container">
+              <Header />
+              <Web3Modal>
+                {children}
+              </Web3Modal>
+            </div>
+          </div>
+        </div>
       </body>
     </html>
   )

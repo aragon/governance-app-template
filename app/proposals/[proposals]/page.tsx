@@ -4,13 +4,19 @@ import { usePublicClient } from 'wagmi';
 import { Address } from 'viem'
 import { Proposal } from '../../../utils/types';
 import { useProposal } from '@/hooks/useProposal';
+import { useProposalVotes } from '@/hooks/useProposalVotes';
 import { Button, AlertCard } from '@aragon/ods'
+import Blockies from 'react-blockies';
+
 
 const pluginAddress: Address = `0x${process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || ""}`
+
 
 export default function Proposal({ params }: { params: { proposals: string } }) {
   const publicClient = usePublicClient()
   const proposal = useProposal(publicClient, pluginAddress, params.proposals);
+  const votes = useProposalVotes(publicClient, pluginAddress, params.proposals, (proposal as Proposal));
+
 
   if (proposal.title) return (
     <section className="pb-6 pt-10 min-h-screen p-24 dark:bg-dark lg:pb-[15px] lg:pt-[20px]">
@@ -48,23 +54,48 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
         <div className="flex flex-col space-between border bg-neutral-50 border-neutral-300 rounded-2xl py-8 px-6 m-2">
           <div className="flex flex-row space-between pb-2">
             <p className="flex-grow text-xl text-success-500 font-semibold">For</p>
-            <p className="text-xl font-semibold">5.000</p>
+            <p className="text-xl font-semibold">{Number(proposal.tally?.yes)}</p>
           </div>
           <div className="h-4 w-full bg-success-100 rounded"><div className="h-4 w-12 bg-success-800 rounded"></div></div>
+          <div className="mt-4 grid grid-cols-5 space-between">
+            {votes && votes.filter(vote => vote.voteOption === 2).map(vote => (
+              <Blockies
+                className="rounded-2xl"
+                seed={vote?.voter}
+              />
+            ))}
+          </div>
         </div>
         <div className="flex flex-col space-between border bg-neutral-50 border-neutral-300 rounded-2xl py-8 px-6 m-2">
           <div className="flex flex-row space-between pb-2">
             <p className="flex-grow text-xl text-critical-500 font-semibold">Against</p>
-            <p className="text-xl font-semibold">10.000</p>
+            <p className="text-xl font-semibold">{Number(proposal.tally?.no)}</p>
           </div>
           <div className="h-4 w-full bg-critical-100 rounded"><div className="h-4 w-24 bg-critical-800 rounded"></div></div>
+          <div className="mt-4 grid grid-cols-5 space-between">
+            {votes && votes.filter(vote => vote.voteOption === 0).map(vote => (
+              <Blockies
+                className="rounded-2xl"
+                seed={vote?.voter}
+              />
+            ))}
+          </div>
         </div>
         <div className="flex flex-col space-between border bg-neutral-50 border-neutral-300 rounded-2xl py-8 px-6 m-2">
           <div className="flex flex-row space-between pb-2">
             <p className="flex-grow text-xl text-neutral-500 font-semibold">Abstain</p>
-            <p className="text-xl font-semibold">50</p>
+            <p className="text-xl font-semibold">{Number(proposal.tally?.abstain)}</p>
           </div>
           <div className="h-4 w-full bg-neutral-100 rounded"><div className="h-4 w-1 bg-neutral-800 rounded"></div></div>
+          <div className="mt-4 grid grid-cols-5 space-between">
+            {votes && votes.filter(vote => vote.voteOption === 1).map(vote => (
+              <Blockies
+                className="rounded-2xl"
+                seed={vote?.voter}
+              />
+            ))}
+          </div>
+
         </div>
 
 
@@ -104,7 +135,7 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
         <h2 className="flex-grow text-2xl text-neutral-900 font-semibold">To execute</h2>
         <div className="flex flex-row space-between">
           {proposal.actions?.length && proposal.actions.map((action) => (
-            <div>
+            <div key={`${action.to}-${action.value}-${action.data}`}>
               <p>To: {action.to}</p>
               <p>Value: {Number(action.value)}</p>
               <p>Data: {action.data}</p>

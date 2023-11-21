@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Proposal from '../containers/proposal';
 import { Address } from 'viem'
 import { TokenVotingAbi } from '../../artifacts/TokenVoting.sol';
+import { Button, IconType } from '@aragon/ods'
 
 const pluginAddress: Address = `0x${process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || ""}`
 
@@ -22,8 +23,19 @@ export default function Proposals() {
   })
 
   return (
-    <main className="bg-gray-50 flex flex-col items-center">
-      <h1 className="text-3xl font-semibold w-5/6 pt-12">Proposals</h1>
+    <main className="flex flex-col items-center mt-12">
+      <div className="flex flex-row justify-between content-center w-5/6 mb-6">
+        <h1 className="justify-self-start text-3xl font-semibold align-middle">Proposals</h1>
+        <div className="justify-self-end">
+          <Button
+            iconLeft={IconType.ADD}
+            size="lg"
+            variant='primary'
+          >
+            Submit Proposal
+          </Button>
+        </div>
+      </div>
       {numProposals && [...Array(numProposals)].map((_, i) => (
         <Proposal key={i} proposalId={BigInt(numProposals - 1 - i)} />
       )

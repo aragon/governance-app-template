@@ -1,3 +1,5 @@
+import { Address } from 'viem'
+
 export type ProposalInputs = {
   proposalId: bigint;
 }
@@ -48,6 +50,10 @@ export type Proposal = {
   tally: Tally;
   actions: Action[];
   allowFailureMap: bigint;
+  title: string;
+  summary: string;
+  resources: string[];
+
 }
 
 export type GetProposalCallResponse = {
@@ -59,4 +65,15 @@ export type ProposalMetadata = {
   title: string;
   summary: string;
   resources: string[];
+}
+
+export type VoteCastResponse = {
+  args: VoteCastEvent[];
+}
+
+export type VoteCastEvent = {
+  voter: Address;
+  proposalId: bigint;
+  voteOption: number;
+  votingPower: bigint;
 }

@@ -24,6 +24,20 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
   const votes = useProposalVotes(publicClient, pluginAddress, params.proposals, proposal);
   const [descriptionSection, setDescriptionSection] = useState<boolean>(true);
 
+  const votingPercentages = () => {
+    let yesVotes = Number(formatUnits(proposal.tally.yes, 18));
+    let noVotes = Number(formatUnits(proposal.tally.no, 18));
+    let abstainVotes = Number(formatUnits(proposal.tally.abstain, 18));
+    let totalVotes = yesVotes + noVotes + abstainVotes;
+
+
+    return {
+      yes: yesVotes / totalVotes * 100,
+      no: noVotes / totalVotes * 100,
+      abstain: abstainVotes / totalVotes * 100
+    };
+  }
+
 
   if (proposal.title) return (
     <section className="pb-6 pt-10 min-h-screen p-24 dark:bg-dark lg:pb-[15px] lg:pt-[20px]">
@@ -50,9 +64,9 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
           </h4>
           <p className="text-base text-l text-body-color dark:text-dark-6">
             Proposed by
-            <span className="text-critical-400"> {formatAddress(proposal.args?.creator)} </span>
+            <span className="text-primary-400 font-semibold underline"> {formatAddress(proposal.args?.creator)} </span>
             until
-            <span className="text-critical-400"> {dayjs(Number(proposal.parameters?.endDate) * 1000).format('DD/MM/YYYY')}</span>
+            <span className="text-primary-400 font-semibold"> {dayjs(Number(proposal.parameters?.endDate) * 1000).format('DD/MM/YYYY')}</span>
           </p>
         </div>
       </div>
@@ -60,14 +74,17 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
       <div className="grid grid-cols-3 my-12">
         <div className="flex flex-col space-between border bg-neutral-50 border-neutral-300 rounded-2xl py-8 px-6 m-2">
           <div className="flex flex-row space-between pb-2">
-            <p className="flex-grow text-xl text-success-500 font-semibold">For</p>
+            <p className="flex-grow text-xl text-success-700 font-semibold">For</p>
             <p className="text-xl font-semibold">{formatUnits(proposal.tally?.yes, 18)}</p>
           </div>
-          <div className="h-4 w-full bg-success-100 rounded"><div className="h-4 w-12 bg-success-800 rounded"></div></div>
+          <div className="h-4 w-full bg-success-100 rounded">
+            <div className="h-4 bg-success-800 rounded" style={{width: `${votingPercentages().yes}%`}}></div>
+          </div>
           <div className="mt-4 grid grid-cols-5 space-between">
             {votes && votes.filter(vote => vote.voteOption === 2).map(vote => (
               <Blockies
-                className="rounded-2xl"
+                size={11}
+                className="rounded-3xl"
                 seed={vote?.voter}
               />
             ))}
@@ -75,14 +92,17 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
         </div>
         <div className="flex flex-col space-between border bg-neutral-50 border-neutral-300 rounded-2xl py-8 px-6 m-2">
           <div className="flex flex-row space-between pb-2">
-            <p className="flex-grow text-xl text-critical-500 font-semibold">Against</p>
+            <p className="flex-grow text-xl text-critical-700 font-semibold">Against</p>
             <p className="text-xl font-semibold">{formatUnits(proposal.tally?.no, 18)}</p>
           </div>
-          <div className="h-4 w-full bg-critical-100 rounded"><div className="h-4 w-24 bg-critical-800 rounded"></div></div>
+          <div className="h-4 w-full bg-critical-100 rounded">
+            <div className="h-4 bg-critical-800 rounded" style={{width: `${votingPercentages().no}%`}}></div>
+          </div>
           <div className="mt-4 grid grid-cols-5 space-between">
             {votes && votes.filter(vote => vote.voteOption === 0).map(vote => (
               <Blockies
-                className="rounded-2xl"
+                size={12}
+                className="rounded-3xl"
                 seed={vote?.voter}
               />
             ))}
@@ -90,14 +110,17 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
         </div>
         <div className="flex flex-col space-between border bg-neutral-50 border-neutral-300 rounded-2xl py-8 px-6 m-2">
           <div className="flex flex-row space-between pb-2">
-            <p className="flex-grow text-xl text-neutral-500 font-semibold">Abstain</p>
+            <p className="flex-grow text-xl text-neutral-700 font-semibold">Abstain</p>
             <p className="text-xl font-semibold">{formatUnits(proposal.tally?.abstain, 18)}</p>
           </div>
-          <div className="h-4 w-full bg-neutral-100 rounded"><div className="h-4 w-1 bg-neutral-800 rounded"></div></div>
+          <div className="h-4 w-full bg-neutral-100 rounded">
+            <div className="h-4 bg-neutral-800 rounded" style={{width: `${votingPercentages().abstain}%`}}></div>
+            </div>
           <div className="mt-4 grid grid-cols-5 space-between">
             {votes && votes.filter(vote => vote.voteOption === 1).map(vote => (
               <Blockies
-                className="rounded-2xl"
+                size={11}
+                className="rounded-3xl"
                 seed={vote?.voter}
               />
             ))}
@@ -105,24 +128,24 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
         </div>
 
         <div className="flex space-between border border-neutral-300 rounded-2xl py-5 px-3 m-2">
-          <h2 className="text-2xl flex-grow font-bold pr-6">Thresshold</h2>
+          <h2 className="text-xl flex-grow font-semibold text-neutral-600 pr-6">Thresshold</h2>
           <div className="items-right text-right flex-wrap">
-            <span className="text-xl">{proposal.parameters?.supportThreshold}</span>
-            <p>voting power</p>
+            <span className="text-xl font-semibold">{proposal.parameters?.supportThreshold}</span>
+            <p className="text-neutral-600">voting power</p>
           </div>
         </div>
         <div className="flex space-between border border-neutral-300 rounded-2xl py-5 px-3 m-2">
-          <h2 className="text-2xl flex-grow font-bold pr-6">Ends</h2>
+          <h2 className="text-xl flex-grow font-semibold pr-6 text-neutral-600">Ends</h2>
           <div className="items-right text-right flex-wrap">
-            <span className="text-xl mr-2">{dayjs(Number(proposal.parameters?.endDate) * 1000).format('DD/MM/YYYY')}</span>
-            <p>unix time</p>
+            <span className="text-xl mr-2 font-semibold">{dayjs(Number(proposal.parameters?.endDate) * 1000).format('DD/MM/YYYY')}</span>
+            <p className="text-neutral-600">unix time</p>
           </div>
         </div>
         <div className="flex space-between border border-neutral-300 rounded-2xl py-5 px-3 m-2">
-          <h2 className="text-2xl flex-grow font-bold pr-6">Snapshot</h2>
+          <h2 className="text-xl flex-grow font-semibold text-neutral-600 pr-6">Snapshot</h2>
           <div className="items-right text-right flex-wrap">
-            <p>Taken at block</p>
-            <span className="text-xl mr-2">{proposal.parameters?.snapshotBlock.toLocaleString()}</span>
+            <p className="text-neutral-600">Taken at block</p>
+            <span className="text-xl mr-2 font-semibold">{proposal.parameters?.snapshotBlock.toLocaleString()}</span>
           </div>
         </div>
       </div>
@@ -132,8 +155,8 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
             { descriptionSection ? 'Description' : 'Votes'}
             </h2>
           <div className="flex flex-row gap-4">
-            <h2 className="px-3 py-2 border-2 border-primary-500 rounded-3xl" onClick={() => setDescriptionSection(true)}>Description</h2>
-            <h2 className="px-3 py-2 border-2 border-primary-500 rounded-3xl" onClick={() => setDescriptionSection(false)}>Votes</h2>
+            <h2 className={`px-3 py-2 border-2 rounded-3xl hover:bg-primary-500 hover:text-neutral-50 hover:border-primary-500 ${descriptionSection ? 'border-primary-500' : 'border-neutral-500'}`} onClick={() => setDescriptionSection(true)}>Description</h2>
+            <h2 className={`px-3 py-2 border-2 rounded-3xl hover:bg-primary-500 hover:text-neutral-50 hover:border-primary-500 ${!descriptionSection ? 'border-primary-500' : 'border-neutral-500'}`} onClick={() => setDescriptionSection(false)}>Votes</h2>
           </div>
         </div>
       </div>

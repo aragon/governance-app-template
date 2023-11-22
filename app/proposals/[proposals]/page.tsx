@@ -15,7 +15,7 @@ import { formatAddress } from '@/utils/addressHelper'
 import * as dayjs from 'dayjs'
 
 
-const pluginAddress: Address = `0x${process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || ""}`
+const pluginAddress = ((process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address)
 
 const getProposalVariantStatus = (proposal: Proposal) => {
   return {

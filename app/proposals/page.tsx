@@ -6,11 +6,13 @@ import Proposal from '../containers/proposal';
 import { Address } from 'viem'
 import { TokenVotingAbi } from '../../artifacts/TokenVoting.sol';
 import { Button, IconType } from '@aragon/ods'
+import { useCanCreateProposal } from '@/hooks/useCanCreateProposal';
 
-const pluginAddress: Address = `0x${process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || ""}`
+const pluginAddress = ((process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address)
 
 export default function Proposals() {
   const [numProposals, setNumProposals] = useState<number>();
+  const canCreate = useCanCreateProposal();
 
   const { isLoading } = useContractRead({
     address: pluginAddress,
@@ -27,13 +29,16 @@ export default function Proposals() {
       <div className="flex flex-row justify-between content-center w-5/6 mb-6">
         <h1 className="justify-self-start text-3xl font-semibold align-middle">Proposals</h1>
         <div className="justify-self-end">
-          <Button
-            iconLeft={IconType.ADD}
-            size="lg"
-            variant='primary'
-          >
-            Submit Proposal
-          </Button>
+          {canCreate && (
+            <Button
+              iconLeft={IconType.ADD}
+              size="lg"
+              variant='primary'
+            >
+              Submit Proposal
+            </Button>
+
+          )}
         </div>
       </div>
       {numProposals && [...Array(numProposals)].map((_, i) => (

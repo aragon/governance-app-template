@@ -7,7 +7,7 @@ import { Proposal } from '@/utils/types';
 import { useProposal } from '@/hooks/useProposal';
 import { Button, } from '@aragon/ods'
 
-const pluginAddress: Address = `0x${process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || ""}`
+const pluginAddress = ((process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address)
 
 type ProposalInputs = {
   proposalId: bigint;

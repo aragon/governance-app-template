@@ -17,6 +17,12 @@ import * as dayjs from 'dayjs'
 
 const pluginAddress: Address = `0x${process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || ""}`
 
+const getProposalVariantStatus = (proposal: Proposal) => {
+  return {
+    variant: proposal?.open ? 'secondary' : proposal?.executed ? 'success' : proposal?.tally?.no >= proposal?.tally?.yes ? 'critical' : 'success',
+    label: proposal?.open ? 'Open' : proposal?.executed ? 'Executed' : proposal?.tally!.no >= proposal?.tally!.yes ? 'Defeated' : 'To Execute',
+  }
+}
 
 export default function Proposal({ params }: { params: { proposals: string } }) {
   const publicClient = usePublicClient()
@@ -25,9 +31,11 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
   const [descriptionSection, setDescriptionSection] = useState<boolean>(true);
 
   const votingPercentages = () => {
-    let yesVotes = Number(formatUnits(proposal.tally.yes, 18));
-    let noVotes = Number(formatUnits(proposal.tally.no, 18));
-    let abstainVotes = Number(formatUnits(proposal.tally.abstain, 18));
+    if (!proposal.tally) return {yes: 0, no: 0, abstain: 0}
+
+    let yesVotes = Number(formatUnits(proposal.tally.yes || BigInt(0), 18));
+    let noVotes = Number(formatUnits(proposal.tally.no || BigInt(0), 18));
+    let abstainVotes = Number(formatUnits(proposal.tally.abstain || BigInt(0), 18));
     let totalVotes = yesVotes + noVotes + abstainVotes;
 
 
@@ -51,9 +59,8 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
               {proposal.tally && (
                 <AlertCard
                   className="flex h-5 items-center"
-                  description=""
-                  message={proposal?.open ? 'Open' : proposal?.executed ? 'Executed' : proposal?.tally!.no >= proposal?.tally!.yes ? 'Defeated' : 'To Execute'}
-                  variant={proposal?.open ? 'secondary' : proposal?.executed ? 'success' : proposal?.tally!.no >= proposal?.tally!.yes ? 'critical' : 'info'}
+                  description={getProposalVariantStatus((proposal as Proposal)).label}
+                  variant={getProposalVariantStatus((proposal as Proposal)).variant}
                 />
               )}
             </div>
@@ -75,7 +82,7 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
         <div className="flex flex-col space-between border bg-neutral-50 border-neutral-300 rounded-2xl py-8 px-6 m-2">
           <div className="flex flex-row space-between pb-2">
             <p className="flex-grow text-xl text-success-700 font-semibold">For</p>
-            <p className="text-xl font-semibold">{formatUnits(proposal.tally?.yes, 18)}</p>
+            <p className="text-xl font-semibold">{formatUnits(proposal?.tally?.yes || BigInt(0), 18)}</p>
           </div>
           <div className="h-4 w-full bg-success-100 rounded">
             <div className="h-4 bg-success-800 rounded" style={{width: `${votingPercentages().yes}%`}}></div>
@@ -83,6 +90,7 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
           <div className="mt-4 grid grid-cols-5 space-between">
             {votes && votes.filter(vote => vote.voteOption === 2).map(vote => (
               <Blockies
+                key={vote?.voter}
                 size={11}
                 className="rounded-3xl"
                 seed={vote?.voter}
@@ -93,7 +101,7 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
         <div className="flex flex-col space-between border bg-neutral-50 border-neutral-300 rounded-2xl py-8 px-6 m-2">
           <div className="flex flex-row space-between pb-2">
             <p className="flex-grow text-xl text-critical-700 font-semibold">Against</p>
-            <p className="text-xl font-semibold">{formatUnits(proposal.tally?.no, 18)}</p>
+            <p className="text-xl font-semibold">{formatUnits(proposal?.tally?.no || BigInt(0), 18)}</p>
           </div>
           <div className="h-4 w-full bg-critical-100 rounded">
             <div className="h-4 bg-critical-800 rounded" style={{width: `${votingPercentages().no}%`}}></div>
@@ -101,6 +109,7 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
           <div className="mt-4 grid grid-cols-5 space-between">
             {votes && votes.filter(vote => vote.voteOption === 0).map(vote => (
               <Blockies
+                key={vote?.voter}
                 size={12}
                 className="rounded-3xl"
                 seed={vote?.voter}
@@ -111,7 +120,7 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
         <div className="flex flex-col space-between border bg-neutral-50 border-neutral-300 rounded-2xl py-8 px-6 m-2">
           <div className="flex flex-row space-between pb-2">
             <p className="flex-grow text-xl text-neutral-700 font-semibold">Abstain</p>
-            <p className="text-xl font-semibold">{formatUnits(proposal.tally?.abstain, 18)}</p>
+            <p className="text-xl font-semibold">{formatUnits(proposal?.tally?.abstain || BigInt(0), 18)}</p>
           </div>
           <div className="h-4 w-full bg-neutral-100 rounded">
             <div className="h-4 bg-neutral-800 rounded" style={{width: `${votingPercentages().abstain}%`}}></div>
@@ -119,6 +128,7 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
           <div className="mt-4 grid grid-cols-5 space-between">
             {votes && votes.filter(vote => vote.voteOption === 1).map(vote => (
               <Blockies
+                key={vote?.voter}
                 size={11}
                 className="rounded-3xl"
                 seed={vote?.voter}

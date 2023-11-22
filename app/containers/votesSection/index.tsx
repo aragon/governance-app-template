@@ -66,7 +66,6 @@ export default function VotesSection({ votes }: { votes: Array<VoteCastEvent> })
               <p className="py-1 px-4 h-9 bg-neutral-50 text-neutral-800 font-semibold rounded-xl border border-neutral-400">Abstain</p>
             </div>
           </div>
-
         ))
         }
       </div>

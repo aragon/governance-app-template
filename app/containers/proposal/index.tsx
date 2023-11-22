@@ -13,6 +13,13 @@ type ProposalInputs = {
   proposalId: bigint;
 }
 
+const getProposalVariantStatus = (proposal: Proposal) => {
+  return {
+    variant: proposal?.open ? 'secondary' : proposal?.executed ? 'success' : proposal?.tally?.no >= proposal?.tally?.yes ? 'critical' : 'success',
+    label: proposal?.open ? 'Open' : proposal?.executed ? 'Executed' : proposal?.tally!.no >= proposal?.tally!.yes ? 'Defeated' : 'To Execute',
+  }
+}
+
 export default function Proposal(props: ProposalInputs) {
   const publicClient = usePublicClient()
   const proposal = useProposal(publicClient, pluginAddress, props.proposalId.toString());
@@ -34,9 +41,9 @@ export default function Proposal(props: ProposalInputs) {
             {proposal.tally && (
               <Button
                 size="lg"
-                variant={proposal?.open ? 'secondary' : proposal?.executed ? 'success' : proposal?.tally!.no >= proposal?.tally!.yes ? 'critical' : 'info'}
+                variant={getProposalVariantStatus((proposal as Proposal)).variant}
               >
-                {proposal?.open ? 'Open' : proposal?.executed ? 'Executed' : proposal?.tally!.no >= proposal?.tally!.yes ? 'Defeated' : 'To Execute'}
+                { getProposalVariantStatus((proposal as Proposal)).label}
               </Button>
             )}
           </div>
@@ -46,5 +53,3 @@ export default function Proposal(props: ProposalInputs) {
   )
   else return (<></>)
 }
-
-

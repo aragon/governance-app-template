@@ -1,3 +1,4 @@
+import { CID } from 'ipfs-http-client';
 import { fromHex } from 'viem';
 import { Address } from 'viem'
 
@@ -12,7 +13,7 @@ export function getPath(hexedIpfs: Address) {
 export async function fetchFromIPFS(ipfsPath: string | undefined) {
   if (!ipfsPath) return
   const path = getPath((ipfsPath as Address))
-  const response = await fetch(`${ipfsEndpoint}${path}`, {
+  const response = await fetch(`${ipfsEndpoint}/cat?arg=${path}`, {
     method: 'POST',
     headers: {
       'X-API-KEY': ipfsKey,
@@ -26,3 +27,11 @@ export async function fetchFromIPFS(ipfsPath: string | undefined) {
 }
 
 
+export async function uploadToIPFS(client: any, blob: Blob) {
+  try {
+    const { cid }: {cid: CID} = await client.add(blob);
+    return cid.toString()
+  } catch (error) {
+    console.error('Error uploading file: ', error);
+  }
+}

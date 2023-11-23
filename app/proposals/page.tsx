@@ -30,14 +30,15 @@ export default function Proposals() {
         <h1 className="justify-self-start text-3xl font-semibold align-middle">Proposals</h1>
         <div className="justify-self-end">
           {canCreate && (
-            <Button
-              iconLeft={IconType.ADD}
-              size="lg"
-              variant='primary'
-            >
-              Submit Proposal
-            </Button>
-
+            <a href="/create">
+              <Button
+                iconLeft={IconType.ADD}
+                size="lg"
+                variant='primary'
+              >
+                Submit Proposal
+              </Button>
+            </a>
           )}
         </div>
       </div>

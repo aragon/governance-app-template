@@ -26,7 +26,7 @@ const metadata = {
 
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [polygon],
+  [polygon, mainnet],
   [alchemyProvider({ apiKey: alchemyKey })],
 )
 

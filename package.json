@@ -12,6 +12,7 @@
     "@aragon/ods": "^1.0.5",
     "@web3modal/wagmi": "^3.3.1",
     "dayjs": "^1.11.10",
+    "ipfs-http-client": "^60.0.1",
     "next": "14.0.2",
     "react": "^18",
     "react-blockies": "^1.4.1",

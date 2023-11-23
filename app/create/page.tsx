@@ -24,7 +24,7 @@ export default function Create() {
         abi: TokenVotingAbi,
         address: pluginAddress,
         functionName: 'createProposal',
-        args: [toHex(ipfsPin), [], 0, 0, 0, 1, 0],
+        args: [toHex(ipfsPin), [], 0, 0, 0, 0, 0],
         onSuccess(data) {
             console.log('Success creating the proposal', data)
             setProposalCreated(true)

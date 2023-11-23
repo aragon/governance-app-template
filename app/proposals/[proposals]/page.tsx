@@ -1,6 +1,6 @@
 "use client";
 
-import { usePublicClient, useAccount } from 'wagmi';
+import { usePublicClient, useAccount, useContractWrite } from 'wagmi';
 import { useState } from 'react'
 import { Address } from 'viem'
 import { Proposal } from '../../../utils/types';
@@ -12,7 +12,9 @@ import VotesSection from '@/app/containers/votesSection';
 import Blockies from 'react-blockies';
 import { formatUnits } from 'viem'
 import { formatAddress } from '@/utils/addressHelper'
+import { useUserCanVote } from '@/hooks/useUserCanVote';
 import * as dayjs from 'dayjs'
+import { TokenVotingAbi } from '@/artifacts/TokenVoting.sol';
 
 
 const pluginAddress = ((process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address)
@@ -28,8 +30,22 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
   const publicClient = usePublicClient()
   const proposal = (useProposal(publicClient, pluginAddress, params.proposals) as Proposal);
   const votes = useProposalVotes(publicClient, pluginAddress, params.proposals, proposal);
-  // const userCanVote = useUserCanVote(publicClient, pluginAddress, params.proposals)
+  const userCanVote = useUserCanVote(BigInt(params.proposals))
   const [descriptionSection, setDescriptionSection] = useState<boolean>(true);
+  const [showVotingModal, setShowVotingModal] = useState(false);
+  const [userVotedOption, setUserVotedOption] = useState<number>();
+  const [userExecutedVote, setUserExecutedVote] = useState<boolean>();
+  const { write: voteWrite } = useContractWrite({
+    abi: TokenVotingAbi,
+    address: pluginAddress,
+    functionName: 'vote',
+    args: [params.proposals, userVotedOption, 0],
+    onSuccess(data) {
+      console.log('Success creating the proposal', data)
+      setUserExecutedVote(true)
+    },
+  });
+
   const { address, isConnecting, isDisconnected } = useAccount()
 
   const votingPercentages = () => {
@@ -60,6 +76,12 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
     }
   }
 
+  const voteFor = (option: number) => {
+    setUserVotedOption(option)
+    voteWrite?.()
+    setShowVotingModal(false)
+  }
+
   if (proposal.title) return (
     <section className="pb-6 pt-10 min-h-screen p-24 dark:bg-dark lg:pb-[15px] lg:pt-[20px]">
       <div className="flex justify-between px-4 py-5 xs:px-10 md:px-6 lg:px-7 ">
@@ -80,16 +102,23 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
               </div>
             </div>
             <div className="flex ">
-              {userVote() && (
-                <div className="flex items-center align-center">
-                  <span className="text-lg text-neutral-800 font-semibold pr-4">Voted: </span>
-                  <Button
-                    className="flex h-5 items-center"
-                    size="lg"
-                    variant={getUserVoteData().variant}
-                  >{getUserVoteData().label}</Button>
-                </div>
-              )}
+              {userCanVote ?
+                <Button
+                  className="flex h-5 items-center"
+                  size="lg"
+                  variant="primary"
+                  onClick={() => setShowVotingModal(true)}
+                >Vote</Button>
+                : userVote() && (
+                  <div className="flex items-center align-center">
+                    <span className="text-lg text-neutral-800 font-semibold pr-4">Voted: </span>
+                    <Button
+                      className="flex h-5 items-center"
+                      size="lg"
+                      variant={getUserVoteData().variant}
+                    >{getUserVoteData().label}</Button>
+                  </div>
+                )}
             </div>
 
           </div>
@@ -200,9 +229,58 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
       {
         descriptionSection ? (<ProposalDescription {...proposal} />) : (<VotesSection votes={votes} />)
       }
+      {showVotingModal && (
+        <>
+          <div
+            className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="relative w-auto my-6 mx-auto max-w-sm">
+              {/*content*/}
+              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-neutral-50 outline-none focus:outline-none">
+                {/*header*/}
+                <div className="flex items-start justify-between p-5 border-b border-solid border-primary-200 rounded-t">
+                  <h3 className="text-3xl font-semibold text-neutral-700">
+                    Choose wisely
+                  </h3>
+                  <button
+                    className="p-1 ml-auto bg-transparent border-0 text-neutral-800 opacity-1 float-right text-3xl "
+                    onClick={() => setShowVotingModal(false)}
+                  >
+                    <span className="bg-transparent text-neutral-800 opacity-1 h-6 w-6 text-2xl block font-semibold">
+                      ×
+                    </span>
+                  </button>
+                </div>
+                {/*footer*/}
+                <div className="flex items-center justify-end p-6 border-t border-solid border-neutral-200 rounded-b">
+                  <Button
+                    className="flex h-5 items-center m-2"
+                    size="md"
+                    variant="success"
+                    onClick={() => voteFor(2)}
+                  >For</Button>
+                  <Button
+                    className="flex h-5 items-center m-2"
+                    size="md"
+                    variant="critical"
+                    onClick={() => voteFor(3)}
+                  >Against</Button>
+
+                  <Button
+                    className="flex h-5 items-center m-2"
+                    size="md"
+                    variant="tertiary"
+                    onClick={() => voteFor(1)}
+                  >Abstain</Button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-neutral-900"></div>
+        </>
+      )}
     </section>
   )
-  else return (<></>)
 }
 
 

@@ -1,12 +1,12 @@
 "use client";
 
-import { usePublicClient } from 'wagmi';
-import {useState} from 'react'
+import { usePublicClient, useAccount } from 'wagmi';
+import { useState } from 'react'
 import { Address } from 'viem'
 import { Proposal } from '../../../utils/types';
 import { useProposal } from '@/hooks/useProposal';
 import { useProposalVotes } from '@/hooks/useProposalVotes';
-import { Button, AlertCard } from '@aragon/ods'
+import { Button, AlertCard, Tag } from '@aragon/ods'
 import ProposalDescription from '@/app/containers/proposalDescription';
 import VotesSection from '@/app/containers/votesSection';
 import Blockies from 'react-blockies';
@@ -28,10 +28,12 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
   const publicClient = usePublicClient()
   const proposal = (useProposal(publicClient, pluginAddress, params.proposals) as Proposal);
   const votes = useProposalVotes(publicClient, pluginAddress, params.proposals, proposal);
+  // const userCanVote = useUserCanVote(publicClient, pluginAddress, params.proposals)
   const [descriptionSection, setDescriptionSection] = useState<boolean>(true);
+  const { address, isConnecting, isDisconnected } = useAccount()
 
   const votingPercentages = () => {
-    if (!proposal.tally) return {yes: 0, no: 0, abstain: 0}
+    if (!proposal.tally) return { yes: 0, no: 0, abstain: 0 }
 
     let yesVotes = Number(formatUnits(proposal.tally.yes || BigInt(0), 18));
     let noVotes = Number(formatUnits(proposal.tally.no || BigInt(0), 18));
@@ -46,22 +48,47 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
     };
   }
 
+  const userVote = () => votes.find(vote => vote.voter === address)?.voteOption
+
+  const getUserVoteData = () => {
+    if (userVote() === 0) {
+      return { variant: 'critical', label: 'Against' }
+    } else if (userVote() === 1) {
+      return { variant: 'tertiary', label: 'Abstain' }
+    } else {
+      return { variant: 'success', label: 'For' }
+    }
+  }
 
   if (proposal.title) return (
     <section className="pb-6 pt-10 min-h-screen p-24 dark:bg-dark lg:pb-[15px] lg:pt-[20px]">
       <div className="flex justify-between px-4 py-5 xs:px-10 md:px-6 lg:px-7 ">
-        <div className="">
-          <div className="flex flex-row pb-2 content-center items-center">
-            <h4 className="text-xl font-semibold text-neutral-600 align-middle">
-              Proposal {Number(params.proposals) + 1}
-            </h4>
-            <div className="pl-3 align-middle">
-              {proposal.tally && (
-                <AlertCard
-                  className="flex h-5 items-center"
-                  description={getProposalVariantStatus((proposal as Proposal)).label}
-                  variant={getProposalVariantStatus((proposal as Proposal)).variant}
-                />
+        <div className="w-full">
+          <div className="flex flex-row pb-2 content-center items-center ">
+            <div className="flex flex-grow">
+              <h4 className="text-xl font-semibold text-neutral-600 align-middle">
+                Proposal {Number(params.proposals) + 1}
+              </h4>
+              <div className="pl-3 align-middle">
+                {proposal.tally && (
+                  <AlertCard
+                    className="flex h-5 items-center"
+                    description={getProposalVariantStatus((proposal as Proposal)).label}
+                    variant={getProposalVariantStatus((proposal as Proposal)).variant}
+                  />
+                )}
+              </div>
+            </div>
+            <div className="flex ">
+              {userVote() && (
+                <div className="flex items-center align-center">
+                  <span className="text-lg text-neutral-800 font-semibold pr-4">Voted: </span>
+                  <Button
+                    className="flex h-5 items-center"
+                    size="lg"
+                    variant={getUserVoteData().variant}
+                  >{getUserVoteData().label}</Button>
+                </div>
               )}
             </div>
 
@@ -85,7 +112,7 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
             <p className="text-xl font-semibold">{formatUnits(proposal?.tally?.yes || BigInt(0), 18)}</p>
           </div>
           <div className="h-4 w-full bg-success-100 rounded">
-            <div className="h-4 bg-success-800 rounded" style={{width: `${votingPercentages().yes}%`}}></div>
+            <div className="h-4 bg-success-800 rounded" style={{ width: `${votingPercentages().yes}%` }}></div>
           </div>
           <div className="mt-4 grid grid-cols-5 space-between">
             {votes && votes.filter(vote => vote.voteOption === 2).map(vote => (
@@ -104,7 +131,7 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
             <p className="text-xl font-semibold">{formatUnits(proposal?.tally?.no || BigInt(0), 18)}</p>
           </div>
           <div className="h-4 w-full bg-critical-100 rounded">
-            <div className="h-4 bg-critical-800 rounded" style={{width: `${votingPercentages().no}%`}}></div>
+            <div className="h-4 bg-critical-800 rounded" style={{ width: `${votingPercentages().no}%` }}></div>
           </div>
           <div className="mt-4 grid grid-cols-5 space-between">
             {votes && votes.filter(vote => vote.voteOption === 0).map(vote => (
@@ -123,8 +150,8 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
             <p className="text-xl font-semibold">{formatUnits(proposal?.tally?.abstain || BigInt(0), 18)}</p>
           </div>
           <div className="h-4 w-full bg-neutral-100 rounded">
-            <div className="h-4 bg-neutral-800 rounded" style={{width: `${votingPercentages().abstain}%`}}></div>
-            </div>
+            <div className="h-4 bg-neutral-800 rounded" style={{ width: `${votingPercentages().abstain}%` }}></div>
+          </div>
           <div className="mt-4 grid grid-cols-5 space-between">
             {votes && votes.filter(vote => vote.voteOption === 1).map(vote => (
               <Blockies
@@ -162,8 +189,8 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
       <div className="py-12">
         <div className="flex flex-row space-between">
           <h2 className="flex-grow text-3xl text-neutral-900 font-semibold">
-            { descriptionSection ? 'Description' : 'Votes'}
-            </h2>
+            {descriptionSection ? 'Description' : 'Votes'}
+          </h2>
           <div className="flex flex-row gap-4">
             <h2 className={`px-3 py-2 border-2 rounded-3xl hover:bg-primary-500 hover:text-neutral-50 hover:border-primary-500 ${descriptionSection ? 'border-primary-500' : 'border-neutral-500'}`} onClick={() => setDescriptionSection(true)}>Description</h2>
             <h2 className={`px-3 py-2 border-2 rounded-3xl hover:bg-primary-500 hover:text-neutral-50 hover:border-primary-500 ${!descriptionSection ? 'border-primary-500' : 'border-neutral-500'}`} onClick={() => setDescriptionSection(false)}>Votes</h2>

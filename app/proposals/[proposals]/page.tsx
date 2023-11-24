@@ -79,19 +79,19 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
   }, [userVotedOption, showVotingModal])
 
   if (proposal.title && proposal?.parameters?.supportThreshold) return (
-    <section className="pb-6 pt-10 min-h-screen p-24 dark:bg-dark lg:pb-[15px] lg:pt-[20px]">
-      <div className="flex justify-between px-4 py-5 xs:px-10 md:px-6 lg:px-7 ">
+    <section className="flex flex-col items-center mt-12 w-screen max-w-full">
+      <div className="flex justify-between px-4 py-5 w-full">
         <ProposalHeader proposalNumber={Number(params.proposals)} proposal={proposal} userVote={userVote()} userCanVote={userCanVote as boolean} setShowVotingModal={setShowVotingModal} />
       </div>
 
-      <div className="grid grid-cols-3 my-12">
+      <div className="grid grid-cols-3 my-10 gap-10 w-full">
         <VoteTally voteType="For" voteCount={proposal?.tally?.yes} votePercentage={votingPercentages().yes} votes={votes} color="success" option={2} />
         <VoteTally voteType="Against" voteCount={proposal?.tally?.no} votePercentage={votingPercentages().no} votes={votes} color="critical" option={3} />
         <VoteTally voteType="Abstain" voteCount={proposal?.tally?.abstain} votePercentage={votingPercentages().abstain} votes={votes} color="neutral" option={1} />
 
         <ProposalDetails supportThreshold={proposal.parameters.supportThreshold} endDate={proposal.parameters.endDate} snapshotBlock={proposal.parameters.snapshotBlock} />
       </div>
-      <div className="py-12">
+      <div className="py-12 w-full">
         <div className="flex flex-row space-between">
           <h2 className="flex-grow text-3xl text-neutral-900 font-semibold">
             {descriptionSection ? 'Description' : 'Votes'}
@@ -101,8 +101,9 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
             <h2 className={`px-3 py-2 border-2 rounded-3xl hover:bg-primary-500 hover:text-neutral-50 hover:border-primary-500 ${!descriptionSection ? 'border-primary-500' : 'border-neutral-500'}`} onClick={() => setDescriptionSection(false)}>Votes</h2>
           </div>
         </div>
+
+        {descriptionSection ? (<ProposalDescription {...proposal} />) : (<VotesSection votes={votes} />)}
       </div>
-      {descriptionSection ? (<ProposalDescription {...proposal} />) : (<VotesSection votes={votes} />)}
       {showVotingModal && (<VotingModal show={showVotingModal} setShow={setShowVotingModal} voteFor={voteFor} />)}
     </section>
   )

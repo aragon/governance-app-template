@@ -7,6 +7,7 @@ import { uploadToIPFS } from '@/utils/ipfs'
 import { useContractWrite } from 'wagmi';
 import { Address, toHex } from 'viem'
 import { TokenVotingAbi } from '@/artifacts/TokenVoting.sol';
+import { useAlertContext } from '../context/AlertContext';
 
 const ipfsEndpoint = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
 const ipfsKey = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
@@ -19,15 +20,14 @@ export default function Create() {
     const [ipfsPin, setIpfsPin] = useState<string>('');
     const [title, setTitle] = useState<string>();
     const [summary, setSummary] = useState<string>();
-    const [proposalCreated, setProposalCreated] = useState<boolean>(false);
+    const { addAlert } = useAlertContext()
     const { write: createProposalWrite } = useContractWrite({
         abi: TokenVotingAbi,
         address: pluginAddress,
         functionName: 'createProposal',
         args: [toHex(ipfsPin), [], 0, 0, 0, 0, 0],
         onSuccess(data) {
-            console.log('Success creating the proposal', data)
-            setProposalCreated(true)
+            addAlert("We got your proposal!", data.hash)
         },
     });
 
@@ -46,7 +46,6 @@ export default function Create() {
         const blob = new Blob([JSON.stringify(proposalMetadataJsonObject)], { type: 'application/json' });
 
         const ipfsPin = await uploadToIPFS(client, blob);
-        console.log('IPFS Pin: ', ipfsPin)
         setIpfsPin(ipfsPin)
     }
 
@@ -59,7 +58,6 @@ export default function Create() {
 
     return (
         <main className="flex pt-24">
-            {proposalCreated && <h1 className="text-2xl">Release the confetti!</h1>}
             <div className="w-2/4 max-w-2xl mx-auto">
                 <div className="mb-6 pb-6">
                     <label className="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Title</label>

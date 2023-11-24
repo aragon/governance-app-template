@@ -1,7 +1,7 @@
 "use client";
 
 import { usePublicClient, useAccount, useContractWrite } from 'wagmi';
-import { useState } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { Address } from 'viem'
 import { Proposal } from '../../../utils/types';
 import { useProposal } from '@/hooks/useProposal';
@@ -19,6 +19,7 @@ import { TokenVotingAbi } from '@/artifacts/TokenVoting.sol';
 import VoteTally from '@/app/containers/voteTally'
 import VotingModal from '@/app/containers/votingModal';
 import ProposalDetails from '@/app/containers/proposalDetails';
+import { useAlertContext, AlertContext, AlertContextProps } from '@/app/context/AlertContext';
 
 
 const pluginAddress = ((process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address)
@@ -38,7 +39,8 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
   const [descriptionSection, setDescriptionSection] = useState<boolean>(true);
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [userVotedOption, setUserVotedOption] = useState<number>();
-  const [userExecutedVote, setUserExecutedVote] = useState<boolean>();
+  const { addAlert } = useAlertContext() as AlertContextProps
+  const { address, isConnected, isDisconnected } = useAccount()
   const { write: voteWrite } = useContractWrite({
     abi: TokenVotingAbi,
     address: pluginAddress,
@@ -46,11 +48,9 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
     args: [params.proposals, userVotedOption, 1],
     onSuccess(data) {
       console.log('Success creating the proposal', data)
-      setUserExecutedVote(true)
+      addAlert("We got your vote!", data.hash)
     },
   });
-
-  const { address, isConnecting, isDisconnected } = useAccount()
 
   const votingPercentages = () => {
     if (!proposal.tally) return { yes: 0, no: 0, abstain: 0 }
@@ -59,7 +59,6 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
     let noVotes = Number(formatUnits(proposal.tally.no || BigInt(0), 18));
     let abstainVotes = Number(formatUnits(proposal.tally.abstain || BigInt(0), 18));
     let totalVotes = yesVotes + noVotes + abstainVotes;
-
 
     return {
       yes: yesVotes / totalVotes * 100,
@@ -72,20 +71,23 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
 
   const voteFor = (option: number) => {
     setUserVotedOption(option)
-    voteWrite?.()
     setShowVotingModal(false)
   }
 
-  if (proposal.title) return (
+  useEffect(() => {
+    if (userVotedOption && !showVotingModal) voteWrite?.()
+  }, [userVotedOption, showVotingModal])
+
+  if (proposal.title && proposal?.parameters?.supportThreshold) return (
     <section className="pb-6 pt-10 min-h-screen p-24 dark:bg-dark lg:pb-[15px] lg:pt-[20px]">
       <div className="flex justify-between px-4 py-5 xs:px-10 md:px-6 lg:px-7 ">
         <ProposalHeader proposalNumber={Number(params.proposals)} proposal={proposal} userVote={userVote()} userCanVote={userCanVote as boolean} setShowVotingModal={setShowVotingModal} />
       </div>
 
       <div className="grid grid-cols-3 my-12">
-        <VoteTally voteType="For" voteCount={proposal?.tally?.yes} votePercentage={votingPercentages().yes} votes={votes} color="success" />
-        <VoteTally voteType="Against" voteCount={proposal?.tally?.no} votePercentage={votingPercentages().no} votes={votes} color="critical" />
-        <VoteTally voteType="Abstain" voteCount={proposal?.tally?.abstain} votePercentage={votingPercentages().abstain} votes={votes} color="neutral" />
+        <VoteTally voteType="For" voteCount={proposal?.tally?.yes} votePercentage={votingPercentages().yes} votes={votes} color="success" option={2} />
+        <VoteTally voteType="Against" voteCount={proposal?.tally?.no} votePercentage={votingPercentages().no} votes={votes} color="critical" option={3} />
+        <VoteTally voteType="Abstain" voteCount={proposal?.tally?.abstain} votePercentage={votingPercentages().abstain} votes={votes} color="neutral" option={1} />
 
         <ProposalDetails supportThreshold={proposal.parameters.supportThreshold} endDate={proposal.parameters.endDate} snapshotBlock={proposal.parameters.snapshotBlock} />
       </div>

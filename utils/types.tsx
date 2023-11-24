@@ -77,3 +77,9 @@ export type VoteCastEvent = {
   voteOption: number;
   votingPower: bigint;
 }
+
+export interface IAlert {
+  message: string;
+  txHash: string;
+  id: number;
+}

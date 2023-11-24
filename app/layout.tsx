@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google'
 import { Web3Modal } from "./context/Web3Modal";
 import Header from "./containers/header";
 import Sidebar from "./containers/sidebar";
-
 import '@aragon/ods/index.css';
 import './globals.css'
 

@@ -54,7 +54,18 @@ const wagmiConfig = createConfig({
 })
 
 // 3. Create modal
-createWeb3Modal({ wagmiConfig, projectId, chains })
+createWeb3Modal({ 
+  wagmiConfig, 
+  projectId, 
+  chains,
+  themeVariables: {
+    // '--w3m-color-mix': '#00BB7F',
+    '--w3m-accent': '#3164FA',
+    '--w3m-color-mix': '#3164FA',
+    '--w3m-color-mix-strength': 30,
+    '--w3m-border-radius-master': '12px'
+  }
+})
 
 const queryClient = new QueryClient();
 

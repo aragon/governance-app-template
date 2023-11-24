@@ -23,16 +23,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-white`}>
-        <div className="w-full h-full">
-          <div className="flex flex-no-wrap h-full">
+          <div className="flex h-screen ">
             <Sidebar />
-            <div className="container">
+            <div className="overflow-y-auto flex flex-col items-center">
+              <div className="w-3/4">
               <Header />
               <Web3Modal>
                 {children}
               </Web3Modal>
+              </div>
             </div>
-          </div>
         </div>
       </body>
     </html>

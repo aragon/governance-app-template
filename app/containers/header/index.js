@@ -1,9 +1,10 @@
+'use client'
+
 const Header = () => {
+
     return (
         <div className="flex flex-row-reverse w-full mt-5">
-            <div className="w-50">
-                <w3m-button />
-            </div>
+            <w3m-button balance="hide" />
         </div>
     )
 }

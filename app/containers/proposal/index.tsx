@@ -25,10 +25,10 @@ export default function Proposal(props: ProposalInputs) {
   const proposal = useProposal(publicClient, pluginAddress, props.proposalId.toString());
 
   if (proposal.title) return (
-    <section className="pb-6 pt-10 lg:pb-[15px] lg:pt-[20px] w-5/6">
-      <Link href={`/proposals/${props.proposalId}`} className="bg-neutral-50 flex justify-between rounded-2xl border border-stroke border-neutral-200 shadow-md px-4 py-5 xs:px-10 md:px-6 lg:px-7 cursor-pointer">
+    <section className="pb-6 pt-10 lg:pb-[15px] lg:pt-[20px] w-full">
+      <Link href={`/proposals/${props.proposalId}`} className="bg-neutral-50 flex justify-between rounded-xl border border-stroke border-neutral-200 shadow-md px-4 py-5 xs:px-10 md:px-6 lg:px-7 cursor-pointer">
         <div className="">
-          <h4 className="mb-1 text-l font-semibold text-dark xs:text-l md:text-m lg:text-l">
+          <h4 className="mb-1 text-lg font-semibold text-dark">
             {Number(props.proposalId) + 1} - {proposal.title}
           </h4>
           <p className="text-base text-body-color">
@@ -43,7 +43,7 @@ export default function Proposal(props: ProposalInputs) {
                 size="lg"
                 variant={getProposalVariantStatus((proposal as Proposal)).variant}
               >
-                { getProposalVariantStatus((proposal as Proposal)).label}
+                {getProposalVariantStatus((proposal as Proposal)).label}
               </Button>
             )}
           </div>

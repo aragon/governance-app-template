@@ -8,7 +8,7 @@ export default function VotesSection({ votes }: { votes: Array<VoteCastEvent> })
     <div className="grid grid-cols-3 my-14">
       <div className="flex flex-col space-between m-2 gap-4">
         {votes.filter(vote => vote.voteOption === 2).length >= 0 && votes.filter(vote => vote.voteOption === 2).map(vote => (
-          <div className="border border-neutral-200 rounded-2xl py-6 px-6">
+          <div key={vote.voter} className="border border-neutral-200 rounded-2xl py-6 px-6">
             <div className="flex flex-row space-between">
               <div className="flex flex-grow">
                 <Blockies
@@ -29,7 +29,7 @@ export default function VotesSection({ votes }: { votes: Array<VoteCastEvent> })
       </div>
       <div className="flex flex-col space-between m-2 gap-4">
         {votes.filter(vote => vote.voteOption === 0).length >= 0 && votes.filter(vote => vote.voteOption === 0).map(vote => (
-          <div className="border border-neutral-200 rounded-2xl py-6 px-6">
+          <div key={vote.voter} className="border border-neutral-200 rounded-2xl py-6 px-6">
             <div className="flex flex-row space-between">
               <div className="flex flex-grow">
                 <Blockies
@@ -50,7 +50,7 @@ export default function VotesSection({ votes }: { votes: Array<VoteCastEvent> })
       </div>
       <div className="flex flex-col space-between m-2 gap-4">
         {votes.filter(vote => vote.voteOption === 1).length >= 0  && votes.filter(vote => vote.voteOption === 1).map(vote => (
-          <div className="border border-neutral-200 rounded-2xl py-6 px-6">
+          <div key={vote.voter} className="border border-neutral-200 rounded-2xl py-6 px-6">
             <div className="flex flex-row space-between">
               <div className="flex flex-grow">
                 <Blockies

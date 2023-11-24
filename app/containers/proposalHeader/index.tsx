@@ -1,4 +1,4 @@
-import { AlertCard, Button } from '@aragon/ods'
+import { AlertInline, Button } from '@aragon/ods'
 import { Proposal } from '@/utils/types'
 import { formatAddress } from '@/utils/addressHelper';
 import * as dayjs from 'dayjs'
@@ -31,16 +31,17 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
 
   return (
     <div className="w-full">
-      <div className="flex flex-row pb-2 content-center items-center ">
+      <div className="flex flex-row pb-2 h-16 items-center">
         <div className="flex flex-grow">
-          <h4 className="text-xl font-semibold text-neutral-600 align-middle">
+          <span className="text-xl font-semibold text-neutral-700 pt-1">
             Proposal {proposalNumber + 1}
-          </h4>
-          <div className="pl-3 align-middle">
+          </span>
+          <div className="pl-5">
+            {/** bg-info-400 bg-success-400 bg-critical-400 */}
             {proposal.tally && (
-              <AlertCard
-                className="flex h-5 items-center"
-                description={getProposalVariantStatus((proposal as Proposal)).label}
+              <AlertInline
+                className={`border border-${getProposalVariantStatus((proposal as Proposal)).variant}-400 py-2 px-4 rounded-xl`}
+                message={getProposalVariantStatus((proposal as Proposal)).label}
                 variant={getProposalVariantStatus((proposal as Proposal)).variant}
               />
             )}

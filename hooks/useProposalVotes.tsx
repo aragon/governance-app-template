@@ -19,7 +19,7 @@ export function useProposalVotes(publicClient: any, address: Address, proposalId
           proposalId,
         } as any,
         fromBlock: proposal.parameters.snapshotBlock,
-        toBlock: 'pending',
+        toBlock: 'latest',
       });
       setLogs(logs.flatMap(log => log.args));
       setCentinel(true)

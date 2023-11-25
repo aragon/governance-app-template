@@ -6,6 +6,7 @@ import { IAlert } from '@/utils/types'
 import { formatAddress } from '@/utils/addressHelper';
 import { Address } from 'viem';
 import { useWaitForTransaction } from 'wagmi'
+import { Icon, IconType } from '@aragon/ods';
 
 
 const Alert: React.FC<IAlert> = ({ message, txHash, id }) => {
@@ -16,8 +17,7 @@ const Alert: React.FC<IAlert> = ({ message, txHash, id }) => {
     hash: txHash as `0x${string}`,
   })
 
-  // Listen for transaction status here
-  // Update the alert based on the transaction status
+
 
 
   useEffect(() => {
@@ -36,13 +36,25 @@ const Alert: React.FC<IAlert> = ({ message, txHash, id }) => {
   }, [isSuccess, removeAlert])
 
   if (!hide) return (
-    <div className={`fixed bottom-0 right-0 bg-${isSuccess ? 'success' : 'primary'}-100 text-neutral-900 p-4 m-4 rounded`}>
-      <p className="text-xl font-semibold">{message}</p>
-      {isSuccess
-        ? (<p className="">Check your tx: <span className="underline font-semibold font-primary-500">{formatAddress(txHash as Address)}</span></p>)
-        : (<p className="">Your tx <span className="underline font-semibold font-primary-500">{formatAddress(txHash as Address)} </span>is confirmed</p>)
-      }
-    </div>
+    <>
+      {/** bg-success-50 bg-primary-50 text-success-900 text-primary-900 */}
+      <div className={`fixed bottom-0 right-0 ${isSuccess ? 'bg-success-100 border-success-500' : 'bg-primary-100 border-primary-500'} text-neutral-900 shadow-xl py-6 px-5 m-10 rounded-xl border w-96`}>
+        <div className="flex flex-row gap-2">
+          <Icon
+            className={`rounded-full ${isSuccess ? 'bg-success-300 text-success-900' : 'bg-primary-300 text-primary-900'} p-2 w-14 h-14 self-center`}
+            size="lg"
+            icon={IconType.APP_GOVERNANCE}
+          />
+          <div className="flex flex-col pl-1">
+            <p className={`text-xl font-semibold ${isSuccess ? 'text-success-900' : 'text-primary-900'} pb-2`}>{message}</p>
+            {isSuccess
+              ? (<p className={isSuccess ? 'text-success-900' : 'text-primary-900'}>Check your tx: <span className="underline font-semibold">{formatAddress(txHash as Address)}</span></p>)
+              : (<p className={isSuccess ? 'text-success-900' : 'text-primary-900'}>Your tx <span className="underline font-semibold">{formatAddress(txHash as Address)} </span>is confirmed</p>)
+            }
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

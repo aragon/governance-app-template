@@ -1,13 +1,15 @@
 "use client"
 
 import { create } from 'ipfs-http-client';
-import { Button, IconType } from '@aragon/ods'
+import { Button, IconType, Icon } from '@aragon/ods'
 import React, { useEffect, useState } from 'react'
 import { uploadToIPFS } from '@/utils/ipfs'
 import { useContractWrite } from 'wagmi';
 import { Address, toHex } from 'viem'
 import { TokenVotingAbi } from '@/artifacts/TokenVoting.sol';
 import { useAlertContext } from '../context/AlertContext';
+import WithdrawalInput from '@/app/containers/withdrawalInput'
+import { Action } from '@/utils/types'
 
 const ipfsEndpoint = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
 const ipfsKey = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
@@ -15,21 +17,30 @@ const pluginAddress = ((process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address
 
 const auth = ipfsKey; // Replace YOUR_API_KEY with your actual API key
 
+enum ActionType {
+    Signaling,
+    Withdrawal,
+    Custom
+}
 
 export default function Create() {
     const [ipfsPin, setIpfsPin] = useState<string>('');
     const [title, setTitle] = useState<string>();
     const [summary, setSummary] = useState<string>();
+    const [toVariable, setToVariable] = useState<string>();
+    const [valueVariable, setValueVariable] = useState<string>();
+    const [actionToExecute, setActionToExecute] = useState<Action[]>([]);
     const { addAlert } = useAlertContext()
     const { write: createProposalWrite } = useContractWrite({
         abi: TokenVotingAbi,
         address: pluginAddress,
         functionName: 'createProposal',
-        args: [toHex(ipfsPin), [], 0, 0, 0, 0, 0],
+        args: [toHex(ipfsPin), actionToExecute, 0, 0, 0, 0, 0],
         onSuccess(data) {
             addAlert("We got your proposal!", data.hash)
         },
     });
+    const [actionType, setActionType] = useState<ActionType>(ActionType.Signaling)
 
     const client = create({
         url: ipfsEndpoint,
@@ -41,12 +52,22 @@ export default function Create() {
         if (ipfsPin !== '') createProposalWrite?.()
     }, [ipfsPin])
 
+    useEffect(() => {
+        if (toVariable && valueVariable) {
+            setActionToExecute([{
+                to: toVariable,
+                value: BigInt(valueVariable),
+                data: ""
+            }])
+        }
+    }, [toVariable, valueVariable])
+
     const submitIPFS = async () => {
         const proposalMetadataJsonObject = { title, summary };
         const blob = new Blob([JSON.stringify(proposalMetadataJsonObject)], { type: 'application/json' });
 
         const ipfsPin = await uploadToIPFS(client, blob);
-        setIpfsPin(ipfsPin)
+        setIpfsPin(ipfsPin!)
     }
 
     const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,9 +77,16 @@ export default function Create() {
         setSummary(event?.target?.value);
     };
 
+    const handleToVariable = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setToVariable(event?.target?.value);
+    }
+
+    const handleValueVariable = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setValueVariable(event?.target?.value);
+    }
     return (
         <main className="flex pt-12 w-screen max-w-full">
-            <div className="w-2/4 max-w-2xl mx-auto">
+            <div className="w-2/4 mx-auto">
                 <h1 className="font-semibold text-neutral-900 text-3xl mb-10">Create Proposal</h1>
                 <div className="mb-6 pb-6">
                     <label className="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Title</label>
@@ -71,7 +99,7 @@ export default function Create() {
                     />
                 </div>
                 <div className="mb-6">
-                    <label className="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Summary</label>
+                    <label className="block mb-2 text-lg text-gray-900 ">Summary</label>
                     <textarea
                         id="message"
                         rows={6}
@@ -80,6 +108,45 @@ export default function Create() {
                         value={summary}
                         onChange={handleSummaryInput}
                     ></textarea>
+                </div>
+                <div className="mb-6">
+                    <span className="block mb-2 text-lg text-gray-900 ">Select proposal action</span>
+                    <div className="grid grid-cols-3 gap-5 h-48">
+                        <div
+                            onClick={() => setActionType(ActionType.Signaling)}
+                            className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Signaling ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
+                            <Icon
+                                className="h-12 w-12 p-2 rounded-full bg-primary-100 text-primary-600 my-10"
+                                icon={IconType.INFO}
+                                size="lg"
+                            />
+                            <h3 className="font-semibold text-lg">Signaling proposal</h3>
+                        </div>
+                        <div
+                            onClick={() => setActionType(ActionType.Withdrawal)}
+                            className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Withdrawal ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
+                            <Icon
+                                className="h-12 w-12 p-1 rounded-full bg-primary-100 text-primary-600 my-10"
+                                icon={IconType.TX_WITHDRAW}
+                                size="lg"
+                            />
+                            <h3 className="font-semibold text-lg">DAO Payment</h3>
+                        </div>
+                        <div
+                            onClick={() => setActionType(ActionType.Custom)}
+                            className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Custom ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
+                            <Icon
+                                className="h-12 w-12 p-2 rounded-full bg-primary-100 text-primary-600 my-10"
+                                icon={IconType.BLOCKCHAIN}
+                                size="lg"
+                            />
+                            <h3 className="font-semibold text-lg">Custom action</h3>
+                        </div>
+                    </div>
+                    <div className="mb-6">
+                        {actionType === ActionType.Withdrawal && (<WithdrawalInput toVariable={toVariable} toFunction={handleToVariable} valueVariable={valueVariable} valueFunction={handleValueVariable} />)}
+                        {actionType === ActionType.Custom && (<p className="text-2xl font-semibold text-neutral-600 my-10 italic">...Coming soon...</p>)}
+                    </div>
                 </div>
 
                 <Button

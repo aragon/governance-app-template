@@ -24,7 +24,7 @@ export default function ProposalDescription(proposal: Proposal) {
   const [decodedActions, setDecodedActions] = useState<FunctionData[]>([])
 
   const getFunctionData = async (action: Action) => {
-    const abiLoader = new whatsabi.loaders.EtherscanABILoader({apiKey: etherscanKey});
+    const abiLoader = new whatsabi.loaders.EtherscanABILoader({ apiKey: etherscanKey });
 
     const { abi } = await whatsabi.autoload(action.to, {
       provider: publicClient,
@@ -36,12 +36,17 @@ export default function ProposalDescription(proposal: Proposal) {
       abi,
       data: action.data as Address
     })
-  } 
+  }
 
   const fetchActionData = useCallback(async () => {
     var decodedActions = await Promise.all(proposal.actions.map(async (action) => {
-      const functionData = await getFunctionData(action)
-      return {...functionData, to: action.to} as FunctionData
+      let functionData: any;
+      if (action.data != '0x') {
+        functionData = await getFunctionData(action)
+      } else {
+        functionData = { functionName: 'transfer', args: [action.value] }
+      }
+      return { ...functionData, to: action.to } as FunctionData
     }))
     setDecodedActions(decodedActions)
   }, [])
@@ -59,7 +64,7 @@ export default function ProposalDescription(proposal: Proposal) {
         {!proposal.actions.length && <span className="pt-2">No actions in this proposal</span>}
         {decodedActions?.length >= 0 && decodedActions.map((action, i) => (
           <div key={`${i}-${action.to}-${action.functionName}`}>
-            <p className="leading-6">{i+1}. <span className="text-primary-500 underline">{action.to}</span>.{action.functionName}(</p>
+            <p className="leading-6">{i + 1}. <span className="text-primary-500 underline">{action.to}</span>.{action.functionName}(</p>
             <div className="pl-10">
               {
                 action?.args?.map((arg: any, j: number) => (
@@ -68,8 +73,8 @@ export default function ProposalDescription(proposal: Proposal) {
                   </div>
                 ))
               }
-          </div>
-              <p className="pl-5">)</p>
+            </div>
+            <p className="pl-5">)</p>
           </div>
         ))
         }

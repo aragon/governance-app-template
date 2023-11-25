@@ -54,7 +54,7 @@ export default function ProposalDescription(proposal: Proposal) {
         {!proposal.actions.length && <span className="pt-2">No actions in this proposal</span>}
         {decodedActions?.length >= 0 && decodedActions.map((action, i) => (
           <div key={`${i}-${action.to}-${action.functionName}`}>
-            <p>{i} - <span className="text-primary-500 underline">{formatAddress(action.to)}</span>.{action.functionName}(</p>
+            <p>{i} - <span className="text-primary-500 underline">{action.to}</span>.{action.functionName}(</p>
             <div className="pl-4">
               {
                 action?.args?.map((arg: any, j: number) => (

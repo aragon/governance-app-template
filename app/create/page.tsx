@@ -57,8 +57,9 @@ export default function Create() {
     };
 
     return (
-        <main className="flex pt-24">
+        <main className="flex pt-12 w-screen max-w-full">
             <div className="w-2/4 max-w-2xl mx-auto">
+                <h1 className="font-semibold text-neutral-900 text-3xl mb-10">Create Proposal</h1>
                 <div className="mb-6 pb-6">
                     <label className="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Title</label>
                     <input
@@ -82,12 +83,11 @@ export default function Create() {
                 </div>
 
                 <Button
-                    iconLeft={IconType.ADD}
                     size="lg"
                     variant='primary'
                     onClick={() => submitIPFS()}
                 >
-                    Submit Proposal
+                    Submit
                 </Button>
             </div>
         </main>

@@ -18,8 +18,6 @@ const Alert: React.FC<IAlert> = ({ message, txHash, id }) => {
   })
 
 
-
-
   useEffect(() => {
     // Remove the alert after 5 seconds
     const timer = setTimeout(() => {

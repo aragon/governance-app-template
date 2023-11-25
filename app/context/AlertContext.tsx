@@ -12,13 +12,7 @@ export interface AlertContextProps {
 export const AlertContext = createContext<AlertContextProps | undefined>(undefined);
 
 export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [alerts, setAlerts] = useState<IAlert[]>([
-    {
-        id: 0,
-        message: "We got your vote!",
-        txHash: "0xadc5793f5e33f3137d3a2bd6e2ee32f59b7a6ddf7fc2d8fd01516e777804dbf8"
-    }
-  ]);
+  const [alerts, setAlerts] = useState<IAlert[]>([]);
 
   // Function to add a new alert
   const addAlert = (message: string, txHash: string) => {

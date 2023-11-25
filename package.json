@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@aragon/ods": "^1.0.5",
+    "@shazow/whatsabi": "^0.9.1",
     "@web3modal/wagmi": "^3.3.1",
     "dayjs": "^1.11.10",
     "ipfs-http-client": "^60.0.1",

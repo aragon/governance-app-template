@@ -115,8 +115,9 @@ export default function Create() {
                         <div
                             onClick={() => setActionType(ActionType.Signaling)}
                             className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Signaling ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
+
                             <Icon
-                                className="h-12 w-12 p-2 rounded-full bg-primary-100 text-primary-600 my-10"
+                                className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
                                 icon={IconType.INFO}
                                 size="lg"
                             />
@@ -126,7 +127,7 @@ export default function Create() {
                             onClick={() => setActionType(ActionType.Withdrawal)}
                             className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Withdrawal ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
                             <Icon
-                                className="h-12 w-12 p-1 rounded-full bg-primary-100 text-primary-600 my-10"
+                                className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
                                 icon={IconType.TX_WITHDRAW}
                                 size="lg"
                             />
@@ -136,7 +137,7 @@ export default function Create() {
                             onClick={() => setActionType(ActionType.Custom)}
                             className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Custom ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
                             <Icon
-                                className="h-12 w-12 p-2 rounded-full bg-primary-100 text-primary-600 my-10"
+                                className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
                                 icon={IconType.BLOCKCHAIN}
                                 size="lg"
                             />
@@ -150,6 +151,7 @@ export default function Create() {
                 </div>
 
                 <Button
+                className='mt-14'
                     size="lg"
                     variant='primary'
                     onClick={() => submitIPFS()}
@@ -160,3 +162,4 @@ export default function Create() {
         </main>
     )
 }
+

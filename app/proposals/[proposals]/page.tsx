@@ -24,12 +24,6 @@ import { useAlertContext, AlertContext, AlertContextProps } from '@/app/context/
 
 const pluginAddress = ((process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address)
 
-const getProposalVariantStatus = (proposal: Proposal) => {
-  return {
-    variant: proposal?.open ? 'info' : proposal?.executed ? 'success' : proposal?.tally?.no >= proposal?.tally?.yes ? 'critical' : 'success',
-    label: proposal?.open ? 'Open' : proposal?.executed ? 'Executed' : proposal?.tally!.no >= proposal?.tally!.yes ? 'Defeated' : 'To Execute',
-  }
-}
 
 export default function Proposal({ params }: { params: { proposals: string } }) {
   const publicClient = usePublicClient()
@@ -79,7 +73,7 @@ export default function Proposal({ params }: { params: { proposals: string } }) 
   }, [userVotedOption, showVotingModal])
 
   if (proposal.title && proposal?.parameters?.supportThreshold) return (
-    <section className="flex flex-col items-center mt-12 w-screen max-w-full min-w-full">
+    <section className="flex flex-col items-center  w-screen max-w-full min-w-full">
       <div className="flex justify-between px-4 py-5 w-full">
         <ProposalHeader proposalNumber={Number(params.proposals)} proposal={proposal} userVote={userVote()} userCanVote={userCanVote as boolean} setShowVotingModal={setShowVotingModal} />
       </div>

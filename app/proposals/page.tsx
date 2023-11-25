@@ -25,7 +25,7 @@ export default function Proposals() {
   })
 
   return (
-    <main className="flex flex-col items-center mt-12">
+    <main className="flex flex-col items-center mt-6 w-screen max-w-full">
       <div className="flex flex-row justify-between content-center w-full mb-6">
         <h1 className="justify-self-start text-3xl font-semibold align-middle">Proposals</h1>
         <div className="justify-self-end">

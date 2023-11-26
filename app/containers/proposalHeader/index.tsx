@@ -20,7 +20,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
   }
 
   const getUserVoteData = () => {
-    if (userVote === 0) {
+    if (userVote === 3) {
       return { variant: 'critical', label: 'Against' }
     } else if (userVote === 1) {
       return { variant: 'tertiary', label: 'Abstain' }

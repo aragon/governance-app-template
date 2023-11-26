@@ -1,7 +1,7 @@
 'use client'
 
 import { AlertContext } from '@/app/context/AlertContext';
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState, useRef } from 'react';
 import { IAlert } from '@/utils/types'
 import { formatAddress } from '@/utils/addressHelper';
 import { Address } from 'viem';
@@ -16,22 +16,28 @@ const Alert: React.FC<IAlert> = ({ message, txHash, id }) => {
   const { isSuccess } = useWaitForTransaction({
     hash: txHash as `0x${string}`,
   })
-
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    // Remove the alert after 5 seconds
-    const timer = setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       setHide(true);
-    }, 5000);
+    }, 4000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, [id, setHide]);
 
   useEffect(() => {
     if (isSuccess) {
-      removeAlert(id)
+        removeAlert(id);
+        setHide(false);
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => {
+          setHide(true);
+        }, 4000);
     }
-  }, [isSuccess, removeAlert])
+  }, [isSuccess, removeAlert]);
 
   if (!hide) return (
     <>
@@ -46,8 +52,8 @@ const Alert: React.FC<IAlert> = ({ message, txHash, id }) => {
           <div className="flex flex-col pl-1">
             <p className={`text-xl font-semibold ${isSuccess ? 'text-success-900' : 'text-primary-900'} pb-2`}>{message}</p>
             {isSuccess
-              ? (<p className={isSuccess ? 'text-success-900' : 'text-primary-900'}>Check your tx: <span className="underline font-semibold">{formatAddress(txHash as Address)}</span></p>)
-              : (<p className={isSuccess ? 'text-success-900' : 'text-primary-900'}>Your tx <span className="underline font-semibold">{formatAddress(txHash as Address)} </span>is confirmed</p>)
+              ? (<p className={'text-success-900'}>Your tx <span className="underline font-semibold">{formatAddress(txHash as Address)} </span>is confirmed</p>)
+              : (<p className={'text-primary-900'}>Check your tx: <span className="underline font-semibold">{formatAddress(txHash as Address)}</span></p>)
             }
           </div>
         </div>

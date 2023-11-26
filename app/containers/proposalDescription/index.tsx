@@ -3,7 +3,6 @@ import { whatsabi } from "@shazow/whatsabi";
 import { useCallback, useEffect, useState } from "react";
 import { usePublicClient } from "wagmi";
 import { Address, decodeFunctionData } from 'viem'
-import { formatAddress } from "@/utils/addressHelper";
 
 
 type FunctionData = {

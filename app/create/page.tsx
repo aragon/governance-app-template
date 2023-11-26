@@ -9,6 +9,7 @@ import { Address, toHex } from 'viem'
 import { TokenVotingAbi } from '@/artifacts/TokenVoting.sol';
 import { useAlertContext } from '../context/AlertContext';
 import WithdrawalInput from '@/app/containers/withdrawalInput'
+import CustomActionInput from '@/app/containers/customActionInput'
 import { Action } from '@/utils/types'
 
 const ipfsEndpoint = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
@@ -27,15 +28,13 @@ export default function Create() {
     const [ipfsPin, setIpfsPin] = useState<string>('');
     const [title, setTitle] = useState<string>();
     const [summary, setSummary] = useState<string>();
-    const [toVariable, setToVariable] = useState<string>();
-    const [valueVariable, setValueVariable] = useState<string>();
-    const [actionToExecute, setActionToExecute] = useState<Action[]>([]);
+    const [action, setAction] = useState<Action[]>([]);
     const { addAlert } = useAlertContext()
     const { write: createProposalWrite } = useContractWrite({
         abi: TokenVotingAbi,
         address: pluginAddress,
         functionName: 'createProposal',
-        args: [toHex(ipfsPin), actionToExecute, 0, 0, 0, 0, 0],
+        args: [toHex(ipfsPin), [action], 0, 0, 0, 0, 0],
         onSuccess(data) {
             addAlert("We got your proposal!", data.hash)
         },
@@ -48,19 +47,9 @@ export default function Create() {
     });
 
     useEffect(() => {
-        console.log("Contract proposal thingy")
+        console.log("Contract proposal thingy: ", action)
         if (ipfsPin !== '') createProposalWrite?.()
     }, [ipfsPin])
-
-    useEffect(() => {
-        if (toVariable && valueVariable) {
-            setActionToExecute([{
-                to: toVariable,
-                value: BigInt(valueVariable),
-                data: ""
-            }])
-        }
-    }, [toVariable, valueVariable])
 
     const submitIPFS = async () => {
         const proposalMetadataJsonObject = { title, summary };
@@ -77,16 +66,10 @@ export default function Create() {
         setSummary(event?.target?.value);
     };
 
-    const handleToVariable = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setToVariable(event?.target?.value);
-    }
 
-    const handleValueVariable = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setValueVariable(event?.target?.value);
-    }
     return (
         <main className="flex pt-12 w-screen max-w-full">
-            <div className="w-2/4 mx-auto">
+            <div className="w-3/4 mx-auto">
                 <h1 className="font-semibold text-neutral-900 text-3xl mb-10">Create Proposal</h1>
                 <div className="mb-6 pb-6">
                     <label className="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Title</label>
@@ -145,13 +128,13 @@ export default function Create() {
                         </div>
                     </div>
                     <div className="mb-6">
-                        {actionType === ActionType.Withdrawal && (<WithdrawalInput toVariable={toVariable} toFunction={handleToVariable} valueVariable={valueVariable} valueFunction={handleValueVariable} />)}
-                        {actionType === ActionType.Custom && (<p className="text-2xl font-semibold text-neutral-600 my-10 italic">...Coming soon...</p>)}
+                        {actionType === ActionType.Withdrawal && (<WithdrawalInput setAction={setAction} />)}
+                        {actionType === ActionType.Custom && (<CustomActionInput setAction={setAction} />)}
                     </div>
                 </div>
 
                 <Button
-                className='mt-14'
+                    className='mt-14'
                     size="lg"
                     variant='primary'
                     onClick={() => submitIPFS()}

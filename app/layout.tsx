@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${manrope.className} bg-white`}>
+      <body className={`${manrope.className} bg-primary-50`}>
         <div className="flex h-screen ">
           <Sidebar />
           <div className="overflow-y-auto flex flex-col items-center w-full">

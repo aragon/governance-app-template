@@ -13,9 +13,10 @@ type FunctionData = {
 
 const etherscanKey: string = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY || "";
 
-const isAddress = (maybeAddress: string) => {
-  if (maybeAddress.length === 42 && maybeAddress.startsWith('0x')) return true
-  return false
+const isAddress = (maybeAddress: any) => {
+  if (!maybeAddress || typeof maybeAddress !== "string") return false
+  else if (!maybeAddress.match(/^0x[0-9a-fA-F]{40}$/)) return false
+  return true
 }
 
 export default function ProposalDescription(proposal: Proposal) {
@@ -58,7 +59,7 @@ export default function ProposalDescription(proposal: Proposal) {
   return (
     <div className="pt-2">
       <p className="pb-6">{proposal?.summary}</p>
-      <h2 className="flex-grow text-2xl text-neutral-900 font-semibold pt-10 pb-3">To execute</h2>
+      <h2 className="flex-grow text-2xl text-neutral-900 font-semibold pt-10 pb-3">Actions</h2>
       <div className="flex flex-row space-between">
         {!proposal.actions.length && <span className="pt-2">No actions in this proposal</span>}
         {decodedActions?.length >= 0 && decodedActions.map((action, i) => (

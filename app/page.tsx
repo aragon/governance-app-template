@@ -13,7 +13,7 @@ export default function Home() {
 
       {/* Section 2: About Us Section */}
       <Section>
-        <h2 className="text-3xl font-bold">About Us</h2>
+        <h2 className="text-2xl font-bold">About Us</h2>
         <p className="text-lg">
           We are a team of professionals dedicated to providing the best
           service.
@@ -22,13 +22,13 @@ export default function Home() {
 
       {/* Section 3: Contact Us Section */}
       <Section>
-        <h2 className="text-3xl font-bold">FAQ</h2>
+        <h2 className="text-2xl font-bold">FAQ</h2>
         <p className="text-lg">
           Let us resolve your questions, we know what we are doing.
         </p>
       </Section>
       <Section>
-        <h2 className="text-3xl font-bold">Contact Us</h2>
+        <h2 className="text-2xl font-bold">Contact Us</h2>
         <p className="text-lg">Get in touch with us for more information.</p>
       </Section>
     </main>

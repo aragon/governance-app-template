@@ -87,8 +87,9 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
                 <div className="flex h-96 bg-neutral-50 rounded-lg border border-neutral-200">
                     <div className="w-2/5 bg-gray-200 px-2 py-4 overflow-y-auto overflow-x-auto border-r border-neutral-200">
                         <ul className="space-y-2">
-                            {abi?.map(abiItemSelection => (
+                            {abi?.map((abiItemSelection, idx) => (
                                 <li
+                                    key={idx}
                                     onClick={() => { setAbiItem(abiItemSelection as AbiFunction) }}
                                     className={`w-full text-left font-sm hover:bg-neutral-100 py-3 px-4 rounded-2xl hover:cursor-pointer ${abiItemSelection.name === abiItem?.name && 'bg-neutral-100 font-semibold'}`}>
                                     {abiItemSelection.name}
@@ -101,7 +102,7 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
                             <div className="">
                                 <p className="text-xl font-semibold text-neutral-800 pt-1 pb-3 px-6 border-b border-neutral-200">{abiItem.name}</p>
                                 {abiItem.inputs.map((itemInputs, i) => (
-                                    <div className="my-4 mx-6">
+                                    <div key={i} className="my-4 mx-6">
                                         <label className="block mb-2 text-md font-medium text-neutral-700">{itemInputs.type}:</label>
                                         <input
                                             value={abiInputValues[i] || ''}

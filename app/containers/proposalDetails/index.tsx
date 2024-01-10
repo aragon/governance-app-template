@@ -19,7 +19,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
           Threshold
         </h2>
         <div className="items-right text-right flex-wrap">
-          <span className="text-xl font-semibold">{supportThreshold}</span>
+          <span className="text-xl font-semibold">{supportThreshold.toLocaleString()}</span>
           <p className="text-neutral-600">voting power</p>
         </div>
       </Card>

@@ -105,7 +105,7 @@ export default function Proposal({
           />
         </div>
 
-        <div className="grid grid-cols-3 my-10 gap-10 w-full">
+        <div className="grid xl:grid-cols-3 lg:grid-cols-2 my-10 gap-10 w-full">
           <VoteTally
             voteType="Yes"
             voteCount={proposal?.tally?.yes}

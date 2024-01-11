@@ -19,11 +19,8 @@ import { TokenVotingAbi } from "@/artifacts/TokenVoting.sol";
 import VoteTally from "@/app/containers/voteTally";
 import VotingModal from "@/app/containers/votingModal";
 import ProposalDetails from "@/app/containers/proposalDetails";
-import {
-  useAlertContext,
-  AlertContextProps,
-} from "@/app/context/AlertContext";
-import { Else, If, Then, When } from "react-if";
+import { useAlertContext, AlertContextProps } from "@/app/context/AlertContext";
+import { Else, If, IfCase, Then } from "@/app/components/if";
 
 const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
 
@@ -163,23 +160,23 @@ export default function Proposal({
             </div>
           </div>
 
-          <If condition={showDescriptionView}>
+          <IfCase condition={showDescriptionView}>
             <Then>
               <ProposalDescription {...proposal} />
             </Then>
             <Else>
               <VotesSection votes={votes} />
             </Else>
-          </If>
+          </IfCase>
         </div>
 
-        <When condition={showVotingModal}>
+        <If condition={showVotingModal}>
           <VotingModal
             show={showVotingModal}
             setShow={setShowVotingModal}
             voteFor={voteFor}
           />
-        </When>
+        </If>
       </section>
     );
 }

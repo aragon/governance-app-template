@@ -18,7 +18,6 @@
     "react": "^18",
     "react-blockies": "^1.4.1",
     "react-dom": "^18",
-    "react-if": "^4.1.5",
     "react-query": "^3.39.3",
     "tailwindcss-fluid-type": "^2.0.3",
     "viem": "^1.19.1",

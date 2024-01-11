@@ -8,7 +8,7 @@ import { TokenVotingAbi } from "../../artifacts/TokenVoting.sol";
 import { Button, IconType } from "@aragon/ods";
 import { useCanCreateProposal } from "@/hooks/useCanCreateProposal";
 import Link from "next/link";
-import { Else, If, Then, When } from "react-if";
+import { If, IfNot } from "../components/if";
 
 const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
 
@@ -33,29 +33,27 @@ export default function Proposals() {
           Proposals
         </h1>
         <div className="justify-self-end">
-          <When condition={canCreate}>
+          <If condition={canCreate}>
             <Link href="/create">
               <Button iconLeft={IconType.ADD} size="lg" variant="primary">
                 Submit Proposal
               </Button>
             </Link>
-          </When>
+          </If>
         </div>
       </SectionView>
       <If condition={proposalCount}>
-        <Then>
-          {[...Array(proposalCount)].map((_, i) => (
-            <Proposal key={i} proposalId={BigInt(proposalCount! - 1 - i)} />
-          ))}
-        </Then>
-        <Else>
-          <When condition={isLoading}>
-            <SectionView>
-              <p className="justify-self-start">Please wait...</p>
-            </SectionView>
-          </When>
-        </Else>
+        {[...Array(proposalCount)].map((_, i) => (
+          <Proposal key={i} proposalId={BigInt(proposalCount! - 1 - i)} />
+        ))}
       </If>
+      <IfNot condition={proposalCount}>
+        <If condition={isLoading}>
+          <SectionView>
+            <p className="justify-self-start">Please wait...</p>
+          </SectionView>
+        </If>
+      </IfNot>
     </MainSection>
   );
 }

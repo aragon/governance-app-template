@@ -9,27 +9,21 @@ export default function VotesSection({
 }: {
   votes: Array<VoteCastEvent>;
 }) {
-  const yesVotes = votes.filter((vote) => vote.voteOption === 2);
-  const noVotes = votes.filter((vote) => vote.voteOption === 0);
   const abstainVotes = votes.filter((vote) => vote.voteOption === 1);
+  const yesVotes = votes.filter((vote) => vote.voteOption === 2);
+  const noVotes = votes.filter((vote) => vote.voteOption === 3);
 
   return (
     <div className="grid grod-cols-1 lg:grid-cols-2 mt-4 mb-14 gap-4">
-      <div className="flex flex-col space-between">
-        {yesVotes.map((vote) => (
-          <VoteCard vote={vote} type="Yes" />
-        ))}
-      </div>
-      <div className="flex flex-col space-between">
-        {noVotes.map((vote) => (
-          <VoteCard vote={vote} type="No" />
-        ))}
-      </div>
-      <div className="flex flex-col space-between">
-        {abstainVotes.map((vote) => (
-          <VoteCard vote={vote} />
-        ))}
-      </div>
+      {yesVotes.map((vote) => (
+        <VoteCard vote={vote} type="Yes" />
+      ))}
+      {noVotes.map((vote) => (
+        <VoteCard vote={vote} type="No" />
+      ))}
+      {abstainVotes.map((vote) => (
+        <VoteCard vote={vote} />
+      ))}
     </div>
   );
 }

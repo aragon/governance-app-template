@@ -1,7 +1,7 @@
 "use client";
 
 import { useContractRead } from "wagmi";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import Proposal from "../containers/proposal";
 import { Address } from "viem";
 import { TokenVotingAbi } from "../../artifacts/TokenVoting.sol";

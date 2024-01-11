@@ -18,7 +18,7 @@ export const If = ({
   children,
 }: {
   condition: Booleanish;
-  children: ReactNode;
+  children?: ReactNode;
 }) => {
   if (!condition) return <></>;
   return children;
@@ -39,7 +39,7 @@ export const IfNot = ({
   children,
 }: {
   condition: Booleanish;
-  children: ReactNode;
+  children?: ReactNode;
 }) => {
   if (condition) return <></>;
   return children;
@@ -65,7 +65,7 @@ export const IfCase = ({
   children,
 }: {
   condition: Booleanish;
-  children: ReactNode;
+  children?: ReactNode;
 }) => {
   return (
     <IfCaseContext.Provider value={{ condition }}>

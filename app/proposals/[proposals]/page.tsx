@@ -92,91 +92,93 @@ export default function Proposal({
     if (userVotedOption && !showVotingModal) voteWrite?.();
   }, [userVotedOption, showVotingModal]);
 
-  if (proposal.title && proposal?.parameters?.supportThreshold)
-    return (
-      <section className="flex flex-col items-center  w-screen max-w-full min-w-full">
-        <div className="flex justify-between py-5 w-full">
-          <ProposalHeader
-            proposalNumber={Number(params.proposals)}
-            proposal={proposal}
-            userVote={userVote()}
-            userCanVote={userCanVote as boolean}
-            setShowVotingModal={setShowVotingModal}
-          />
-        </div>
+  if (!proposal.title || !proposal?.parameters?.supportThreshold) {
+    return <div><p>Loading, please wait...</p></div>;
+  }
+  return (
+    <section className="flex flex-col items-center w-screen max-w-full min-w-full">
+      <div className="flex justify-between py-5 w-full">
+        <ProposalHeader
+          proposalNumber={Number(params.proposals)}
+          proposal={proposal}
+          userVote={userVote()}
+          userCanVote={userCanVote as boolean}
+          setShowVotingModal={setShowVotingModal}
+        />
+      </div>
 
-        <div className="grid xl:grid-cols-3 lg:grid-cols-2 my-10 gap-10 w-full">
-          <VoteTally
-            voteType="Yes"
-            voteCount={proposal?.tally?.yes}
-            votePercentage={votingPercentages.yes}
-            votes={votes}
-            color="success"
-            option={2}
-          />
-          <VoteTally
-            voteType="No"
-            voteCount={proposal?.tally?.no}
-            votePercentage={votingPercentages.no}
-            votes={votes}
-            color="critical"
-            option={3}
-          />
-          <VoteTally
-            voteType="Abstain"
-            voteCount={proposal?.tally?.abstain}
-            votePercentage={votingPercentages.abstain}
-            votes={votes}
-            color="neutral"
-            option={1}
-          />
+      <div className="grid xl:grid-cols-3 lg:grid-cols-2 my-10 gap-10 w-full">
+        <VoteTally
+          voteType="Yes"
+          voteCount={proposal?.tally?.yes}
+          votePercentage={votingPercentages.yes}
+          votes={votes}
+          color="success"
+          option={2}
+        />
+        <VoteTally
+          voteType="No"
+          voteCount={proposal?.tally?.no}
+          votePercentage={votingPercentages.no}
+          votes={votes}
+          color="critical"
+          option={3}
+        />
+        <VoteTally
+          voteType="Abstain"
+          voteCount={proposal?.tally?.abstain}
+          votePercentage={votingPercentages.abstain}
+          votes={votes}
+          color="neutral"
+          option={1}
+        />
 
-          <ProposalDetails
-            supportThreshold={proposal.parameters.supportThreshold}
-            endDate={proposal.parameters.endDate}
-            snapshotBlock={proposal.parameters.snapshotBlock}
-          />
-        </div>
-        <div className="py-12 w-full">
-          <div className="flex flex-row space-between">
-            <h2 className="flex-grow text-3xl text-neutral-900 font-semibold">
-              {showDescriptionView ? "Description" : "Votes"}
-            </h2>
-            <div className="flex flex-row gap-4">
-              <Button
-                onClick={() => toggleDetailsView(true)}
-                size="lg"
-                variant={showDescriptionView ? "primary" : "secondary"}
-              >
-                Description
-              </Button>
-              <Button
-                onClick={() => toggleDetailsView(false)}
-                size="lg"
-                variant={showDescriptionView ? "secondary" : "primary"}
-              >
-                Votes
-              </Button>
-            </div>
+        <ProposalDetails
+          supportThreshold={proposal.parameters.supportThreshold}
+          endDate={proposal.parameters.endDate}
+          snapshotBlock={proposal.parameters.snapshotBlock}
+        />
+      </div>
+      <div className="py-12 w-full">
+        <div className="flex flex-row space-between">
+          <h2 className="flex-grow text-3xl text-neutral-900 font-semibold">
+            {showDescriptionView ? "Description" : "Votes"}
+          </h2>
+          <div className="flex flex-row gap-4">
+            <Button
+              onClick={() => toggleDetailsView(true)}
+              size="lg"
+              variant={showDescriptionView ? "primary" : "secondary"}
+            >
+              Description
+            </Button>
+            <Button
+              onClick={() => toggleDetailsView(false)}
+              size="lg"
+              variant={showDescriptionView ? "secondary" : "primary"}
+            >
+              Votes
+            </Button>
           </div>
-
-          <IfCase condition={showDescriptionView}>
-            <Then>
-              <ProposalDescription {...proposal} />
-            </Then>
-            <Else>
-              <VotesSection votes={votes} />
-            </Else>
-          </IfCase>
         </div>
 
-        <If condition={showVotingModal}>
-          <VotingModal
-            show={showVotingModal}
-            setShow={setShowVotingModal}
-            voteFor={voteFor}
-          />
-        </If>
-      </section>
-    );
+        <IfCase condition={showDescriptionView}>
+          <Then>
+            <ProposalDescription {...proposal} />
+          </Then>
+          <Else>
+            <VotesSection votes={votes} />
+          </Else>
+        </IfCase>
+      </div>
+
+      <If condition={showVotingModal}>
+        <VotingModal
+          show={showVotingModal}
+          setShow={setShowVotingModal}
+          voteFor={voteFor}
+        />
+      </If>
+    </section>
+  );
 }

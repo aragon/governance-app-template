@@ -53,7 +53,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
 const Card = function ({ children }: { children: ReactNode }) {
   return (
     <div className="p-4 xl:p-6 w-full flex flex-col space-y-6
-    box-border border border-neutral-0
+    box-border border border-neutral-100
     focus:outline-none focus:ring focus:ring-primary
     bg-neutral-0 rounded-xl">
       {children}

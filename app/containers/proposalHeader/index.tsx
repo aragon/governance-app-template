@@ -32,7 +32,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
   return (
     <div className="w-full">
       <div className="flex flex-row pb-2 h-16 items-center">
-        <div className="flex flex-grow">
+        <div className="flex flex-grow justify-between">
           <span className="text-xl font-semibold text-neutral-700 pt-1">
             Proposal {proposalNumber + 1}
           </span>

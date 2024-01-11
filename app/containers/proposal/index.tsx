@@ -48,20 +48,22 @@ export default function Proposal(props: ProposalInputs) {
       <Card>
         <Link
           href={`/proposals/${props.proposalId}`}
-          className="flex justify-between gap-4 px-4 py-5 xs:px-10 md:px-6 lg:px-7 cursor-pointer"
+          className="flex justify-between px-4 py-5 xs:px-10 md:px-6 lg:px-7 cursor-pointer"
         >
-          <div className="md:w-7/12 lg:w-2/3 text-nowrap">
-            <h4 className="mb-1 text-lg font-semibold text-dark text-ellipsis line-clamp-1">
+          <div className="md:w-7/12 lg:w-3/4 xl:4/5 pr-4 text-nowrap text-ellipsis overflow-hidden">
+            <h4 className="mb-1 text-lg font-semibold text-dark line-clamp-1">
               {Number(props.proposalId) + 1} - {proposal.title}
             </h4>
-            <p className="text-base text-body-color text-ellipsis line-clamp-3">{proposal.summary}</p>
+            <p className="text-base text-body-color line-clamp-3">
+              {proposal.summary}
+            </p>
           </div>
 
-          <div className="md:w-5/12 lg:w-1/3">
+          <div className="md:w-5/12 lg:w-1/4 xl:1/5">
             {proposal.tally && (
               <Button
-              className="w-full"
-                size="md"
+                className="w-full"
+                size="sm"
                 variant={getProposalVariantStatus(proposal as Proposal).variant}
               >
                 {getProposalVariantStatus(proposal as Proposal).label}

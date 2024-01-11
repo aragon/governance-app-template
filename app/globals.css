@@ -5,28 +5,50 @@
 @layer base {
   :root {
     --tw-text-opacity: 1;
-    --color-primary-50: 235,242,254;
-    --color-primary-100: 215,230,253;
-    --color-primary-200: 176,205,251;
-    --color-primary-300: 137,180,250;
-    --color-primary-400: 98,155,248;
-    --color-primary-500: 59,130,246;
-    --color-primary-600: 11,97,238;
-    --color-primary-700: 8,75,184;
-    --color-primary-800: 6,53,131;
-    --color-primary-900: 4,31,77;
-    --foreground-rgb: 0, 0, 0;
+    --color-primary-50: rgb(var(--ods-color-neutral-50)); /* former: 235,242,254 */
+    --color-primary-100: rgb(var(--ods-color-neutral-100)); /* former: 215,230,253 */
+    --color-primary-200: rgb(var(--ods-color-neutral-200)); /* former: 176,205,251 */
+    --color-primary-300: rgb(var(--ods-color-neutral-300)); /* former: 137,180,250 */
+    --color-primary-400: rgb(var(--ods-color-neutral-400)); /* former: 98,155,248 */
+    --color-primary-500: rgb(var(--ods-color-neutral-500)); /* former: 59,130,246 */
+    --color-primary-600: rgb(var(--ods-color-neutral-600)); /* former: 11,97,238 */
+    --color-primary-700: rgb(var(--ods-color-neutral-700)); /* former: 8,75,184 */
+    --color-primary-800: rgb(var(--ods-color-neutral-800)); /* former: 6,53,131 */
+    --color-primary-900: rgb(var(--ods-color-neutral-900)); /* former: 4,31,77 */
+    --foreground-rgb: rgb(var(--ods-color-neutral-800));
   }
 }
 
+body {
+  /* Variables imported from layout.tsx > @aragon/ods */
+  color: var(--ods-color-neutral-800);
+  background-color: var(--ods-color-neutral-50);
+  font-family: var(--ods-font-family);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  /* Variables imported from layout.tsx > @aragon/ods */
+  color: var(--ods-color-neutral-800);
+}
+
+p,
+ul,
+ol {
+  /* Variables imported from layout.tsx > @aragon/ods */
+  color: var(--ods-color-neutral-600);
+}
+
+/* Dark mode snippet */
+/* 
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 230, 230, 230;
     --background-rgb: 45, 46, 52;
   }
 }
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background-color: rgb(var(--background-rgb));
-}
+*/

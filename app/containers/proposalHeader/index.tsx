@@ -15,7 +15,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
   const getProposalVariantStatus = (proposal: Proposal) => {
     return {
       variant: proposal?.open ? 'info' : proposal?.executed ? 'success' : proposal?.tally?.no >= proposal?.tally?.yes ? 'critical' : 'success',
-      label: proposal?.open ? 'Open' : proposal?.executed ? 'Executed' : proposal?.tally!.no >= proposal?.tally!.yes ? 'Defeated' : 'To Execute',
+      label: proposal?.open ? 'Open' : proposal?.executed ? 'Executed' : proposal?.tally!.no >= proposal?.tally!.yes ? 'Defeated' : 'Executable',
     }
   }
 
@@ -32,7 +32,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
   return (
     <div className="w-full">
       <div className="flex flex-row pb-2 h-16 items-center">
-        <div className="flex flex-grow">
+        <div className="flex flex-grow justify-between">
           <span className="text-xl font-semibold text-neutral-700 pt-1">
             Proposal {proposalNumber + 1}
           </span>
@@ -72,9 +72,9 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
       </h4>
       <p className="text-base text-l text-body-color dark:text-dark-6">
         Proposed by
-        <span className="text-primary-400 font-semibold underline"> {formatAddress(proposal.args?.creator)} </span>
-        until
-        <span className="text-primary-400 font-semibold"> {dayjs(Number(proposal.parameters?.endDate) * 1000).format('DD/MM/YYYY')}</span>
+        <span className="text-primary-400 font-semibold underline"> {formatAddress(proposal.args?.creator)}</span>
+        &nbsp;active until
+        <span className="text-primary-400 font-semibold"> {dayjs(Number(proposal.parameters?.endDate) * 1000).format('DD/MM/YYYY hh:mm')}h</span>
       </p>
     </div>
   )

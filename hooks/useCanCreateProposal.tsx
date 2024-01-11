@@ -1,7 +1,7 @@
 import { Address } from 'viem'
-import { Proposal } from '@/utils/types'
+// import { Proposal } from '@/utils/types'
 import { useState, useEffect } from 'react'
-import { useContractReads, useContractRead, useBalance, useAccount } from 'wagmi';
+import { useContractReads, useBalance, useAccount } from 'wagmi';
 import { TokenVotingAbi } from '../artifacts/TokenVoting.sol';
 
 
@@ -30,9 +30,9 @@ export function useCanCreateProposal() {
     })
 
     useEffect(() => {
-        console.log("Contract reads: ", contractReads);
         if (contractReads?.length) {
             setMinProposerVotingPower(contractReads[0]?.result as bigint)
+
             setVotingToken(contractReads[1]?.result as Address)
         }
     }, [contractReads])

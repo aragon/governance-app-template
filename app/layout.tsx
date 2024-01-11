@@ -1,12 +1,13 @@
+import { ReactNode } from "react";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { Web3Modal } from "./context/Web3Modal";
+import { Manrope } from "next/font/google";
+import { RootContextProvider } from "./context";
 import Header from "./containers/header";
 import Sidebar from "./containers/sidebar";
 import "@aragon/ods/index.css";
 import "./globals.css";
 
-const inter = Inter({
+const manrope = Manrope({
   subsets: ["latin"],
 });
 
@@ -15,20 +16,16 @@ export const metadata: Metadata = {
   description: "Simplified Aragon Interface for quick prototyping",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-white`}>
+      <body className={`${manrope.className} bg-primary-50`}>
         <div className="flex h-screen ">
           <Sidebar />
-          <div className="overflow-y-auto flex flex-col items-center">
-            <div className="w-3/4">
+          <div className="overflow-y-auto flex flex-col items-center w-full">
+            <div className="w-full md:w-3/4 lg:w-2/3 2xl:w-1/2 p-3">
               <Header />
-              <Web3Modal>{children}</Web3Modal>
+              <RootContextProvider>{children}</RootContextProvider>
             </div>
           </div>
         </div>

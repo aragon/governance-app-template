@@ -10,9 +10,9 @@ const Sidebar = () => {
 
   return (
     <header className="h-screen">
-      <div className="w-72 bg-neutral-50 shadow h-full flex-col justify-between hidden sm:flex border-r border-neutral-200">
+      <div className="w-72 bg-neutral-100 shadow h-full flex-col justify-between hidden sm:flex">
         <div className="flex-1 grow">
-          <div className="w-full flex items-center py-3 px-3 border-b border-neutral-200">
+          <div className="w-full flex items-center py-3 px-3">
             <Image
               src="/logo-bw-lg.png"
               width="60"
@@ -22,7 +22,7 @@ const Sidebar = () => {
             />
             <Link
               href="/"
-              className={`block py-1 leading-tight font-semibold text-xl text-neutral-900`}
+              className={`block py-1 leading-tight font-semibold text-xl text-neutral-700`}
               aria-current="page"
             >
               Aragonette
@@ -30,9 +30,9 @@ const Sidebar = () => {
           </div>
           <ul className="mt-12 px-6">
             <li
-              className={`flex w-full justify-between text-neutral-900 cursor-pointer items-center py-3 px-3 mb-2 ${
-                !segment ? "bg-neutral-100 font-semibold" : ""
-              } rounded-lg shadow-lg hover:bg-neutral-100`}
+              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 ${
+                !segment ? "bg-neutral-200 font-semibold" : ""
+              } rounded-lg shadow-lg hover:bg-neutral-200`}
             >
               <Link href="/" className="flex items-center w-full">
                 <Icon
@@ -55,9 +55,9 @@ const Sidebar = () => {
               </Link>
             </li>
             <li
-              className={`flex w-full justify-between text-neutral-900 cursor-pointer items-center py-3 px-3 mb-2 ${
-                segment ? "bg-neutral-100 rounded-lg shadow-lg" : ""
-              } rounded-lg shadow-lg hover:bg-neutral-100`}
+              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 ${
+                segment ? "bg-neutral-200 rounded-lg shadow-lg" : ""
+              } rounded-lg shadow-lg hover:bg-neutral-200`}
             >
               <Link href="/proposals" className="flex items-center w-full">
                 <Icon
@@ -79,7 +79,7 @@ const Sidebar = () => {
               </Link>
             </li>
             <li
-              className={`flex w-full justify-between text-neutral-900 cursor-pointer items-center py-3 px-3 mb-2 rounded-lg shadow-lg hover:bg-neutral-100`}
+              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 rounded-lg shadow-lg hover:bg-neutral-200`}
             >
               <Link
                 href="#"
@@ -97,7 +97,7 @@ const Sidebar = () => {
               </Link>
             </li>
             <li
-              className={`flex w-full justify-between text-neutral-900 cursor-pointer items-center py-3 px-3 mb-2 rounded-lg shadow-lg hover:bg-neutral-100`}
+              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 rounded-lg shadow-lg hover:bg-neutral-200`}
             >
               <Link href="#" className="flex items-center w-full">
                 <Icon
@@ -122,12 +122,12 @@ const Sidebar = () => {
               >
                 <Image
                   src="/logo-bw-sm.png"
-                  width="25"
-                  height="50"
+                  width="20"
+                  height="20"
                   className=""
                   alt="Aragonette"
                 />
-                <span className="block py-2 pr-4 pl-3 border-b border-neutral-100 hover:bg-neutral-50 lg:border-0">
+                <span className="block py-2 pr-4 pl-3 lg:border-0">
                   Powered by <span className="font-semibold">Aragon</span>
                 </span>
               </Link>

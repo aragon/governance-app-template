@@ -6,7 +6,7 @@ import { Address } from "viem";
 import { Proposal } from "../../../utils/types";
 import { useProposal } from "@/hooks/useProposal";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
-import { AlertCard, Button } from "@aragon/ods";
+import { AlertCard, Button, Spinner } from "@aragon/ods";
 import ProposalDescription from "@/app/containers/proposalDescription";
 import VotesSection from "@/app/containers/votesSection";
 import ProposalHeader from "@/app/containers/proposalHeader";
@@ -93,7 +93,18 @@ export default function Proposal({
   }, [userVotedOption, showVotingModal]);
 
   if (!proposal.title || !proposal?.parameters?.supportThreshold) {
-    return <div><p>Loading, please wait...</p></div>;
+    return (
+      <section className="flex justify-left items-left w-screen max-w-full min-w-full">
+        <p>
+          <Spinner
+            size="sm"
+            variant="neutral"
+            className="inline-block -m-[2px]"
+          />{" "}
+          &nbsp;&nbsp;Loading, please wait...
+        </p>
+      </section>
+    );
   }
   return (
     <section className="flex flex-col items-center w-screen max-w-full min-w-full">
@@ -147,14 +158,14 @@ export default function Proposal({
           <div className="flex flex-row gap-4">
             <Button
               onClick={() => toggleDetailsView(true)}
-              size="lg"
+              size="md"
               variant={showDescriptionView ? "primary" : "secondary"}
             >
               Description
             </Button>
             <Button
               onClick={() => toggleDetailsView(false)}
-              size="lg"
+              size="md"
               variant={showDescriptionView ? "secondary" : "primary"}
             >
               Votes

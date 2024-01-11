@@ -3,6 +3,8 @@ import { whatsabi } from "@shazow/whatsabi";
 import { useCallback, useEffect, useState } from "react";
 import { usePublicClient } from "wagmi";
 import { Address, decodeFunctionData } from 'viem'
+import { If, IfNot } from "@/app/components/if";
+import { PleaseWaitSpinner } from "@/app/components/pleaseWait";
 
 
 type FunctionData = {
@@ -61,8 +63,13 @@ export default function ProposalDescription(proposal: Proposal) {
       <p className="pb-6">{proposal?.summary}</p>
       <h2 className="flex-grow text-2xl text-neutral-900 font-semibold pt-10 pb-3">Actions</h2>
       <div className="flex flex-row space-between">
-        {!proposal.actions.length && <span className="pt-2">No actions in this proposal</span>}
-        {decodedActions?.length >= 0 && decodedActions.map((action, i) => (
+        <IfNot condition={proposal.actions.length}>
+          <p className="pt-2">The proposal has no actions</p>
+        </IfNot>
+        <If condition={proposal.actions.length && !decodedActions?.length}>
+          <PleaseWaitSpinner />
+        </If>
+        {decodedActions?.map?.((action, i) => (
           <div key={`${i}-${action.to}-${action.functionName}`}>
             <p className="leading-6">{i + 1}. <span className="text-primary-500 underline">{action.to}</span>.{action.functionName}(</p>
             <div className="pl-10">

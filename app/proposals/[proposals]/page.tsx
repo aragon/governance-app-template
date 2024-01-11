@@ -12,7 +12,7 @@ import VotesSection from "@/app/containers/votesSection";
 import ProposalHeader from "@/app/containers/proposalHeader";
 // import Blockies from "react-blockies";
 import { formatUnits } from "viem";
-import { formatAddress } from "@/utils/addressHelper";
+// import { formatAddress } from "@/utils/addressHelper";
 import { useUserCanVote } from "@/hooks/useUserCanVote";
 import * as dayjs from "dayjs";
 import { TokenVotingAbi } from "@/artifacts/TokenVoting.sol";
@@ -21,6 +21,7 @@ import VotingModal from "@/app/containers/votingModal";
 import ProposalDetails from "@/app/containers/proposalDetails";
 import { useAlertContext, AlertContextProps } from "@/app/context/AlertContext";
 import { Else, If, IfCase, Then } from "@/app/components/if";
+import { PleaseWaitSpinner } from "@/app/components/pleaseWait";
 
 const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
 
@@ -95,14 +96,7 @@ export default function Proposal({
   if (!proposal.title || !proposal?.parameters?.supportThreshold) {
     return (
       <section className="flex justify-left items-left w-screen max-w-full min-w-full">
-        <p>
-          <Spinner
-            size="sm"
-            variant="neutral"
-            className="inline-block -m-[2px]"
-          />{" "}
-          &nbsp;&nbsp;Loading, please wait...
-        </p>
+        <PleaseWaitSpinner />
       </section>
     );
   }

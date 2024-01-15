@@ -76,7 +76,11 @@ export default function ProposalDescription(proposal: Proposal) {
           <PleaseWaitSpinner />
         </If>
         {decodedActions?.map?.((action, i) => (
-          <ActionCard action={action} idx={i} />
+          <ActionCard
+            key={`${i}-${action.to}-${action.functionName}`}
+            action={action}
+            idx={i}
+          />
         ))}
       </div>
     </div>
@@ -105,7 +109,7 @@ const ActionCard = function ({
   idx: number;
 }) {
   return (
-    <Card key={`${idx}-${action.to}-${action.functionName}`}>
+    <Card>
       <div className="flex flex-row space-between">
         <div className="">
           <h3>Target contract</h3>
@@ -113,7 +117,9 @@ const ActionCard = function ({
             <AddressText>{action.to}</AddressText>
           </p>
         </div>
-        <div className="w-7 h-7 text-center border border-primary-600 text-primary-500 rounded-lg ml-auto">{idx + 1}</div>
+        <div className="w-7 h-7 text-center border border-primary-600 text-primary-500 rounded-lg ml-auto">
+          {idx + 1}
+        </div>
       </div>
 
       <div>

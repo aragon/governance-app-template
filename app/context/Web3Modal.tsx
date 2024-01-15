@@ -2,13 +2,16 @@
 
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 // import { WagmiConfig } from "wagmi";
-import { createConfig, configureChains } from "wagmi";
+import { WagmiConfig, createConfig, configureChains } from "wagmi";
 import { mainnet, polygon, optimism } from "@wagmi/core/chains";
 // import { publicProvider } from 'wagmi/providers/public'
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { alchemyProvider } from "wagmi/providers/alchemy";
+import { ReactNode } from "react";
+import { publicProvider } from "wagmi/providers/public";
+import { walletConnectProvider, EIP6963Connector } from "@web3modal/wagmi";
 
 // 1. Get projectId
 const projectId: string = process.env.NEXT_PUBLIC_WC_PROJECT_ID || "";
@@ -24,24 +27,26 @@ const metadata = {
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [polygon],
-  [alchemyProvider({ apiKey: alchemyKey })]
+  [
+    alchemyProvider({ apiKey: alchemyKey }),
+    walletConnectProvider({ projectId }),
+    publicProvider(),
+  ]
 );
 
 // const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
-export const wagmiConfig = createConfig({
+const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: [
-    new InjectedConnector({ chains }),
+    new WalletConnectConnector({
+      chains,
+      options: { projectId, showQrModal: false, metadata },
+    }),
+    new EIP6963Connector({ chains }),
+    new InjectedConnector({ chains, options: { shimDisconnect: true } }),
     new CoinbaseWalletConnector({
       chains,
       options: { appName: metadata.name },
-    }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        projectId,
-        metadata,
-      },
     }),
   ],
   publicClient,
@@ -61,3 +66,7 @@ createWeb3Modal({
     "--w3m-border-radius-master": "12px",
   },
 });
+
+export function Web3ModalProvider({ children }: { children: ReactNode }) {
+  return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>;
+}

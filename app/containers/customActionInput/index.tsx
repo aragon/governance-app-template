@@ -13,7 +13,7 @@ const etherscanKey: string = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY || "";
 
 const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
     const publicClient = usePublicClient()
-    const [abi, setAbi] = useState<Abi>();
+    const [abi, setAbi] = useState<AbiFunction[]>();
     const [abiItem, setAbiItem] = useState<AbiFunction>();
     const [loadingAbi, setLoadingAbi] = useState<boolean>(false);
     const [abiInputValues, setAbiInputValues] = useState<string[]>([]);
@@ -33,7 +33,7 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
             abiLoader,
             followProxies: true,
         });
-        setAbi(abi as any)
+        setAbi(abi.filter(item => item.type === "function") as any)
         setLoadingAbi(false)
     }, [to])
 
@@ -98,7 +98,7 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
                             <div className="">
                                 <p className="text-xl font-semibold text-neutral-800 pt-1 pb-3 px-6 border-b border-neutral-200">{abiItem.name}</p>
                                 {abiItem.inputs.map((itemInputs, i) => (
-                                    <div className="my-4 mx-6">
+                                    <div key={i} className="my-4 mx-6">
                                         <label className="block mb-2 text-md font-medium text-neutral-700">{itemInputs.type}:</label>
                                         <input
                                             value={abiInputValues[i] || ''}

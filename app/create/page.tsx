@@ -14,7 +14,7 @@ import { Action } from '@/utils/types'
 
 const ipfsEndpoint = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
 const ipfsKey = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
-const pluginAddress = ((process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address)
+const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address
 
 const auth = ipfsKey; // Replace YOUR_API_KEY with your actual API key
 
@@ -34,7 +34,7 @@ export default function Create() {
         abi: TokenVotingAbi,
         address: pluginAddress,
         functionName: 'createProposal',
-        args: [toHex(ipfsPin), [action], 0, 0, 0, 0, 0],
+        args: [toHex(ipfsPin), action, 0, 0, 0, 0, 0],
         onSuccess(data) {
             addAlert("We got your proposal!", data.hash)
         },

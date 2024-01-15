@@ -11,7 +11,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
     const [value, setValue] = useState<number>()
 
     useEffect(() => {
-        setAction({ to, value, data: '0x' } as unknown as Action)
+        setAction([{ to, value, data: '0x' } as unknown as Action])
     }, [to, value])
 
     const handleTo = (event: React.ChangeEvent<HTMLInputElement>) => {

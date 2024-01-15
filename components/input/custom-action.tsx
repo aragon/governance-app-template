@@ -38,9 +38,7 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
     }, [to])
 
     useEffect(() => {
-        if (to) {
-            getContractAbi()
-        }
+        if (to) getContractAbi()
     }, [to])
 
     useEffect(() => {

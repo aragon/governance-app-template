@@ -15,14 +15,14 @@ export default function VotesSection({
 
   return (
     <div className="grid grod-cols-1 lg:grid-cols-2 mt-4 mb-14 gap-4">
-      {yesVotes.map((vote) => (
-        <VoteCard vote={vote} type="Yes" />
+      {yesVotes.map((vote, i) => (
+        <VoteCard key={i} vote={vote} type="Yes" />
       ))}
-      {noVotes.map((vote) => (
-        <VoteCard vote={vote} type="No" />
+      {noVotes.map((vote, i) => (
+        <VoteCard key={i} vote={vote} type="No" />
       ))}
-      {abstainVotes.map((vote) => (
-        <VoteCard vote={vote} />
+      {abstainVotes.map((vote, i) => (
+        <VoteCard key={i} vote={vote} />
       ))}
     </div>
   );
@@ -54,7 +54,7 @@ const VoteCard = function ({
   else if (type === "Yes") colorType = "success";
 
   return (
-    <Card key={vote.voter}>
+    <Card>
       <div className="flex flex-row space-between">
         <div className="flex flex-grow">
           <Blockies className="rounded-3xl" size={9} seed={vote?.voter} />

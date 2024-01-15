@@ -1,3 +1,5 @@
+"use client";
+
 import { ReactNode } from "react";
 
 export default function Home() {
@@ -7,7 +9,7 @@ export default function Home() {
       <Card>
         <h1 className="text-2xl font-bold">Welcome to Aragonette!</h1>
         <p className="text-lg">
-          We provide a DAO experience for you. It's a template that you can
+          We provide a DAO experience for you. It&apos;s a template that you can
           customize.
         </p>
 

@@ -14,7 +14,6 @@ import ProposalHeader from "@/app/containers/proposalHeader";
 import { formatUnits } from "viem";
 // import { formatAddress } from "@/utils/addressHelper";
 import { useUserCanVote } from "@/hooks/useUserCanVote";
-import * as dayjs from "dayjs";
 import { TokenVotingAbi } from "@/artifacts/TokenVoting.sol";
 import VoteTally from "@/app/containers/voteTally";
 import VotingModal from "@/app/containers/votingModal";

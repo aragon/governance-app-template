@@ -1,17 +1,17 @@
 import Blockies from "react-blockies";
 import { VoteCastEvent } from "@/utils/types";
 import { formatUnits } from "viem";
-import { formatAddress } from "@/utils/addressHelper";
 import { ReactNode } from "react";
+import { AddressText } from "../text/address";
 
 export default function VotesSection({
   votes,
 }: {
   votes: Array<VoteCastEvent>;
 }) {
-  const abstainVotes = votes.filter((vote) => vote.voteOption === 1);
-  const yesVotes = votes.filter((vote) => vote.voteOption === 2);
-  const noVotes = votes.filter((vote) => vote.voteOption === 3);
+  const abstainVotes = votes?.filter((vote) => vote.voteOption === 1) || [];
+  const yesVotes = votes?.filter((vote) => vote.voteOption === 2) || [];
+  const noVotes = votes?.filter((vote) => vote.voteOption === 3) || [];
 
   return (
     <div className="grid grod-cols-1 lg:grid-cols-2 mt-4 mb-14 gap-4">
@@ -60,7 +60,7 @@ const VoteCard = function ({
           <Blockies className="rounded-3xl" size={9} seed={vote?.voter} />
           <div className="px-2">
             <p className="text-primary-700 font-semibold underline">
-              {formatAddress(vote.voter)}
+              <AddressText>{vote.voter}</AddressText>
             </p>
             <p className="text-neutral-700 font-semibold">
               {formatUnits(vote.votingPower, 18)} votes

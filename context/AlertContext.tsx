@@ -21,7 +21,7 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Function to remove an alert
   const removeAlert = (id: number) => {
-    setAlerts(alerts.filter((alert) => alert.id !== id));
+    setAlerts(alerts?.filter((alert) => alert.id !== id));
   };
 
   return (

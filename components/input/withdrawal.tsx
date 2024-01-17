@@ -28,17 +28,17 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
                 <input
                     type="text"
                     id="base-input"
-                    className="bg-gray-50 border border-gray-300 text-neutral-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                    className="bg-gray-50 border border-neutral-100 text-neutral-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                     value={to}
                     onChange={handleTo}
                 />
             </div>
             <div className="mb-6">
-                <label className="block mb-2 text-md text-neutral-700">Amount (in weis):</label>
+                <label className="block mb-2 text-md text-neutral-700">Amount (in wei):</label>
                 <input
                     type="number"
                     id="base-input"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                    className="bg-gray-50 border border-neutral-100 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                     value={value}
                     onChange={handleValue}
                 />

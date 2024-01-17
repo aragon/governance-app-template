@@ -2,7 +2,7 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Button } from "@aragon/ods";
 import { useAccount, useWalletClient } from "wagmi";
 import { Else, IfCase, Then } from "./if";
-import { formatAddress } from "@/utils/addressHelper";
+import { formatHexString } from "@/utils/evm";
 
 const Header = () => {
   const { address, isConnected } = useAccount();
@@ -18,7 +18,7 @@ const Header = () => {
             onClick={() => open()}
             className="text-primary-500 underline cursor-pointer"
           >
-            {formatAddress(address as any)}
+            {formatHexString(address as any)}
           </span>
         </Then>
         <Else>

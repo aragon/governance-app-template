@@ -45,7 +45,7 @@ export default function Create() {
     });
 
     useEffect(() => {
-        console.log("Contract proposal thingy: ", action)
+        // console.log("Contract proposal thingy: ", action)
         if (ipfsPin !== '') createProposalWrite?.()
     }, [ipfsPin])
 
@@ -74,7 +74,7 @@ export default function Create() {
                     <input
                         type="text"
                         id="base-input"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        className="bg-gray-50 border border-neutral-100 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                         value={title}
                         onChange={handleTitleInput}
                     />
@@ -84,7 +84,7 @@ export default function Create() {
                     <textarea
                         id="message"
                         rows={6}
-                        className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-neutral-100 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                         placeholder="Leave the description..."
                         value={summary}
                         onChange={handleSummaryInput}
@@ -92,37 +92,37 @@ export default function Create() {
                 </div>
                 <div className="mb-6">
                     <span className="block mb-2 text-lg text-gray-900 ">Select proposal action</span>
-                    <div className="grid grid-cols-3 gap-5 h-48">
+                    <div className="grid grid-cols-3 gap-3 h-32">
                         <div
                             onClick={() => setActionType(ActionType.Signaling)}
-                            className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Signaling ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
+                            className={`cursor-pointer rounded-xl bg-neutral-0 border border-neutral-100 hover:border-primary-400 active:border-primary-700 flex flex-col items-center ${actionType === ActionType.Signaling ? 'border-primary-400 border-2' : 'border-neutral-100'}`}>
 
                             <Icon
-                                className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
+                                className="p-2 rounded-full text-primary-400 !h-12 !w-12 mt-5 mb-2"
                                 icon={IconType.INFO}
                                 size="lg"
                             />
-                            <h3 className="font-semibold text-lg">Signaling proposal</h3>
+                            <span className="text-md text-neutral-400">Signaling proposal</span>
                         </div>
                         <div
                             onClick={() => setActionType(ActionType.Withdrawal)}
-                            className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Withdrawal ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
+                            className={`cursor-pointer rounded-xl bg-neutral-0 border border-neutral-100 hover:border-primary-400 active:border-primary-700 flex flex-col items-center ${actionType === ActionType.Withdrawal ? 'border-primary-400 border-2' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
+                                className="p-2 rounded-full text-primary-400 !h-12 !w-12 mt-5 mb-2"
                                 icon={IconType.TX_WITHDRAW}
                                 size="lg"
                             />
-                            <h3 className="font-semibold text-lg">DAO Payment</h3>
+                            <span className="text-md text-neutral-400">DAO Payment</span>
                         </div>
                         <div
                             onClick={() => setActionType(ActionType.Custom)}
-                            className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Custom ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
+                            className={`cursor-pointer rounded-xl bg-neutral-0 border border-neutral-100 hover:border-primary-400 active:border-primary-700 flex flex-col items-center ${actionType === ActionType.Custom ? 'border-primary-400 border-2' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
+                                className="p-2 rounded-full text-primary-400 !h-12 !w-12 mt-5 mb-2"
                                 icon={IconType.BLOCKCHAIN}
                                 size="lg"
                             />
-                            <h3 className="font-semibold text-lg">Custom action</h3>
+                            <span className="text-md text-neutral-400">Custom action</span>
                         </div>
                     </div>
                     <div className="mb-6">

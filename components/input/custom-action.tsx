@@ -69,7 +69,7 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
                 <input
                     type="text"
                     id="base-input"
-                    className="bg-gray-50 border border-gray-300 text-neutral-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                    className="bg-gray-50 border border-neutral-100 text-neutral-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                     value={to}
                     onChange={handleTo}
                 />

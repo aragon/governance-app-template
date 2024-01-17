@@ -60,11 +60,11 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
     return (
         <div className="my-6">
             <div className="mb-3 pb-3">
-                <label className="block mb-2 text-md font-medium text-neutral-700">Contract address:</label>
+                <label className="block mb-2 text-md font-medium text-neutral-900">Contract address:</label>
                 <input
                     type="text"
                     id="base-input"
-                    className="bg-gray-50 border border-gray-300 text-neutral-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                    className="bg-white border border-neutral-100 text-neutral-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                     value={to}
                     onChange={handleInputChange(setTo)}
                 />
@@ -79,19 +79,19 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
             )}
             {!loadingAbi && abi && abi.length >= 0 && (
                 <div className="flex h-96 bg-neutral-50 rounded-lg border border-neutral-200">
-                    <div className="w-2/5 bg-gray-200 px-2 py-4 overflow-y-auto overflow-x-auto border-r border-neutral-200">
+                    <div className="w-2/5 bg-neutral-50 m-1 px-2 py-4 overflow-y-auto overflow-x-auto border-r border-neutral-200">
                         <ul className="space-y-2">
                             {abi?.map((abiItemSelection, index) => (
                                 <li
                                     key={index}
                                     onClick={() => { setAbiItem(abiItemSelection as AbiFunction) }}
-                                    className={`w-full text-left font-sm hover:bg-neutral-100 py-3 px-4 rounded-2xl hover:cursor-pointer ${abiItemSelection.name === abiItem?.name && 'bg-neutral-100 font-semibold'}`}>
+                                    className={`w-full text-left font-sm hover:bg-neutral-100 py-3 px-4 rounded-xl hover:cursor-pointer ${abiItemSelection.name === abiItem?.name && 'bg-neutral-100 font-semibold'}`}>
                                     {abiItemSelection.name}
                                 </li>
                             ))}
                         </ul>
                     </div>
-                    <div className="w-2/3 bg-white py-4 overflow-y-auto">
+                    <div className="w-2/3 bg-primary-50 py-4 overflow-y-auto">
                         {abiItem && (
                             <div className="">
                                 <p className="text-xl font-semibold text-neutral-800 pt-1 pb-3 px-6 border-b border-neutral-200">{abiItem.name}</p>
@@ -103,7 +103,7 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
                                             onChange={handleAbiInputChange(i)}
                                             type="text"
                                             id="base-input"
-                                            className="bg-gray-50 border border-gray-300 text-neutral-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                                            className="bg-neutral-50 border border-neutral-300 text-neutral-900 text-sm rounded-lg focus:ring-primary-300 focus:border-primary-300 block w-full p-2.5"
                                         />
                                     </div>
                                 ))}
@@ -115,7 +115,7 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
                                             onChange={handleInputChange(setValue)}
                                             type="number"
                                             id="base-input"
-                                            className="bg-gray-50 border border-gray-300 text-neutral-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                                            className="bg-neutral-50 border border-neutral-300 text-neutral-900 text-sm rounded-lg focus:ring-primary-300 focus:border-primary-300 block w-full p-2.5"
                                         />
                                     </div>
 

@@ -67,37 +67,37 @@ export default function Create() {
 
 
     return (
-        <main className="flex pt-12 w-screen max-w-full">
-            <div className="w-3/4 mx-auto">
+    <section className="flex flex-col items-center w-screen max-w-full min-w-full">
+      <div className="justify-between py-5 w-full">
                 <h1 className="font-semibold text-neutral-900 text-3xl mb-10">Create Proposal</h1>
                 <div className="mb-6 pb-6">
-                    <label className="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Title</label>
+                    <label className="block mb-2 text-lg font-medium text-neutral-900">Title</label>
                     <input
                         type="text"
                         id="base-input"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        className="bg-white border border-neutral-100 text-neutral-900 text-sm rounded-lg focus:ring-primary-200 focus:border-primary-300 block w-full p-2.5"
+                        placeholder="A short title that descrives the main purpose"
                         value={title}
                         onChange={handleTitleInput}
                     />
                 </div>
                 <div className="mb-6">
-                    <label className="block mb-2 text-lg text-gray-900 ">Summary</label>
+                    <label className="block mb-2 text-lg text-neutral-900">Summary</label>
                     <textarea
                         id="message"
                         rows={6}
-                        className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        placeholder="Leave the description..."
+                        className="block p-2.5 w-full text-sm text-neutral-900 bg-white rounded-lg border border-neutral-100 focus:ring-primary-300 focus:border-primary-300"
+                        placeholder="A detailed description for what the proposal is all about"
                         value={summary}
                         onChange={handleSummaryInput}
                     ></textarea>
                 </div>
                 <div className="mb-6">
-                    <span className="block mb-2 text-lg text-gray-900 ">Select proposal action</span>
-                    <div className="grid grid-cols-3 gap-5 h-48">
+                    <span className="block mb-2 text-lg text-neutral-900 ">Select proposal action</span>
+                    <div className="grid grid-cols-3 gap-5 h-48 mt-2">
                         <div
                             onClick={() => {changeActionType(ActionType.Signaling)}}
-                            className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Signaling ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
-
+                            className={`rounded-xl bg-white border border-dashed border-2 flex flex-col items-center ${actionType === ActionType.Signaling ? 'border-primary-300' : 'border-neutral-100'}`}>
                             <Icon
                                 className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
                                 icon={IconType.INFO}
@@ -107,7 +107,7 @@ export default function Create() {
                         </div>
                         <div
                             onClick={() => changeActionType(ActionType.Withdrawal)}
-                            className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Withdrawal ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
+                            className={`rounded-xl bg-white border border-dashed border-2 flex flex-col items-center ${actionType === ActionType.Withdrawal ? 'border-primary-300' : 'border-neutral-100'}`}>
                             <Icon
                                 className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
                                 icon={IconType.TX_WITHDRAW}
@@ -117,7 +117,7 @@ export default function Create() {
                         </div>
                         <div
                             onClick={() => changeActionType(ActionType.Custom)}
-                            className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Custom ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
+                            className={`rounded-xl bg-white border border-dashed border-2 flex flex-col items-center ${actionType === ActionType.Custom ? 'border-primary-300' : 'border-neutral-100'}`}>
                             <Icon
                                 className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
                                 icon={IconType.BLOCKCHAIN}
@@ -133,7 +133,7 @@ export default function Create() {
                 </div>
 
                 <Button
-                    className='mt-14'
+                    className='mt-14 mb-6'
                     size="lg"
                     variant='primary'
                     onClick={() => submitProposal()}
@@ -141,7 +141,7 @@ export default function Create() {
                     Submit
                 </Button>
             </div>
-        </main>
+        </section>
     )
 }
 

@@ -97,25 +97,25 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
                                 <p className="text-xl font-semibold text-neutral-800 pt-1 pb-3 px-6 border-b border-neutral-200">{abiItem.name}</p>
                                 {abiItem.inputs.map((itemInputs, i) => (
                                     <div key={i} className="my-4 mx-6">
-                                        <label className="block mb-2 text-md font-medium text-neutral-700">{itemInputs.type}:</label>
+                                        <label className="block mb-2 text-md font-medium text-neutral-900">{itemInputs.type}:</label>
                                         <input
                                             value={abiInputValues[i] || ''}
                                             onChange={handleAbiInputChange(i)}
                                             type="text"
                                             id="base-input"
-                                            className="bg-neutral-50 border border-neutral-300 text-neutral-900 text-sm rounded-lg focus:ring-primary-300 focus:border-primary-300 block w-full p-2.5"
+                                            className="bg-white border border-neutral-100 text-neutral-900 text-sm rounded-lg focus:ring-primary-300 focus:border-primary-300 block w-full p-2.5"
                                         />
                                     </div>
                                 ))}
                                 {abiItem.payable && (
                                     <div className="my-4 mx-6">
-                                        <label className="block mb-2 text-md font-medium text-neutral-700">Value:</label>
+                                        <label className="block mb-2 text-md font-medium text-neutral-900">Value:</label>
                                         <input
                                             value={value}
                                             onChange={handleInputChange(setValue)}
                                             type="number"
                                             id="base-input"
-                                            className="bg-neutral-50 border border-neutral-300 text-neutral-900 text-sm rounded-lg focus:ring-primary-300 focus:border-primary-300 block w-full p-2.5"
+                                            className="bg-white border border-neutral-100 text-neutral-900 text-sm rounded-lg focus:ring-primary-300 focus:border-primary-300 block w-full p-2.5"
                                         />
                                     </div>
 

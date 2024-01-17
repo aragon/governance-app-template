@@ -1,9 +1,6 @@
-"use client";
-
 import { AlertContext } from "@/context/AlertContext";
 import React, { useEffect, useContext, useState, useRef } from "react";
 import { IAlert } from "@/utils/types";
-import { Address } from "viem";
 import { useWaitForTransaction } from "wagmi";
 import { Icon, IconType } from "@aragon/ods";
 import { Else, If, IfCase, Then } from "../if";

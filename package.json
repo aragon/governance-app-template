@@ -9,9 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@aragon/ods": "^1.0.5",
+    "@aragon/ods": "1.0.7",
     "@shazow/whatsabi": "^0.9.1",
-    "@web3modal/wagmi": "^3.3.1",
+    "@web3modal/wagmi": "^3.5.6",
     "dayjs": "^1.11.10",
     "ipfs-http-client": "^60.0.1",
     "next": "14.0.2",
@@ -20,18 +20,19 @@
     "react-dom": "^18",
     "react-query": "^3.39.3",
     "tailwindcss-fluid-type": "^2.0.3",
-    "viem": "^1.19.1",
-    "wagmi": "^1.4.6"
+    "viem": "^1.21.4",
+    "wagmi": "^1.4.13"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
+    "@types/react-blockies": "^1.4.4",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.2",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
-    "eslint": "^8",
-    "eslint-config-next": "14.0.2"
+    "typescript": "^5"
   }
 }

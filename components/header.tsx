@@ -2,9 +2,10 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Button } from "@aragon/ods";
 import { useAccount, useWalletClient } from "wagmi";
 import { Else, IfCase, Then } from "./if";
+import { formatAddress } from "@/utils/addressHelper";
 
 const Header = () => {
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const { data: client } = useWalletClient();
   const { open } = useWeb3Modal();
 
@@ -12,14 +13,21 @@ const Header = () => {
     <div className="flex flex-row-reverse w-full mt-5 h-24">
       <IfCase condition={isConnected}>
         <Then>
-          <Button suppressHydrationWarning size="md" variant="secondary" onClick={() => open()}>
-            <span suppressHydrationWarning>
-              Connected {client?.chain?.name ? "to " + client?.chain?.name : ""}
-            </span>
-          </Button>
+          <span
+            suppressHydrationWarning
+            onClick={() => open()}
+            className="text-primary-500 underline cursor-pointer"
+          >
+            {formatAddress(address as any)}
+          </span>
         </Then>
         <Else>
-          <Button suppressHydrationWarning size="md" variant="primary" onClick={() => open()}>
+          <Button
+            suppressHydrationWarning
+            size="md"
+            variant="primary"
+            onClick={() => open()}
+          >
             <span suppressHydrationWarning>Connect wallet</span>
           </Button>
         </Else>

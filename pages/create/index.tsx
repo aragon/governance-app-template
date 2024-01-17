@@ -92,37 +92,37 @@ export default function Create() {
                 </div>
                 <div className="mb-6">
                     <span className="block mb-2 text-lg text-gray-900 ">Select proposal action</span>
-                    <div className="grid grid-cols-3 gap-3 h-32">
+                    <div className="grid lg:grid-cols-3 gap-3">
                         <div
                             onClick={() => setActionType(ActionType.Signaling)}
-                            className={`cursor-pointer rounded-xl bg-neutral-0 border border-neutral-100 hover:border-primary-400 active:border-primary-700 flex flex-col items-center ${actionType === ActionType.Signaling ? 'border-primary-400 border-2' : 'border-neutral-100'}`}>
+                            className={`pt-2 pb-3 cursor-pointer rounded-xl bg-neutral-0 border border-neutral-100 hover:border-primary-400 active:border-primary-700 flex flex-col items-center ${actionType === ActionType.Signaling ? 'border-primary-400 border-2' : 'border-neutral-100'}`}>
 
                             <Icon
-                                className="p-2 rounded-full text-primary-400 !h-12 !w-12 mt-5 mb-2"
+                                className="p-2 rounded-full text-primary-400 !h-12 !w-12"
                                 icon={IconType.INFO}
                                 size="lg"
                             />
-                            <span className="text-md text-neutral-400">Signaling proposal</span>
+                            <span className="text-sm text-neutral-400 text-center">Signaling</span>
                         </div>
                         <div
                             onClick={() => setActionType(ActionType.Withdrawal)}
-                            className={`cursor-pointer rounded-xl bg-neutral-0 border border-neutral-100 hover:border-primary-400 active:border-primary-700 flex flex-col items-center ${actionType === ActionType.Withdrawal ? 'border-primary-400 border-2' : 'border-neutral-100'}`}>
+                            className={`pt-2 pb-3 cursor-pointer rounded-xl bg-neutral-0 border border-neutral-100 hover:border-primary-400 active:border-primary-700 flex flex-col items-center ${actionType === ActionType.Withdrawal ? 'border-primary-400 border-2' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full text-primary-400 !h-12 !w-12 mt-5 mb-2"
+                                className="p-2 rounded-full text-primary-400 !h-12 !w-12"
                                 icon={IconType.TX_WITHDRAW}
                                 size="lg"
                             />
-                            <span className="text-md text-neutral-400">DAO Payment</span>
+                            <span className="text-sm text-neutral-400 text-center">DAO Payment</span>
                         </div>
                         <div
                             onClick={() => setActionType(ActionType.Custom)}
-                            className={`cursor-pointer rounded-xl bg-neutral-0 border border-neutral-100 hover:border-primary-400 active:border-primary-700 flex flex-col items-center ${actionType === ActionType.Custom ? 'border-primary-400 border-2' : 'border-neutral-100'}`}>
+                            className={`pt-2 pb-3 cursor-pointer rounded-xl bg-neutral-0 border border-neutral-100 hover:border-primary-400 active:border-primary-700 flex flex-col items-center ${actionType === ActionType.Custom ? 'border-primary-400 border-2' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full text-primary-400 !h-12 !w-12 mt-5 mb-2"
+                                className="p-2 rounded-full text-primary-400 !h-12 !w-12"
                                 icon={IconType.BLOCKCHAIN}
                                 size="lg"
                             />
-                            <span className="text-md text-neutral-400">Custom action</span>
+                            <span className="text-sm text-neutral-400 text-center">Custom action</span>
                         </div>
                     </div>
                     <div className="mb-6">
@@ -131,14 +131,16 @@ export default function Create() {
                     </div>
                 </div>
 
-                <Button
-                    className='mt-14'
-                    size="lg"
-                    variant='primary'
-                    onClick={() => submitIPFS()}
-                >
-                    Submit
-                </Button>
+                <div>
+                    <Button
+                        className='my-14'
+                        size="lg"
+                        variant='primary'
+                        onClick={() => submitIPFS()}
+                    >
+                        Submit
+                    </Button>
+                </div>
             </div>
         </main>
     )

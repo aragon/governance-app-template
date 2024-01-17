@@ -1,5 +1,5 @@
 import { create } from 'ipfs-http-client';
-import { Button, IconType, Icon } from '@aragon/ods'
+import { Button, IconType, Icon, InputText } from '@aragon/ods'
 import React, { useEffect, useState } from 'react'
 import { uploadToIPFS } from '@/utils/ipfs'
 import { useContractWrite } from 'wagmi';
@@ -71,12 +71,12 @@ export default function Create() {
       <div className="justify-between py-5 w-full">
                 <h1 className="font-semibold text-neutral-900 text-3xl mb-10">Create Proposal</h1>
                 <div className="mb-6 pb-6">
-                    <label className="block mb-2 text-lg font-medium text-neutral-900">Title</label>
-                    <input
-                        type="text"
-                        id="base-input"
-                        className="bg-white border border-neutral-100 text-neutral-900 text-sm rounded-lg focus:ring-primary-200 focus:border-primary-300 block w-full p-2.5"
+                    <InputText
+                        className=""
+                        label="Title"
+                        maxLength={150}
                         placeholder="A short title that descrives the main purpose"
+                        variant="default"
                         value={title}
                         onChange={handleTitleInput}
                     />

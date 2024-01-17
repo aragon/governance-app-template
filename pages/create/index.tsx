@@ -74,7 +74,7 @@ export default function Create() {
                     <InputText
                         className=""
                         label="Title"
-                        maxLength={150}
+                        maxLength={100}
                         placeholder="A short title that descrives the main purpose"
                         variant="default"
                         value={title}
@@ -82,11 +82,11 @@ export default function Create() {
                     />
                 </div>
                 <div className="mb-6">
-                    <label className="block mb-2 text-lg text-neutral-900">Summary</label>
+                    <label className="block mb-2 text-lg font-semibold text-neutral-600">Summary</label>
                     <textarea
                         id="message"
                         rows={6}
-                        className="block p-2.5 w-full text-sm text-neutral-900 bg-white rounded-lg border border-neutral-100 focus:ring-primary-300 focus:border-primary-300"
+                        className="block p-2.5 w-full text-md font-semibold placeholder-neutral-300 text-neutral-900 bg-white rounded-xl border border-neutral-100 focus:ring-primary-300 focus:border-primary-300"
                         placeholder="A detailed description for what the proposal is all about"
                         value={summary}
                         onChange={handleSummaryInput}

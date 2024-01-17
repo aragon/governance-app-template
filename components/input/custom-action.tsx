@@ -2,7 +2,7 @@ import { FC, useEffect, useState, useCallback } from "react";
 import { Abi, Address, encodeFunctionData } from "viem";
 import { whatsabi } from "@shazow/whatsabi";
 import { usePublicClient } from "wagmi";
-import { Spinner } from '@aragon/ods'
+import { Spinner, InputText } from '@aragon/ods'
 import { AbiFunction } from "abitype";
 
 interface CustomActionInputProps {
@@ -60,14 +60,14 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
     return (
         <div className="my-6">
             <div className="mb-3 pb-3">
-                <label className="block mb-2 text-md font-medium text-neutral-900">Contract address:</label>
-                <input
-                    type="text"
-                    id="base-input"
-                    className="bg-white border border-neutral-100 text-neutral-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                <InputText
+                    className=""
+                    label="Contract address"
+                    placeholder="0x..." 
+                    variant="default"
                     value={to}
                     onChange={handleInputChange(setTo)}
-                />
+                    />
             </div>
             {loadingAbi && (
                 <div className="mb-3 pb-3">
@@ -97,26 +97,26 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
                                 <p className="text-xl font-semibold text-neutral-800 pt-1 pb-3 px-6 border-b border-neutral-200">{abiItem.name}</p>
                                 {abiItem.inputs.map((itemInputs, i) => (
                                     <div key={i} className="my-4 mx-6">
-                                        <label className="block mb-2 text-md font-medium text-neutral-900">{itemInputs.type}:</label>
-                                        <input
+                                        <InputText
+                                            className=""
+                                            label={itemInputs.type}
+                                            placeholder="" 
+                                            variant="default"
                                             value={abiInputValues[i] || ''}
                                             onChange={handleAbiInputChange(i)}
-                                            type="text"
-                                            id="base-input"
-                                            className="bg-white border border-neutral-100 text-neutral-900 text-sm rounded-lg focus:ring-primary-300 focus:border-primary-300 block w-full p-2.5"
-                                        />
+                                            />
                                     </div>
                                 ))}
                                 {abiItem.payable && (
                                     <div className="my-4 mx-6">
-                                        <label className="block mb-2 text-md font-medium text-neutral-900">Value:</label>
-                                        <input
+                                        <InputText
+                                            className=""
+                                            label="Value (in weis)"
+                                            placeholder="100" 
+                                            variant="default"
                                             value={value}
                                             onChange={handleInputChange(setValue)}
-                                            type="number"
-                                            id="base-input"
-                                            className="bg-white border border-neutral-100 text-neutral-900 text-sm rounded-lg focus:ring-primary-300 focus:border-primary-300 block w-full p-2.5"
-                                        />
+                                            />
                                     </div>
 
                                 )}

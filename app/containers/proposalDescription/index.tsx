@@ -26,6 +26,7 @@ export default function ProposalDescription(proposal: Proposal) {
   const [decodedActions, setDecodedActions] = useState<FunctionData[]>([]);
 
   const getFunctionData = async (action: Action) => {
+    console.log("Data: ", action.data)
     const abiLoader = new whatsabi.loaders.EtherscanABILoader({
       apiKey: etherscanKey,
     });
@@ -125,7 +126,7 @@ const ActionCard = function ({
       <div>
         <h3>Parameters</h3>
         <ul className="list-disc pl-4">
-          {action?.args?.map((arg: any, j: number) => (
+          {action?.args?.length && action?.args?.map((arg: any, j: number) => (
             <li key={`arg-${j}`}>
               <IfCase condition={isAddress(arg)}>
                 <Then>

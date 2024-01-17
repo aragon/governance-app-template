@@ -41,22 +41,23 @@ export default function Create() {
     });
     const [actionType, setActionType] = useState<ActionType>(ActionType.Signaling)
 
+    const changeActionType = (actionType: ActionType) => {
+        setAction([])
+        setActionType(actionType)
+    }
+
     const client = create({
         url: ipfsEndpoint,
         headers: { 'X-API-KEY': auth, 'Accept': 'application/json' }
     });
 
-    useEffect(() => {
-        console.log("Contract proposal thingy: ", action)
-        if (ipfsPin !== '') createProposalWrite?.()
-    }, [ipfsPin])
-
-    const submitIPFS = async () => {
+    const submitProposal = async () => {
         const proposalMetadataJsonObject = { title, summary };
         const blob = new Blob([JSON.stringify(proposalMetadataJsonObject)], { type: 'application/json' });
 
         const ipfsPin = await uploadToIPFS(client, blob);
         setIpfsPin(ipfsPin!)
+        if (ipfsPin !== '') createProposalWrite?.()
     }
 
     const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,7 +97,7 @@ export default function Create() {
                     <span className="block mb-2 text-lg text-gray-900 ">Select proposal action</span>
                     <div className="grid grid-cols-3 gap-5 h-48">
                         <div
-                            onClick={() => setActionType(ActionType.Signaling)}
+                            onClick={() => {changeActionType(ActionType.Signaling)}}
                             className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Signaling ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
 
                             <Icon
@@ -107,7 +108,7 @@ export default function Create() {
                             <h3 className="font-semibold text-lg">Signaling proposal</h3>
                         </div>
                         <div
-                            onClick={() => setActionType(ActionType.Withdrawal)}
+                            onClick={() => changeActionType(ActionType.Withdrawal)}
                             className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Withdrawal ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
                             <Icon
                                 className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
@@ -117,7 +118,7 @@ export default function Create() {
                             <h3 className="font-semibold text-lg">DAO Payment</h3>
                         </div>
                         <div
-                            onClick={() => setActionType(ActionType.Custom)}
+                            onClick={() => changeActionType(ActionType.Custom)}
                             className={`rounded-xl bg-neutral-50 border border-neutral-300 flex flex-col items-center ${actionType === ActionType.Custom ? 'border-primary-500 border-2' : 'border-neutral-300'}`}>
                             <Icon
                                 className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
@@ -137,7 +138,7 @@ export default function Create() {
                     className='mt-14'
                     size="lg"
                     variant='primary'
-                    onClick={() => submitIPFS()}
+                    onClick={() => submitProposal()}
                 >
                     Submit
                 </Button>

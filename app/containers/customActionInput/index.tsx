@@ -26,6 +26,7 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
     }
 
     const getContractAbi = useCallback(async () => {
+        setLoadingAbi(true)
         const abiLoader = new whatsabi.loaders.EtherscanABILoader({ apiKey: etherscanKey });
         const { abi } = await whatsabi.autoload(to!, {
             provider: publicClient,
@@ -38,7 +39,6 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
 
     useEffect(() => {
         if (to) {
-            setLoadingAbi(true)
             getContractAbi()
         }
     }, [to])

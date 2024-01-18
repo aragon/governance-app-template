@@ -9,13 +9,9 @@ const Header = () => {
   const [skipRender, setSkipRender] = useState(true);
   const { address, isConnected } = useAccount();
   const { open } = useWeb3Modal();
-  const [skip, setSkip] = useState(true)
-
-  useEffect(() => setSkip(false), [])
-
-  if(skip) return <></>;
 
   useEffect(() => setSkipRender(false), []);
+
   if (skipRender) return <></>;
 
   return (

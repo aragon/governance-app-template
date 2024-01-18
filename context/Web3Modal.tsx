@@ -27,7 +27,6 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
   [polygon],
   [
     alchemyProvider({ apiKey: alchemyKey }),
-    walletConnectProvider({ projectId }),
     publicProvider(),
   ]
 );

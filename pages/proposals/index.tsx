@@ -1,5 +1,5 @@
 import { useContractRead } from "wagmi";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Proposal from "@/components/proposal";
 import { Address } from "viem";
 import { TokenVotingAbi } from "../../artifacts/TokenVoting.sol";
@@ -11,6 +11,7 @@ import { If, IfNot } from "@/components/if";
 const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
 
 export default function Proposals() {
+  const [skipRender, setSkipRender] = useState(true);
   const [proposalCount, setProposalCount] = useState(0);
   const canCreate = useCanCreateProposal();
 
@@ -23,6 +24,9 @@ export default function Proposals() {
       setProposalCount(Number(data));
     },
   });
+
+  useEffect(() => setSkipRender(false), []);
+  if (skipRender) return <></>;
 
   return (
     <MainSection>

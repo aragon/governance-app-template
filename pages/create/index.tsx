@@ -49,13 +49,16 @@ export default function Create() {
         headers: { 'X-API-KEY': auth, 'Accept': 'application/json' }
     });
 
+    useEffect(() => {
+        if (ipfsPin !== '') createProposalWrite?.()
+    }, [ipfsPin])
+
     const submitProposal = async () => {
         const proposalMetadataJsonObject = { title, summary };
         const blob = new Blob([JSON.stringify(proposalMetadataJsonObject)], { type: 'application/json' });
 
         const ipfsPin = await uploadToIPFS(client, blob);
         setIpfsPin(ipfsPin!)
-        if (ipfsPin !== '') createProposalWrite?.()
     }
 
     const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {

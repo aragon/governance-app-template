@@ -19,7 +19,7 @@ export default function Proposals() {
     address: pluginAddress,
     abi: TokenVotingAbi,
     functionName: "proposalCount",
-    // watch: true,
+    watch: true,
     onSuccess(data) {
       setProposalCount(Number(data));
     },

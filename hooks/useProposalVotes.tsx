@@ -18,8 +18,9 @@ export function useProposalVotes(publicClient: any, address: Address, proposalId
         args: {
           proposalId,
         } as any,
+        watch: true,
         fromBlock: proposal.parameters.snapshotBlock,
-        toBlock: 'latest',
+        toBlock: 'latest', // TODO: Make this variable between 'latest' and proposal last block
       });
       setLogs(logs.flatMap(log => log.args));
       setCentinel(true)

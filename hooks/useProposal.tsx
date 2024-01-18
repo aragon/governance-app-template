@@ -17,6 +17,7 @@ export function useProposal(publicClient: any, address: Address, proposalId: str
       abi: TokenVotingAbi,
       functionName: 'getProposal',
       args: [proposalId],
+      watch: true,
       onSuccess(data) {
         setProposal({
           open: (data as Array<boolean>)[0],

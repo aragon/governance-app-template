@@ -47,6 +47,7 @@ export default function Proposal() {
     no: 0,
     abstain: 0,
   });
+  const [userVote, setUserVote] = useState<number|undefined>(undefined)
   const [showDescriptionView, toggleDetailsView] = useState<boolean>(true);
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [userVotedOption, setUserVotedOption] = useState<number>();
@@ -80,8 +81,9 @@ export default function Proposal() {
     });
   }, [proposal.tally]);
 
-  const userVote = () =>
-    votes.find((vote) => vote.voter === address)?.voteOption;
+  useEffect(() => {
+    setUserVote(votes.find((vote) => vote.voter === address)?.voteOption)
+  }, [votes])
 
   const voteFor = (option: number) => {
     setUserVotedOption(option);
@@ -105,7 +107,7 @@ export default function Proposal() {
         <ProposalHeader
           proposalNumber={Number(proposalId)}
           proposal={proposal}
-          userVote={userVote()}
+          userVote={userVote}
           userCanVote={userCanVote as boolean}
           setShowVotingModal={setShowVotingModal}
         />

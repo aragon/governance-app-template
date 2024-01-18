@@ -14,6 +14,7 @@ export function useUserCanVote(proposalId: bigint) {
                 address: pluginAddress,
                 abi: TokenVotingAbi,
                 functionName: 'canVote',
+                watch: true,
                 args: [proposalId, address, 1]
     })
 

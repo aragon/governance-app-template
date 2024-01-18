@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Blockies from "react-blockies";
 import { VoteCastEvent } from "@/utils/types";
 import { formatUnits } from "viem";
@@ -9,9 +10,17 @@ export default function VotesSection({
 }: {
   votes: Array<VoteCastEvent>;
 }) {
-  const abstainVotes = votes.filter((vote) => vote.voteOption === 1);
-  const yesVotes = votes.filter((vote) => vote.voteOption === 2);
-  const noVotes = votes.filter((vote) => vote.voteOption === 3);
+  const [abstainVotes, setAbstainVotes] = useState<VoteCastEvent[]>([])
+  const [yesVotes, setYesVotes] = useState<VoteCastEvent[]>([])
+  const [noVotes, setNoVotes] = useState<VoteCastEvent[]>([])
+
+  useEffect(() => {
+    if (votes) {
+      setAbstainVotes(votes.filter((vote) => vote.voteOption === 1))
+      setYesVotes(votes.filter((vote) => vote.voteOption === 2))
+      setNoVotes(votes.filter((vote) => vote.voteOption === 3))
+    }
+  }, [votes])
 
   return (
     <div className="grid grod-cols-1 lg:grid-cols-2 mt-4 mb-14 gap-4">

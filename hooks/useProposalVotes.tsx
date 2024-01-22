@@ -5,28 +5,25 @@ import { Proposal, VoteCastEvent, VoteCastResponse } from '../utils/types';
 
 export function useProposalVotes(publicClient: any, address: Address, proposalId: string, proposal: Proposal) {
   const [proposalLogs, setLogs] = useState<VoteCastEvent[]>([]);
-  const [centinel, setCentinel] = useState<boolean>(false);
+
+  async function getLogs() {
+    if (!proposal?.parameters?.snapshotBlock) return
+    const event = getAbiItem({ abi: TokenVotingAbi, name: 'VoteCast' });
+    const logs: VoteCastResponse[] = await publicClient.getLogs({
+      address,
+      event,
+      args: {
+        proposalId,
+      } as any,
+      fromBlock: proposal.parameters.snapshotBlock,
+      toBlock: 'latest', // TODO: Make this variable between 'latest' and proposal last block
+    });
+    let newLogs = logs.flatMap(log => log.args)
+    if (newLogs.length > proposalLogs.length) setLogs(newLogs);
+  }
 
   useEffect(() => {
-    async function getLogs() {
-      if (!proposal?.parameters?.snapshotBlock || centinel) return;
-
-      const event = getAbiItem({ abi: TokenVotingAbi, name: 'VoteCast' });
-      const logs: VoteCastResponse[] = await publicClient.getLogs({
-        address,
-        event,
-        args: {
-          proposalId,
-        } as any,
-        watch: true,
-        fromBlock: proposal.parameters.snapshotBlock,
-        toBlock: 'latest', // TODO: Make this variable between 'latest' and proposal last block
-      });
-      setLogs(logs.flatMap(log => log.args));
-      setCentinel(true)
-    }
-
-    getLogs();
+    getLogs()
   }, [proposal]);
 
   return proposalLogs;

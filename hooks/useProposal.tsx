@@ -19,6 +19,7 @@ export function useProposal(publicClient: any, address: Address, proposalId: str
       args: [proposalId],
       watch: true,
       onSuccess(data) {
+        console.log('Data: ', data)
         setProposal({
           open: (data as Array<boolean>)[0],
           executed: (data as Array<boolean>)[1],
@@ -48,7 +49,7 @@ export function useProposal(publicClient: any, address: Address, proposalId: str
       }
   
       getLogs();
-    }, [proposal]);
+    }, [proposal?.tally]);
   
     const { data: ipfsResponse, isLoading: ipfsLoading, error } = useQuery<ProposalMetadata, Error>(
       `ipfsData${proposalId}`,
@@ -56,5 +57,5 @@ export function useProposal(publicClient: any, address: Address, proposalId: str
       { enabled: proposalMetadata ? true : false }
     );
   
-    return { ...proposal, ...proposalLogs, ...ipfsResponse };
+    return { ...proposalLogs, ...ipfsResponse, ...proposal };
   }

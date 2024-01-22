@@ -16,6 +16,8 @@ export default function VotesSection({
 
   useEffect(() => {
     if (votes) {
+      console.log('votes-section || inside:useEffect || changing votes')
+      console.log('votes: ', votes)
       setAbstainVotes(votes.filter((vote) => vote.voteOption === 1))
       setYesVotes(votes.filter((vote) => vote.voteOption === 2))
       setNoVotes(votes.filter((vote) => vote.voteOption === 3))

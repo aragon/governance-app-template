@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { AlertInline, Button, Tag } from '@aragon/ods'
 import { Proposal, ProposalCreatedLogResponse } from '@/utils/types'
 import { formatAddress } from '@/utils/addressHelper';
@@ -13,6 +14,17 @@ interface ProposalHeaderProps {
 }
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposal, userVote, userCanVote, setShowVotingModal }) => {
+  const [proposalVariantStatus, setProposalVariantStatus] = useState({variant: '', label: ''});
+  const [userVoteData, setUserVoteData] = useState({variant: '', label: ''});
+
+  useEffect(() => {
+    setProposalVariantStatus(getProposalVariantStatus(proposal));
+  }, [proposal]);
+  
+  useEffect(() => {
+    setUserVoteData(getUserVoteData());
+  }, [userVote]);
+
   const getProposalVariantStatus = (proposal: Proposal) => {
     return {
       variant: proposal?.open ? 'info' : proposal?.executed ? 'success' : proposal?.tally?.no >= proposal?.tally?.yes ? 'critical' : 'success' as AlertVariant,
@@ -30,6 +42,8 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
     }
   }
 
+  if (userVoteData.variant === '') return <></>;
+
   return (
     <div className="w-full">
       <div className="flex flex-row pb-2 h-16 items-center">
@@ -42,8 +56,8 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
               <div className="flex">
               <Tag
                 className="text-center text-critical-800"
-                label={getProposalVariantStatus((proposal as Proposal)).label}
-                variant={getProposalVariantStatus((proposal as Proposal)).variant}
+                label={proposalVariantStatus.label}
+                variant={proposalVariantStatus.variant as AlertVariant}
               />
               </div>
             )}
@@ -65,8 +79,8 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
                 <span className="text-md text-neutral-800 font-semibold pr-4">Voted: </span>
                 <AlertInline
                   className="flex h-5 items-center"
-                  variant={getUserVoteData().variant}
-                  message={getUserVoteData().label}
+                  variant={userVoteData.variant as AlertVariant}
+                  message={userVoteData.label}
                 />
               </div>
             )}

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import Blockies from "react-blockies";
 import { VoteCastEvent } from "@/utils/types";
 import { formatUnits } from "viem";
-import { formatAddress } from "@/utils/addressHelper";
 import { ReactNode } from "react";
+import { AddressText } from "../text/address";
 
 export default function VotesSection({
   votes,
@@ -71,7 +71,7 @@ const VoteCard = function ({
           <Blockies className="rounded-3xl" size={9} seed={vote?.voter} />
           <div className="px-2">
             <p className="text-primary-700 font-semibold underline">
-              {formatAddress(vote.voter)}
+              <AddressText>{vote.voter}</AddressText>
             </p>
             <p className="text-neutral-700 font-semibold">
               {formatUnits(vote.votingPower, 18)} votes

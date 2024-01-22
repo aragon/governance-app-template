@@ -37,7 +37,7 @@ export default function Proposals() {
         <div className="justify-self-end">
           <If condition={canCreate}>
             <Link href="/create">
-              <Button iconLeft={IconType.ADD} size="lg" variant="primary">
+              <Button iconLeft={IconType.ADD} size="md" variant="primary">
                 Submit Proposal
               </Button>
             </Link>

@@ -1,6 +1,6 @@
-import { Children, ReactNode, createContext, useContext } from "react";
+import { ReactNode, createContext, useContext } from "react";
 
-type Booleanish = boolean | number | bigint | string;
+type Booleanish = any;
 const IfCaseContext = createContext<{ condition: Booleanish }>(null as any);
 
 /**

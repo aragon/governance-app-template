@@ -1,14 +1,14 @@
-import { formatHexString, getAddressExplorerLink } from "@/utils/evm";
+import { formatHexString, getTransactionExplorerLink } from "@/utils/evm";
 import { getChildrenText } from "@/utils/content";
 import { ReactNode } from "react";
 import { useWalletClient } from "wagmi";
 
-export const AddressText = ({ children }: { children: ReactNode }) => {
-  const address = getChildrenText(children);
+export const TransactionText = ({ children }: { children: ReactNode }) => {
+  const txHash = getChildrenText(children);
   const { data: client } = useWalletClient();
 
-  const formattedAddress = formatHexString(address.trim());
-  const link = getAddressExplorerLink(address, client?.chain?.name || "");
+  const formattedAddress = formatHexString(txHash.trim());
+  const link = getTransactionExplorerLink(txHash, client?.chain?.name || "");
 
   if (!link) {
     return (

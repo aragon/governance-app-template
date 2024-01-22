@@ -2,8 +2,9 @@ import { FC, useEffect, useState, useCallback } from "react";
 import { Abi, Address, encodeFunctionData } from "viem";
 import { whatsabi } from "@shazow/whatsabi";
 import { usePublicClient } from "wagmi";
-import { Spinner, InputText } from '@aragon/ods'
+import { InputText } from '@aragon/ods'
 import { AbiFunction } from "abitype";
+import { PleaseWaitSpinner } from "../please-wait";
 
 interface CustomActionInputProps {
     setAction: Function;
@@ -71,10 +72,7 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
             </div>
             {loadingAbi && (
                 <div className="mb-3 pb-3">
-                    <Spinner
-                        size="xl"
-                        variant="primary"
-                    />
+                    <PleaseWaitSpinner/>
                 </div>
             )}
             {!loadingAbi && abi && abi.length >= 0 && (

@@ -4,21 +4,25 @@ import { Proposal, ProposalCreatedLogResponse } from '@/utils/types'
 import { formatAddress } from '@/utils/addressHelper';
 import dayjs from "dayjs";
 import { AlertVariant } from '@aragon/ods/dist/types/src/components/alerts/utils';
+import { TagVariant } from "@aragon/ods/dist/types/src/components/tag/tag";
+import { Else, If, IfCase, Then } from "../if";
+import { StatusTag } from "../text/status-tag";
+import { AddressText } from "../text/address";
 
 interface ProposalHeaderProps {
   proposalNumber: number;
   proposal: Proposal;
   userVote: number | undefined;
   userCanVote: boolean;
-  setShowVotingModal: Function
+  setShowVotingModal: Function;
 }
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposal, userVote, userCanVote, setShowVotingModal }) => {
-  const [proposalVariantStatus, setProposalVariantStatus] = useState({variant: '', label: ''});
+  const [proposalVariant, setProposalVariant] = useState({variant: '', label: ''});
   const [userVoteData, setUserVoteData] = useState({variant: '', label: ''});
 
   useEffect(() => {
-    setProposalVariantStatus(getProposalVariantStatus(proposal));
+    setProposalVariant(getProposalVariantStatus(proposal));
   }, [proposal]);
   
   useEffect(() => {
@@ -56,8 +60,8 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
               <div className="flex">
               <Tag
                 className="text-center text-critical-800"
-                label={proposalVariantStatus.label}
-                variant={proposalVariantStatus.variant as AlertVariant}
+                label={proposalVariant.label}
+                variant={proposalVariant.variant as AlertVariant}
               />
               </div>
             )}
@@ -67,14 +71,17 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
           </div>
         </div>
         <div className="flex ">
-          {userCanVote ?
+          <IfCase condition={userCanVote}>
+            <Then>
             <Button
               className="flex h-5 items-center"
               size="lg"
               variant="primary"
               onClick={() => setShowVotingModal(true)}
             >Vote</Button>
-            : userVote && (
+            </Then>
+            <Else>
+              <If condition={userVote}>
               <div className="flex items-center align-center">
                 <span className="text-md text-neutral-800 font-semibold pr-4">Voted: </span>
                 <AlertInline
@@ -83,20 +90,29 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
                   message={userVoteData.label}
                 />
               </div>
-            )}
+              </If>
+            </Else>
+          </IfCase>
         </div>
       </div>
-      <h4 className="mb-1 text-3xl text-neutral-900 font-semibold">
+
+      <h4 className="flex-grow mb-1 text-3xl text-neutral-900 font-semibold">
         {proposal.title}
       </h4>
       <p className="text-base text-l text-body-color dark:text-dark-6">
-        Proposed by
-        <span className="text-primary-400 font-semibold underline"> {formatAddress((proposal as any as ProposalCreatedLogResponse)?.args?.creator)}</span>
+        Proposed by{" "}
+        <AddressText>{(proposal as any as ProposalCreatedLogResponse)?.args?.creator}</AddressText>
         &nbsp;active until
-        <span className="text-primary-400 font-semibold"> {dayjs(Number(proposal.parameters?.endDate) * 1000).format('DD/MM/YYYY hh:mm')}h</span>
+        <span className="text-primary-400 font-semibold">
+          {" "}
+          {dayjs(Number(proposal.parameters?.endDate) * 1000).format(
+            "DD/MM/YYYY hh:mm"
+          )}
+          h
+        </span>
       </p>
     </div>
-  )
-}
+  );
+};
 
 export default ProposalHeader;

@@ -102,31 +102,31 @@ export default function Create() {
                             onClick={() => {changeActionType(ActionType.Signaling)}}
                             className={`rounded-xl bg-white border border-dashed border-2 flex flex-col items-center ${actionType === ActionType.Signaling ? 'border-primary-300' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
+                                className="p-2 rounded-full text-primary-400 !h-12 !w-12"
                                 icon={IconType.INFO}
                                 size="lg"
                             />
-                            <h3 className="font-semibold text-lg">Signaling proposal</h3>
+                            <span className="text-sm text-neutral-400 text-center">Signaling</span>
                         </div>
                         <div
                             onClick={() => changeActionType(ActionType.Withdrawal)}
                             className={`rounded-xl bg-white border border-dashed border-2 flex flex-col items-center ${actionType === ActionType.Withdrawal ? 'border-primary-300' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
+                                className="p-2 rounded-full text-primary-400 !h-12 !w-12"
                                 icon={IconType.TX_WITHDRAW}
                                 size="lg"
                             />
-                            <h3 className="font-semibold text-lg">DAO Payment</h3>
+                            <span className="text-sm text-neutral-400 text-center">DAO Payment</span>
                         </div>
                         <div
                             onClick={() => changeActionType(ActionType.Custom)}
                             className={`rounded-xl bg-white border border-dashed border-2 flex flex-col items-center ${actionType === ActionType.Custom ? 'border-primary-300' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full bg-primary-100 text-primary-600 !h-16 !w-16 my-8"
+                                className="p-2 rounded-full text-primary-400 !h-12 !w-12"
                                 icon={IconType.BLOCKCHAIN}
                                 size="lg"
                             />
-                            <h3 className="font-semibold text-lg">Custom action</h3>
+                            <span className="text-sm text-neutral-400 text-center">Custom action</span>
                         </div>
                     </div>
                     <div className="mb-6">

@@ -12,9 +12,9 @@ export const PleaseWaitSpinner = ({
   if (!loaded) return null;
 
   return (
-    <p suppressHydrationWarning>
+    <div suppressHydrationWarning>
       <Spinner size="sm" variant="neutral" className="inline-block -m-[2px]" />{" "}
       &nbsp;&nbsp;{status}, please wait...
-    </p>
+    </div>
   );
 };

@@ -19,7 +19,6 @@ export function useProposal(publicClient: any, address: Address, proposalId: str
       args: [proposalId],
       watch: true,
       onSuccess(data) {
-        console.log('Data: ', data)
         setProposal({
           open: (data as Array<boolean>)[0],
           executed: (data as Array<boolean>)[1],

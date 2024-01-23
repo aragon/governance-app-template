@@ -44,7 +44,7 @@ export default function ProposalDescription(proposal: Proposal) {
   };
 
   const fetchActionData = useCallback(async () => {
-    var decodedActions = await Promise.all(
+    const decodedActions = await Promise.all(
       proposal.actions.map(async (action) => {
         let functionData: any;
         if (action.data != "0x") {

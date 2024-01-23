@@ -18,7 +18,7 @@ export function useProposalVotes(publicClient: any, address: Address, proposalId
       fromBlock: proposal.parameters.snapshotBlock,
       toBlock: 'latest', // TODO: Make this variable between 'latest' and proposal last block
     });
-    let newLogs = logs.flatMap(log => log.args)
+    const newLogs = logs.flatMap(log => log.args)
     if (newLogs.length > proposalLogs.length) setLogs(newLogs);
   }
 

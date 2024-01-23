@@ -1,5 +1,5 @@
 import { FC, useEffect, useState, useCallback } from "react";
-import { Abi, Address, encodeFunctionData } from "viem";
+import { Address, encodeFunctionData } from "viem";
 import { whatsabi } from "@shazow/whatsabi";
 import { usePublicClient } from "wagmi";
 import { InputText } from '@aragon/ods'

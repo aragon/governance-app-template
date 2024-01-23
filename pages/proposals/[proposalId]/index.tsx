@@ -65,12 +65,12 @@ export default function Proposal() {
   useEffect(() => {
     if (!proposal.tally) return;
 
-    let yesVotes = Number(formatUnits(proposal.tally.yes || BigInt(0), 18));
-    let noVotes = Number(formatUnits(proposal.tally.no || BigInt(0), 18));
-    let abstainVotes = Number(
+    const yesVotes = Number(formatUnits(proposal.tally.yes || BigInt(0), 18));
+    const noVotes = Number(formatUnits(proposal.tally.no || BigInt(0), 18));
+    const abstainVotes = Number(
       formatUnits(proposal.tally.abstain || BigInt(0), 18)
     );
-    let totalVotes = yesVotes + noVotes + abstainVotes;
+    const totalVotes = yesVotes + noVotes + abstainVotes;
 
     setVotingPercentages({
       yes: (yesVotes / totalVotes) * 100,

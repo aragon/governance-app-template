@@ -1,6 +1,6 @@
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Button } from "@aragon/ods";
-import { useAccount } from "wagmi";
+import { Address, useAccount } from "wagmi";
 import { Else, IfCase, Then } from "./if";
 import { formatHexString } from "@/utils/evm";
 import { useEffect, useState } from "react";
@@ -22,7 +22,7 @@ const Header = () => {
             onClick={() => open()}
             className="text-primary-500 underline cursor-pointer"
           >
-            {formatHexString(address as any)}
+            {formatHexString(address as Address)}
           </span>
         </Then>
         <Else>

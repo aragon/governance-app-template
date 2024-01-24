@@ -3,7 +3,7 @@ import { ReactNode, useEffect, useState } from "react";
 import Proposal from "@/components/proposal";
 import { Address } from "viem";
 import { TokenVotingAbi } from "../../artifacts/TokenVoting.sol";
-import { Button, IconType } from "@aragon/ods";
+import { Button, Icon, IconType } from "@aragon/ods";
 import { useCanCreateProposal } from "@/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { If, IfNot } from "@/components/if";
@@ -14,6 +14,18 @@ export default function Proposals() {
   const [skipRender, setSkipRender] = useState(true);
   const [proposalCount, setProposalCount] = useState(0);
   const canCreate = useCanCreateProposal();
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 10; // Change this to the number of items you want per page
+  const [paginatedProposals, setPaginatedProposals] = useState([]);
+
+  useEffect(() => {
+    const start = (currentPage) * itemsPerPage;
+    const end = (currentPage + 1)* itemsPerPage;
+    setPaginatedProposals([...Array(proposalCount)].slice(start, end));
+  }, [proposalCount, currentPage]);
+
+
 
   const { isLoading } = useContractRead({
     address: pluginAddress,
@@ -45,9 +57,31 @@ export default function Proposals() {
         </div>
       </SectionView>
       <If condition={proposalCount}>
-        {[...Array(proposalCount)].map((_, i) => (
-          <Proposal key={i} proposalId={BigInt(proposalCount! - 1 - i)} />
+        {paginatedProposals.map((_, i) => (
+          <Proposal 
+            key={BigInt((proposalCount! - 1) - (currentPage*itemsPerPage) - i)} 
+            proposalId={BigInt((proposalCount! - 1) - (currentPage*itemsPerPage) - i)} />
         ))}
+        <div className="flex flex-row gap-2 mt-4">
+          <Button 
+            variant="tertiary"
+            size="md"
+            disabled={!currentPage}
+            onClick={() => setCurrentPage((page) => Math.max(page - 1, 0))}
+            iconLeft={IconType.CHEVRON_LEFT}
+          >
+            Previous
+          </Button>
+          <Button 
+            variant="tertiary"
+            size="md"
+            disabled={(currentPage + 1) * itemsPerPage > proposalCount}
+            onClick={() => setCurrentPage((page) => page + 1)}
+            iconRight={IconType.CHEVRON_RIGHT}
+          >
+            Next
+          </Button>
+        </div>
       </If>
       <IfNot condition={proposalCount}>
         <If condition={isLoading}>

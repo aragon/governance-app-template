@@ -5,6 +5,7 @@ import { usePublicClient } from "wagmi";
 import { InputText } from '@aragon/ods'
 import { AbiFunction } from "abitype";
 import { PleaseWaitSpinner } from "@/components/please-wait";
+import { isAddress } from "@/utils/evm";
 
 interface CustomActionInputProps {
     setAction: Function;
@@ -27,6 +28,8 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
     }
 
     const getContractAbi = useCallback(async () => {
+        if (!isAddress(to)) return
+
         setLoadingAbi(true)
         const abiLoader = new whatsabi.loaders.EtherscanABILoader({ apiKey: etherscanKey });
         const { abi } = await whatsabi.autoload(to!, {
@@ -39,10 +42,12 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
     }, [to])
 
     useEffect(() => {
-        if (to) getContractAbi()
+        if (!isAddress(to)) return
+        getContractAbi()
     }, [to])
 
     useEffect(() => {
+        if (!isAddress(to)) return
         setAction([{ to, value, data }])
     }, [to, value, data])
 

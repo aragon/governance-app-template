@@ -24,8 +24,8 @@ enum ActionType {
 
 export default function Create() {
     const [ipfsPin, setIpfsPin] = useState<string>('');
-    const [title, setTitle] = useState<string>();
-    const [summary, setSummary] = useState<string>();
+    const [title, setTitle] = useState<string>('');
+    const [summary, setSummary] = useState<string>('');
     const [action, setAction] = useState<Action[]>([]);
     const { addAlert } = useAlertContext()
     const { write: createProposalWrite } = useContractWrite({
@@ -54,6 +54,9 @@ export default function Create() {
     }, [ipfsPin])
 
     const submitProposal = async () => {
+        if(!title.trim()) return alert("Please, enter a title");
+        else if(!summary.trim()) return alert("Please, enter a summary");
+        
         const proposalMetadataJsonObject = { title, summary };
         const blob = new Blob([JSON.stringify(proposalMetadataJsonObject)], { type: 'application/json' });
 
@@ -89,7 +92,7 @@ export default function Create() {
                     <textarea
                         id="message"
                         rows={6}
-                        className="block p-2.5 w-full text-md font-semibold placeholder-neutral-300 text-neutral-900 bg-white rounded-xl border border-neutral-100 focus:ring-primary-300 focus:border-primary-300"
+                        className="block p-2.5 w-full text-md placeholder-neutral-300 text-neutral-600 bg-white rounded-xl border border-neutral-100 focus:ring-primary-300 focus:border-primary-300"
                         placeholder="A detailed description for what the proposal is all about"
                         value={summary}
                         onChange={handleSummaryInput}
@@ -97,12 +100,12 @@ export default function Create() {
                 </div>
                 <div className="mb-6">
                     <span className="block mb-2 text-lg text-neutral-900 ">Select proposal action</span>
-                    <div className="grid grid-cols-3 gap-5 h-48 mt-2">
+                    <div className="grid grid-cols-3 gap-5 h-24 mt-2">
                         <div
                             onClick={() => {changeActionType(ActionType.Signaling)}}
-                            className={`rounded-xl bg-white border border-dashed border-2 flex flex-col items-center ${actionType === ActionType.Signaling ? 'border-primary-300' : 'border-neutral-100'}`}>
+                            className={`rounded-xl border border-solid border-2 bg-neutral-0 hover:bg-neutral-50 flex flex-col items-center cursor-pointer ${actionType === ActionType.Signaling ? 'border-primary-300' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full text-primary-400 !h-12 !w-12"
+                                className="mt-2 p-2 rounded-full text-primary-400 !h-12 !w-12"
                                 icon={IconType.INFO}
                                 size="lg"
                             />
@@ -110,9 +113,9 @@ export default function Create() {
                         </div>
                         <div
                             onClick={() => changeActionType(ActionType.Withdrawal)}
-                            className={`rounded-xl bg-white border border-dashed border-2 flex flex-col items-center ${actionType === ActionType.Withdrawal ? 'border-primary-300' : 'border-neutral-100'}`}>
+                            className={`rounded-xl border border-solid border-2 bg-neutral-0 hover:bg-neutral-50 flex flex-col items-center cursor-pointer ${actionType === ActionType.Withdrawal ? 'border-primary-300' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full text-primary-400 !h-12 !w-12"
+                                className="mt-2 p-2 rounded-full text-primary-400 !h-12 !w-12"
                                 icon={IconType.TX_WITHDRAW}
                                 size="lg"
                             />
@@ -120,9 +123,9 @@ export default function Create() {
                         </div>
                         <div
                             onClick={() => changeActionType(ActionType.Custom)}
-                            className={`rounded-xl bg-white border border-dashed border-2 flex flex-col items-center ${actionType === ActionType.Custom ? 'border-primary-300' : 'border-neutral-100'}`}>
+                            className={`rounded-xl border border-solid border-2 bg-neutral-0 hover:bg-neutral-50 flex flex-col items-center cursor-pointer ${actionType === ActionType.Custom ? 'border-primary-300' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full text-primary-400 !h-12 !w-12"
+                                className="mt-2 p-2 rounded-full text-primary-400 !h-12 !w-12"
                                 icon={IconType.BLOCKCHAIN}
                                 size="lg"
                             />

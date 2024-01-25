@@ -15,7 +15,7 @@ const Sidebar = () => {
       size="sm"
       responsiveSize={{}}
       variant="tertiary"
-      className="absolute md:hidden mt-2 ml-2 z-50"
+      className="md:hidden block absolute mt-2 ml-2 z-50"
       onClick={() => setIsOpen(!isOpen)}
     >
       <svg
@@ -41,7 +41,7 @@ const Sidebar = () => {
 
 
   return (
-    <header className="h-screen" >
+    <header className="h-screen">
       <SidebarSwitchButton />
       <div className={`md:w-72 bg-neutral-100 shadow h-full flex flex-col justify-between ${isOpen ? 'absolute md:relative w-full' : 'hidden md:block'}`}>
         <div className="flex-1 grow">

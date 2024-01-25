@@ -2,6 +2,7 @@ import { Action } from "@/utils/types";
 import { FC, useEffect, useState } from "react";
 import { InputText } from '@aragon/ods'
 import { Address } from "viem";
+import { isAddress } from "@/utils/evm";
 
 interface WithdrawalInputProps {
     setAction: Function;
@@ -9,10 +10,13 @@ interface WithdrawalInputProps {
 
 const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
     const [to, setTo] = useState<Address>();
-    const [value, setValue] = useState<number>()
+    const [value, setValue] = useState<string>('')
 
     useEffect(() => {
-        setAction([{ to, value, data: '0x' } as unknown as Action])
+        if(!isAddress(to)) return;
+        else if(!isNumeric(value)) return;
+
+        setAction([{ to, value: BigInt(value), data: '0x' } as unknown as Action])
     }, [to, value])
 
     const handleTo = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,7 +24,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
     }
 
     const handleValue = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(Number(event?.target?.value));
+        setValue(event?.target?.value);
     }
     return (
         <div className="my-6">
@@ -28,8 +32,8 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
                 <InputText
                     className=""
                     label="Address"
-                    placeholder="Destination address" 
-                    variant="default"
+                    placeholder="0x..." 
+                    variant={(!to || isAddress(to)) ? "default" : "critical"}
                     value={to}
                     onChange={handleTo}
                     />
@@ -37,9 +41,9 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
             <div className="mb-6">
                 <InputText
                     className=""
-                    label="Amount (in weis)"
+                    label="Amount (in wei)"
                     placeholder="1000000000000000000" 
-                    variant="default"
+                    variant={(typeof value === "undefined" || isNumeric(value)) ? "default" : "critical"}
                     value={value}
                     onChange={handleValue}
                     />
@@ -47,5 +51,10 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
         </div>
     )
 };
+
+function isNumeric(value: string): boolean{
+    if (!value) return true;
+    return !!value.match(/^[0-9]+$/);
+}
 
 export default WithdrawalInput

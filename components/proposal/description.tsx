@@ -6,6 +6,7 @@ import { Address, decodeFunctionData } from "viem";
 import { Else, If, IfCase, IfNot, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { AddressText } from "@/components/text/address";
+import { isAddress } from "@/utils/evm";
 
 type FunctionData = {
   args: readonly unknown[] | undefined;
@@ -14,12 +15,6 @@ type FunctionData = {
 };
 
 const etherscanKey: string = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY || "";
-
-const isAddress = (maybeAddress: any) => {
-  if (!maybeAddress || typeof maybeAddress !== "string") return false;
-  else if (!maybeAddress.match(/^0x[0-9a-fA-F]{40}$/)) return false;
-  return true;
-};
 
 export default function ProposalDescription(proposal: Proposal) {
   const publicClient = usePublicClient();

@@ -2,6 +2,7 @@ import { Action } from "@/utils/types";
 import { FC, useEffect, useState } from "react";
 import { InputText } from '@aragon/ods'
 import { Address } from "viem";
+import { isAddress } from "@/utils/evm";
 
 interface WithdrawalInputProps {
     setAction: Function;
@@ -20,7 +21,8 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
     }
 
     const handleValue = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(Number(event?.target?.value));
+        const n = Number(event?.target?.value)
+        setValue(n);
     }
     return (
         <div className="my-6">
@@ -28,8 +30,8 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
                 <InputText
                     className=""
                     label="Address"
-                    placeholder="Destination address" 
-                    variant="default"
+                    placeholder="0x..." 
+                    variant={(!to || isAddress(to)) ? "default" : "critical"}
                     value={to}
                     onChange={handleTo}
                     />
@@ -39,7 +41,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
                     className=""
                     label="Amount (in weis)"
                     placeholder="1000000000000000000" 
-                    variant="default"
+                    variant={(typeof value === "undefined" || !isNaN(value)) ? "default" : "critical"}
                     value={value}
                     onChange={handleValue}
                     />

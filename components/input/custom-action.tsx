@@ -128,8 +128,6 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setAction }) => {
                     </div>
                 </div>
             )}
-
-
         </div>
     )
 };

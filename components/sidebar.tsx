@@ -63,9 +63,8 @@ const Sidebar = () => {
           </div>
           <ul className="mt-12 px-6">
             <li
-              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 ${
-                isHome ? "bg-neutral-200 font-semibold" : ""
-              } rounded-lg shadow-lg hover:bg-neutral-200`}
+              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 ${isHome ? "bg-neutral-200 font-semibold" : ""
+                } rounded-lg shadow-lg hover:bg-neutral-200`}
             >
               <Link href="/" className="flex items-center w-full">
                 <Icon
@@ -78,9 +77,8 @@ const Sidebar = () => {
                 />
 
                 <span
-                  className={`block py-2 pr-4 pl-3 rounded ${
-                    isHome ? "font-semibold" : ""
-                  } lg:p-0`}
+                  className={`block py-2 pr-4 pl-3 rounded ${isHome ? "font-semibold" : ""
+                    } lg:p-0`}
                   aria-current="page"
                 >
                   Home
@@ -88,9 +86,8 @@ const Sidebar = () => {
               </Link>
             </li>
             <li
-              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 ${
-                isProposals ? "bg-neutral-200 rounded-lg shadow-lg" : ""
-              } rounded-lg shadow-lg hover:bg-neutral-200`}
+              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 ${isProposals ? "bg-neutral-200 rounded-lg shadow-lg" : ""
+                } rounded-lg shadow-lg hover:bg-neutral-200`}
             >
               <Link href="/proposals" className="flex items-center w-full">
                 <Icon
@@ -102,9 +99,8 @@ const Sidebar = () => {
                   }}
                 />
                 <span
-                  className={`block py-2 pr-4 pl-3 rounded lg:p-0 ${
-                    isProposals ? "font-semibold" : ""
-                  }`}
+                  className={`block py-2 pr-4 pl-3 rounded lg:p-0 ${isProposals ? "font-semibold" : ""
+                    }`}
                   aria-current="page"
                 >
                   Proposals
@@ -153,15 +149,16 @@ const Sidebar = () => {
                 href="https://aragon.org"
                 className="flex items-center focus:outline-none focus:ring-2 focus:ring-white"
               >
-                <Image
-                  src="/logo-bw-sm.png"
-                  width="20"
-                  height="20"
-                  className=""
-                  alt="Aragonette"
-                />
-                <span className="block py-2 pr-4 pl-3 lg:border-0">
-                  Powered by <span className="font-semibold">Aragon</span>
+
+                <span className="block py-2 pr-4 pl-3 lg:border-0 flex flex-row">
+                  Powered by <span className="font-semibold text-primary-400 mr-1">&nbsp;Aragon</span>
+                  <Image
+                    src="/logo.png"
+                    width="24"
+                    height="20"
+                    className=""
+                    alt="Aragonette"
+                  />
                 </span>
               </Link>
             </li>

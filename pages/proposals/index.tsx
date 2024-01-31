@@ -1,9 +1,9 @@
 import { useContractRead } from "wagmi";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Proposal from "@/components/proposal";
 import { Address } from "viem";
 import { TokenVotingAbi } from "../../artifacts/TokenVoting.sol";
-import { Button, IconType } from "@aragon/ods";
+import { Button, Icon, IconType } from "@aragon/ods";
 import { useCanCreateProposal } from "@/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { If, IfNot } from "@/components/if";
@@ -11,18 +11,34 @@ import { If, IfNot } from "@/components/if";
 const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
 
 export default function Proposals() {
+  const [skipRender, setSkipRender] = useState(true);
   const [proposalCount, setProposalCount] = useState(0);
   const canCreate = useCanCreateProposal();
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 10; // Change this to the number of items you want per page
+  const [paginatedProposals, setPaginatedProposals] = useState([]);
+
+  useEffect(() => {
+    const start = (currentPage) * itemsPerPage;
+    const end = (currentPage + 1)* itemsPerPage;
+    setPaginatedProposals([...Array(proposalCount)].slice(start, end));
+  }, [proposalCount, currentPage]);
+
+
 
   const { isLoading } = useContractRead({
     address: pluginAddress,
     abi: TokenVotingAbi,
     functionName: "proposalCount",
-    // watch: true,
+    watch: true,
     onSuccess(data) {
       setProposalCount(Number(data));
     },
   });
+
+  useEffect(() => setSkipRender(false), []);
+  if (skipRender) return <></>;
 
   return (
     <MainSection>
@@ -33,7 +49,7 @@ export default function Proposals() {
         <div className="justify-self-end">
           <If condition={canCreate}>
             <Link href="/create">
-              <Button iconLeft={IconType.ADD} size="lg" variant="primary">
+              <Button iconLeft={IconType.ADD} size="md" variant="primary">
                 Submit Proposal
               </Button>
             </Link>
@@ -41,9 +57,31 @@ export default function Proposals() {
         </div>
       </SectionView>
       <If condition={proposalCount}>
-        {[...Array(proposalCount)].map((_, i) => (
-          <Proposal key={i} proposalId={BigInt(proposalCount! - 1 - i)} />
+        {paginatedProposals.map((_, i) => (
+          <Proposal 
+            key={BigInt((proposalCount! - 1) - (currentPage*itemsPerPage) - i)} 
+            proposalId={BigInt((proposalCount! - 1) - (currentPage*itemsPerPage) - i)} />
         ))}
+        <div className="flex flex-row gap-2 mt-4">
+          <Button 
+            variant="tertiary"
+            size="md"
+            disabled={!currentPage}
+            onClick={() => setCurrentPage((page) => Math.max(page - 1, 0))}
+            iconLeft={IconType.CHEVRON_LEFT}
+          >
+            Previous
+          </Button>
+          <Button 
+            variant="tertiary"
+            size="md"
+            disabled={(currentPage + 1) * itemsPerPage > proposalCount}
+            onClick={() => setCurrentPage((page) => page + 1)}
+            iconRight={IconType.CHEVRON_RIGHT}
+          >
+            Next
+          </Button>
+        </div>
       </If>
       <IfNot condition={proposalCount}>
         <If condition={isLoading}>

@@ -17,6 +17,7 @@ export function useProposal(publicClient: any, address: Address, proposalId: str
       abi: TokenVotingAbi,
       functionName: 'getProposal',
       args: [proposalId],
+      watch: true,
       onSuccess(data) {
         setProposal({
           open: (data as Array<boolean>)[0],
@@ -47,7 +48,7 @@ export function useProposal(publicClient: any, address: Address, proposalId: str
       }
   
       getLogs();
-    }, [proposal]);
+    }, [proposal?.tally]);
   
     const { data: ipfsResponse, isLoading: ipfsLoading, error } = useQuery<ProposalMetadata, Error>(
       `ipfsData${proposalId}`,
@@ -55,5 +56,5 @@ export function useProposal(publicClient: any, address: Address, proposalId: str
       { enabled: proposalMetadata ? true : false }
     );
   
-    return { ...proposal, ...proposalLogs, ...ipfsResponse };
+    return { ...proposalLogs, ...ipfsResponse, ...proposal };
   }

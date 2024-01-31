@@ -8,9 +8,7 @@ import { Button } from "@aragon/ods";
 import ProposalDescription from "@/components/proposal/description";
 import VotesSection from "@/components/vote/votes-section";
 import ProposalHeader from "@/components/proposal/header";
-// import Blockies from "react-blockies";
 import { formatUnits } from "viem";
-// import { formatAddress } from "@/utils/addressHelper";
 import { useUserCanVote } from "@/hooks/useUserCanVote";
 import { TokenVotingAbi } from "@/artifacts/TokenVoting.sol";
 import VoteTally from "@/components/vote/tally";
@@ -47,6 +45,7 @@ export default function Proposal() {
     no: 0,
     abstain: 0,
   });
+  const [userVote, setUserVote] = useState<number|undefined>(undefined)
   const [showDescriptionView, toggleDetailsView] = useState<boolean>(true);
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [userVotedOption, setUserVotedOption] = useState<number>();
@@ -66,12 +65,12 @@ export default function Proposal() {
   useEffect(() => {
     if (!proposal.tally) return;
 
-    let yesVotes = Number(formatUnits(proposal.tally.yes || BigInt(0), 18));
-    let noVotes = Number(formatUnits(proposal.tally.no || BigInt(0), 18));
-    let abstainVotes = Number(
+    const yesVotes = Number(formatUnits(proposal.tally.yes || BigInt(0), 18));
+    const noVotes = Number(formatUnits(proposal.tally.no || BigInt(0), 18));
+    const abstainVotes = Number(
       formatUnits(proposal.tally.abstain || BigInt(0), 18)
     );
-    let totalVotes = yesVotes + noVotes + abstainVotes;
+    const totalVotes = yesVotes + noVotes + abstainVotes;
 
     setVotingPercentages({
       yes: (yesVotes / totalVotes) * 100,
@@ -80,8 +79,9 @@ export default function Proposal() {
     });
   }, [proposal.tally]);
 
-  const userVote = () =>
-    votes.find((vote) => vote.voter === address)?.voteOption;
+  useEffect(() => {
+    setUserVote(votes.find((vote) => vote.voter === address)?.voteOption)
+  }, [votes])
 
   const voteFor = (option: number) => {
     setUserVotedOption(option);
@@ -105,7 +105,7 @@ export default function Proposal() {
         <ProposalHeader
           proposalNumber={Number(proposalId)}
           proposal={proposal}
-          userVote={userVote()}
+          userVote={userVote}
           userCanVote={userCanVote as boolean}
           setShowVotingModal={setShowVotingModal}
         />

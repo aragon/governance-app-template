@@ -15,8 +15,8 @@ const Sidebar = () => {
       size="sm"
       responsiveSize={{}}
       variant="tertiary"
-      className="sm:hidden block absolute mt-2 ml-2 z-50"
-      onClick={() => setIsOpen(true)}
+      className="absolute md:hidden mt-2 ml-2 z-50"
+      onClick={() => setIsOpen(!isOpen)}
     >
       <svg
         className="h-6 w-6 fill-current"
@@ -41,9 +41,9 @@ const Sidebar = () => {
 
 
   return (
-    <header className="h-screen" onClick={() => setIsOpen(!isOpen)}>
+    <header className="h-screen" >
       <SidebarSwitchButton />
-      <div className={`w-full bg-neutral-100 shadow h-full flex-col justify-between ${isOpen ? 'absolute' : 'hidden'} sm:flex md:w-72`}>
+      <div className={`md:w-72 bg-neutral-100 shadow h-full flex flex-col justify-between ${isOpen ? 'absolute md:relative w-full' : 'hidden md:block'}`}>
         <div className="flex-1 grow">
           <div className="w-full flex items-center pt-14 py-3 px-3 md:pt-3">
             <Image
@@ -63,6 +63,7 @@ const Sidebar = () => {
           </div>
           <ul className="mt-12 px-6">
             <li
+              onClick={() => setIsOpen(false)}
               className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 ${isHome ? "bg-neutral-200 font-semibold" : ""
                 } rounded-lg shadow-lg hover:bg-neutral-200`}
             >
@@ -86,6 +87,7 @@ const Sidebar = () => {
               </Link>
             </li>
             <li
+              onClick={() => setIsOpen(false)}
               className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 ${isProposals ? "bg-neutral-200 rounded-lg shadow-lg" : ""
                 } rounded-lg shadow-lg hover:bg-neutral-200`}
             >
@@ -142,8 +144,7 @@ const Sidebar = () => {
             </li>
           </ul>
         </div>
-        <div className="px-8">
-          <ul className="w-full flex items-center justify-between mb-2">
+          <ul className="px-8 flex grow flex-col justify-end justify-items-end">
             <li className="cursor-pointer pt-5 pb-3 text-neutral-400">
               <Link
                 href="https://aragon.org"
@@ -163,7 +164,6 @@ const Sidebar = () => {
               </Link>
             </li>
           </ul>
-        </div>
       </div>
     </header>
   );

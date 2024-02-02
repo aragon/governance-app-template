@@ -13,8 +13,8 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
     const [value, setValue] = useState<string>('')
 
     useEffect(() => {
-        if(!isAddress(to)) return;
-        else if(!isNumeric(value)) return;
+        if (!isAddress(to)) return;
+        else if (!isNumeric(value)) return;
 
         setAction([{ to, value: BigInt(value), data: '0x' } as unknown as Action])
     }, [to, value])
@@ -52,7 +52,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
     )
 };
 
-function isNumeric(value: string): boolean{
+function isNumeric(value: string): boolean {
     if (!value) return true;
     return !!value.match(/^[0-9]+$/);
 }

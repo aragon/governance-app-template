@@ -20,14 +20,14 @@ export default function Proposals() {
 
   const [currentPage, setCurrentPage] = useState(0);
   const [paginatedProposals, setPaginatedProposals] = useState<number[]>([]);
-
+  
   useEffect(() => {
     const start = currentPage * PROPOSALS_PER_PAGE;
     const end = (currentPage + 1) * PROPOSALS_PER_PAGE;
     const propIds = new Array(proposalCount).fill(0).map((_, i) => i);
     setPaginatedProposals(propIds.slice(start, end));
   }, [proposalCount, currentPage]);
-
+  
   const { isLoading, isFetching, isError } = useContractRead({
     address: PLUGIN_ADDRESS,
     abi: TokenVotingAbi,

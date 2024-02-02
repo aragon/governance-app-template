@@ -7,6 +7,7 @@ import { Button, IconType } from "@aragon/ods";
 import { useCanCreateProposal } from "@/tokenVoting/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { If, IfNot } from "@/components/if";
+import { PleaseWaitSpinner } from "@/components/please-wait";
 
 const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
 
@@ -17,17 +18,15 @@ export default function Proposals() {
 
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 10; // Change this to the number of items you want per page
-  const [paginatedProposals, setPaginatedProposals] = useState([]);
+  const [paginatedProposals, setPaginatedProposals] = useState<number[]>([]);
 
   useEffect(() => {
-    const start = (currentPage) * itemsPerPage;
-    const end = (currentPage + 1)* itemsPerPage;
-    setPaginatedProposals([...Array(proposalCount)].slice(start, end));
+    const start = currentPage * itemsPerPage;
+    const end = (currentPage + 1) * itemsPerPage;
+    setPaginatedProposals(Array(proposalCount).slice(start, end));
   }, [proposalCount, currentPage]);
 
-
-
-  const { isLoading } = useContractRead({
+  const { isLoading, isFetching, isError } = useContractRead({
     address: pluginAddress,
     abi: TokenVotingAbi,
     functionName: "proposalCount",
@@ -58,23 +57,26 @@ export default function Proposals() {
       </SectionView>
       <If condition={proposalCount}>
         {paginatedProposals.map((_, i) => (
-          <Proposal 
-            key={BigInt((proposalCount! - 1) - (currentPage*itemsPerPage) - i)} 
-            proposalId={BigInt((proposalCount! - 1) - (currentPage*itemsPerPage) - i)} />
+          <Proposal
+            key={BigInt(proposalCount! - 1 - currentPage * itemsPerPage - i)}
+            proposalId={BigInt(
+              proposalCount! - 1 - currentPage * itemsPerPage - i
+            )}
+          />
         ))}
-        <div className="flex flex-row gap-2 mt-4">
-          <Button 
+        <div className="w-full flex flex-row justify-end gap-2 mt-4">
+          <Button
             variant="tertiary"
-            size="md"
+            size="sm"
             disabled={!currentPage}
             onClick={() => setCurrentPage((page) => Math.max(page - 1, 0))}
             iconLeft={IconType.CHEVRON_LEFT}
           >
             Previous
           </Button>
-          <Button 
+          <Button
             variant="tertiary"
-            size="md"
+            size="sm"
             disabled={(currentPage + 1) * itemsPerPage > proposalCount}
             onClick={() => setCurrentPage((page) => page + 1)}
             iconRight={IconType.CHEVRON_RIGHT}
@@ -86,7 +88,7 @@ export default function Proposals() {
       <IfNot condition={proposalCount}>
         <If condition={isLoading}>
           <SectionView>
-            <p className="justify-self-start">Please wait...</p>
+            <PleaseWaitSpinner />
           </SectionView>
         </If>
       </IfNot>

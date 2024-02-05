@@ -1,20 +1,22 @@
+import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { Spinner } from "@aragon/ods";
-import { useEffect, useState } from "react";
 
 export const PleaseWaitSpinner = ({
   status = "Loading",
+  fullMessage,
 }: {
   status?: string;
+  fullMessage?: string;
 }) => {
-  const [loaded, setLoaded] = useState(false);
-  useEffect(() => setLoaded(true), []);
+  const skipRender = useSkipFirstRender();
+  if (skipRender) return <></>;
 
-  if (!loaded) return null;
+  const message = fullMessage ? fullMessage : status + ", please wait...";
 
   return (
-    <div suppressHydrationWarning>
+    <div>
       <Spinner size="sm" variant="neutral" className="inline-block -m-[2px]" />{" "}
-      &nbsp;&nbsp;{status}, please wait...
+      &nbsp;&nbsp;{message}
     </div>
   );
 };

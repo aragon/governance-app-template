@@ -10,11 +10,9 @@ import WithdrawalInput from '@/components/input/withdrawal'
 import CustomActionInput from '@/components/input/custom-action'
 import { Action } from '@/utils/types'
 
-const ipfsEndpoint = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
-const ipfsKey = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
-const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address
-
-const auth = ipfsKey; // Replace YOUR_API_KEY with your actual API key
+const IPFS_ENDPOINT = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
+const IPFS_KEY = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
+const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address
 
 enum ActionType {
     Signaling,
@@ -30,7 +28,7 @@ export default function Create() {
     const { addAlert } = useAlertContext()
     const { write: createProposalWrite } = useContractWrite({
         abi: TokenVotingAbi,
-        address: pluginAddress,
+        address: PLUGIN_ADDRESS,
         functionName: 'createProposal',
         args: [toHex(ipfsPin), action, 0, 0, 0, 0, 0],
         onSuccess(data) {
@@ -45,8 +43,8 @@ export default function Create() {
     }
 
     const client = create({
-        url: ipfsEndpoint,
-        headers: { 'X-API-KEY': auth, 'Accept': 'application/json' }
+        url: IPFS_ENDPOINT,
+        headers: { 'X-API-KEY': IPFS_KEY, 'Accept': 'application/json' }
     });
 
     useEffect(() => {
@@ -71,10 +69,9 @@ export default function Create() {
         setSummary(event?.target?.value);
     };
 
-
     return (
-    <section className="flex flex-col items-center w-screen max-w-full min-w-full">
-      <div className="justify-between py-5 w-full">
+        <section className="flex flex-col items-center w-screen max-w-full min-w-full">
+            <div className="justify-between py-5 w-full">
                 <h1 className="font-semibold text-neutral-900 text-3xl mb-10">Create Proposal</h1>
                 <div className="mb-6 pb-6">
                     <InputText

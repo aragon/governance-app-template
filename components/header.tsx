@@ -3,15 +3,13 @@ import { Button } from "@aragon/ods";
 import { Address, useAccount } from "wagmi";
 import { Else, IfCase, Then } from "@/components/if";
 import { formatHexString } from "@/utils/evm";
-import { useEffect, useState } from "react";
+import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 
 const Header = () => {
-  const [skipRender, setSkipRender] = useState(true);
   const { address, isConnected } = useAccount();
   const { open } = useWeb3Modal();
 
-  useEffect(() => setSkipRender(false), []);
-
+  const skipRender = useSkipFirstRender();
   if (skipRender) return <></>;
 
   return (

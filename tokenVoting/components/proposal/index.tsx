@@ -90,9 +90,8 @@ export default function Proposal(props: ProposalInputs) {
 const Card = function ({ children }: { children: ReactNode }) {
   return (
     <div
-      className="w-full flex flex-col space-y-6 shadow-lg
-    box-border border border-neutral-0
-    focus:outline-none focus:ring focus:ring-primary
+      className="w-full flex flex-col space-y-6 drop-shadow-sm hover:drop-shadow
+    box-border focus:outline-none focus:ring focus:ring-primary
     hover:border-neutral-100 active:border-200
     bg-neutral-0 rounded-xl"
     >

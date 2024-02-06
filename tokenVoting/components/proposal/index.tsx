@@ -6,6 +6,7 @@ import { useProposal } from "@/tokenVoting/hooks/useProposal";
 import { Button } from "@aragon/ods";
 import { ReactNode } from "react";
 import { ButtonVariant } from "@aragon/ods/dist/types/src/components/button/button.api";
+import { PleaseWaitSpinner } from "../please-wait";
 
 const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
 
@@ -40,7 +41,17 @@ export default function Proposal(props: ProposalInputs) {
     props.proposalId.toString()
   );
 
-  if (!proposal.title) return null;
+  if (!proposal.title) {
+    return (
+      <section className="pb-3 pt-3 w-full">
+        <Card>
+          <span className="px-4 py-5 xs:px-10 md:px-6 lg:px-7">
+            <PleaseWaitSpinner fullMessage="Loading proposal..." />
+          </span>
+        </Card>
+      </section>
+    );
+  }
 
   return (
     <section className="pb-3 pt-3 w-full">

@@ -15,7 +15,7 @@ const Sidebar = () => {
       size="sm"
       responsiveSize={{}}
       variant="tertiary"
-      className="absolute md:hidden mt-2 ml-2 z-50"
+      className="md:hidden block absolute mt-2 ml-2 z-50"
       onClick={() => setIsOpen(!isOpen)}
     >
       <svg
@@ -41,7 +41,7 @@ const Sidebar = () => {
 
 
   return (
-    <header className="h-screen" >
+    <header className="h-screen">
       <SidebarSwitchButton />
       <div className={`md:w-72 bg-neutral-100 shadow h-full flex flex-col justify-between ${isOpen ? 'absolute md:relative w-full' : 'hidden md:block'}`}>
         <div className="flex-1 grow">
@@ -64,10 +64,10 @@ const Sidebar = () => {
           <ul className="mt-12 px-6">
             <li
               onClick={() => setIsOpen(false)}
-              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 ${isHome ? "bg-neutral-200 font-semibold" : ""
+              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 ${isHome ? "bg-neutral-200 font-semibold" : ""
                 } rounded-lg shadow-lg hover:bg-neutral-200`}
             >
-              <Link href="/" className="flex items-center w-full">
+              <Link href="/" className="flex items-center w-full p-3">
                 <Icon
                   className="mr-2"
                   icon={IconType.HOME}
@@ -88,10 +88,10 @@ const Sidebar = () => {
             </li>
             <li
               onClick={() => setIsOpen(false)}
-              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 ${isProposals ? "bg-neutral-200 rounded-lg shadow-lg" : ""
+              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 ${isProposals ? "bg-neutral-200 rounded-lg shadow-lg" : ""
                 } rounded-lg shadow-lg hover:bg-neutral-200`}
             >
-              <Link href="/proposals" className="flex items-center w-full">
+              <Link href="/proposals" className="flex items-center w-full p-3">
                 <Icon
                   className="mr-2"
                   icon={IconType.APP_GOVERNANCE}
@@ -110,11 +110,11 @@ const Sidebar = () => {
               </Link>
             </li>
             <li
-              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 rounded-lg shadow-lg hover:bg-neutral-200`}
+              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 rounded-lg shadow-lg hover:bg-neutral-200`}
             >
               <Link
                 href="#"
-                className="flex items-center focus:outline-none focus:ring-2 focus:ring-white w-full"
+                className="flex items-center focus:outline-none focus:ring-2 focus:ring-white w-full p-3"
               >
                 <Icon
                   className="mr-2"
@@ -128,9 +128,9 @@ const Sidebar = () => {
               </Link>
             </li>
             <li
-              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center py-3 px-3 mb-2 rounded-lg shadow-lg hover:bg-neutral-200`}
+              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 rounded-lg shadow-lg hover:bg-neutral-200`}
             >
-              <Link href="#" className="flex items-center w-full">
+              <Link href="#" className="flex items-center w-full p-3">
                 <Icon
                   className="mr-2"
                   icon={IconType.QUESTION}

@@ -10,11 +10,9 @@ import WithdrawalInput from '@/components/input/withdrawal'
 import CustomActionInput from '@/components/input/custom-action'
 import { Action } from '@/utils/types'
 
-const ipfsEndpoint = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
-const ipfsKey = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
-const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address
-
-const auth = ipfsKey; // Replace YOUR_API_KEY with your actual API key
+const IPFS_ENDPOINT = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
+const IPFS_KEY = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
+const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address
 
 enum ActionType {
     Signaling,
@@ -24,13 +22,13 @@ enum ActionType {
 
 export default function Create() {
     const [ipfsPin, setIpfsPin] = useState<string>('');
-    const [title, setTitle] = useState<string>();
-    const [summary, setSummary] = useState<string>();
+    const [title, setTitle] = useState<string>('');
+    const [summary, setSummary] = useState<string>('');
     const [action, setAction] = useState<Action[]>([]);
     const { addAlert } = useAlertContext()
     const { write: createProposalWrite } = useContractWrite({
         abi: TokenVotingAbi,
-        address: pluginAddress,
+        address: PLUGIN_ADDRESS,
         functionName: 'createProposal',
         args: [toHex(ipfsPin), action, 0, 0, 0, 0, 0],
         onSuccess(data) {
@@ -45,8 +43,8 @@ export default function Create() {
     }
 
     const client = create({
-        url: ipfsEndpoint,
-        headers: { 'X-API-KEY': auth, 'Accept': 'application/json' }
+        url: IPFS_ENDPOINT,
+        headers: { 'X-API-KEY': IPFS_KEY, 'Accept': 'application/json' }
     });
 
     useEffect(() => {
@@ -54,6 +52,9 @@ export default function Create() {
     }, [ipfsPin])
 
     const submitProposal = async () => {
+        if(!title.trim()) return alert("Please, enter a title");
+        else if(!summary.trim()) return alert("Please, enter a summary");
+        
         const proposalMetadataJsonObject = { title, summary };
         const blob = new Blob([JSON.stringify(proposalMetadataJsonObject)], { type: 'application/json' });
 
@@ -68,10 +69,9 @@ export default function Create() {
         setSummary(event?.target?.value);
     };
 
-
     return (
-    <section className="flex flex-col items-center w-screen max-w-full min-w-full">
-      <div className="justify-between py-5 w-full">
+        <section className="flex flex-col items-center w-screen max-w-full min-w-full">
+            <div className="justify-between py-5 w-full">
                 <h1 className="font-semibold text-neutral-900 text-3xl mb-10">Create Proposal</h1>
                 <div className="mb-6 pb-6">
                     <InputText
@@ -89,7 +89,7 @@ export default function Create() {
                     <textarea
                         id="message"
                         rows={6}
-                        className="block p-2.5 w-full text-md font-semibold placeholder-neutral-300 text-neutral-900 bg-white rounded-xl border border-neutral-100 focus:ring-primary-300 focus:border-primary-300"
+                        className="block p-2.5 w-full text-md placeholder-neutral-300 text-neutral-600 bg-white rounded-xl border border-neutral-100 focus:ring-primary-300 focus:border-primary-300"
                         placeholder="A detailed description for what the proposal is all about"
                         value={summary}
                         onChange={handleSummaryInput}
@@ -97,12 +97,12 @@ export default function Create() {
                 </div>
                 <div className="mb-6">
                     <span className="block mb-2 text-lg text-neutral-900 ">Select proposal action</span>
-                    <div className="grid grid-cols-3 gap-5 h-48 mt-2">
+                    <div className="grid grid-cols-3 gap-5 h-24 mt-2">
                         <div
                             onClick={() => {changeActionType(ActionType.Signaling)}}
-                            className={`rounded-xl bg-white border border-dashed border-2 flex flex-col items-center ${actionType === ActionType.Signaling ? 'border-primary-300' : 'border-neutral-100'}`}>
+                            className={`rounded-xl border border-solid border-2 bg-neutral-0 hover:bg-neutral-50 flex flex-col items-center cursor-pointer ${actionType === ActionType.Signaling ? 'border-primary-300' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full text-primary-400 !h-12 !w-12"
+                                className="mt-2 p-2 rounded-full text-primary-400 !h-12 !w-12"
                                 icon={IconType.INFO}
                                 size="lg"
                             />
@@ -110,9 +110,9 @@ export default function Create() {
                         </div>
                         <div
                             onClick={() => changeActionType(ActionType.Withdrawal)}
-                            className={`rounded-xl bg-white border border-dashed border-2 flex flex-col items-center ${actionType === ActionType.Withdrawal ? 'border-primary-300' : 'border-neutral-100'}`}>
+                            className={`rounded-xl border border-solid border-2 bg-neutral-0 hover:bg-neutral-50 flex flex-col items-center cursor-pointer ${actionType === ActionType.Withdrawal ? 'border-primary-300' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full text-primary-400 !h-12 !w-12"
+                                className="mt-2 p-2 rounded-full text-primary-400 !h-12 !w-12"
                                 icon={IconType.TX_WITHDRAW}
                                 size="lg"
                             />
@@ -120,9 +120,9 @@ export default function Create() {
                         </div>
                         <div
                             onClick={() => changeActionType(ActionType.Custom)}
-                            className={`rounded-xl bg-white border border-dashed border-2 flex flex-col items-center ${actionType === ActionType.Custom ? 'border-primary-300' : 'border-neutral-100'}`}>
+                            className={`rounded-xl border border-solid border-2 bg-neutral-0 hover:bg-neutral-50 flex flex-col items-center cursor-pointer ${actionType === ActionType.Custom ? 'border-primary-300' : 'border-neutral-100'}`}>
                             <Icon
-                                className="p-2 rounded-full text-primary-400 !h-12 !w-12"
+                                className="mt-2 p-2 rounded-full text-primary-400 !h-12 !w-12"
                                 icon={IconType.BLOCKCHAIN}
                                 size="lg"
                             />

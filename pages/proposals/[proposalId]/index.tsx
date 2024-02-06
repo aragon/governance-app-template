@@ -101,7 +101,13 @@ export default function Proposal() {
     voteWrite?.();
   }, [selectedVoteOption, showVotingModal]);
 
-  if (!proposal.title || !proposal?.parameters?.supportThreshold) {
+  if (!proposal.title && !proposal?.parameters?.supportThreshold) {
+    return (
+      <section className="flex justify-left items-left w-screen max-w-full min-w-full">
+        <PleaseWaitSpinner />
+      </section>
+    );
+  } else if (!proposal.title) {
     return (
       <section className="flex justify-left items-left w-screen max-w-full min-w-full">
         <PleaseWaitSpinner />
@@ -146,9 +152,9 @@ export default function Proposal() {
           option={1}
         />
         <ProposalDetails
-          supportThreshold={proposal.parameters.supportThreshold}
-          endDate={proposal.parameters.endDate}
-          snapshotBlock={proposal.parameters.snapshotBlock}
+          supportThreshold={proposal?.parameters?.supportThreshold}
+          endDate={proposal?.parameters?.endDate}
+          snapshotBlock={proposal?.parameters?.snapshotBlock}
         />
       </div>
       <div className="py-12 w-full">

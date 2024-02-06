@@ -1,6 +1,6 @@
 import { useContractRead } from "wagmi";
 import { ReactNode, useEffect, useState } from "react";
-import Proposal from "@/tokenVoting/components/proposal";
+import ProposalCard from "@/tokenVoting/components/proposal";
 import { Address } from "viem";
 import { TokenVotingAbi } from "@/tokenVoting/artifacts/TokenVoting.sol";
 import { Button, IconType } from "@aragon/ods";
@@ -59,7 +59,7 @@ export default function Proposals() {
       </SectionView>
       <If condition={proposalCount}>
         {paginatedProposals.map((_, i) => (
-          <Proposal
+          <ProposalCard
             key={i}
             proposalId={BigInt(
               proposalCount! - 1 - currentPage * PROPOSALS_PER_PAGE - i

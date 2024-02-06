@@ -7,8 +7,13 @@ import { Button } from "@aragon/ods";
 import { ReactNode } from "react";
 import { ButtonVariant } from "@aragon/ods/dist/types/src/components/button/button.api";
 import { PleaseWaitSpinner } from "@/components/please-wait";
+import { If } from "@/components/if";
 
-const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
+const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
+const DEFAULT_PROPOSAL_METADATA_SUMMARY =
+  "(The metadata of the proposal is not available)";
+const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS ||
+  "") as Address;
 
 type ProposalInputs = {
   proposalId: bigint;
@@ -27,27 +32,47 @@ const getProposalVariantStatus = (proposal: Proposal) => {
       ? "Active"
       : proposal?.executed
       ? "Executed"
-      : proposal?.tally!.no >= proposal?.tally!.yes
+      : proposal?.tally?.no >= proposal?.tally?.yes
       ? "Defeated"
       : "Executable",
   };
 };
 
-export default function Proposal(props: ProposalInputs) {
+export default function ProposalCard(props: ProposalInputs) {
   const publicClient = usePublicClient();
   const proposal = useProposal(
     publicClient,
-    pluginAddress,
+    PLUGIN_ADDRESS,
     props.proposalId.toString()
   );
 
-  if (!proposal.title) {
+  if (!proposal?.parameters?.supportThreshold) {
     return (
       <section className="pb-3 pt-3 w-full">
         <Card>
           <span className="px-4 py-5 xs:px-10 md:px-6 lg:px-7">
             <PleaseWaitSpinner fullMessage="Loading proposal..." />
           </span>
+        </Card>
+      </section>
+    );
+  } else if (!proposal.title) {
+    return (
+      <section className="pb-3 pt-3 w-full">
+        <Card>
+          <Link
+            href={`/proposals/${props.proposalId}`}
+            className="flex justify-between px-4 py-5 xs:px-10 md:px-6 lg:px-7 cursor-pointer"
+          >
+            <div className="md:w-7/12 lg:w-3/4 xl:4/5 pr-4 text-nowrap text-ellipsis overflow-hidden">
+              <h4 className="mb-1 text-lg text-neutral-300 line-clamp-1">
+                {DEFAULT_PROPOSAL_METADATA_TITLE}
+              </h4>
+              <p className="text-base text-neutral-300 line-clamp-3">
+                {DEFAULT_PROPOSAL_METADATA_SUMMARY}
+              </p>
+            </div>
+          </Link>
         </Card>
       </section>
     );
@@ -65,12 +90,12 @@ export default function Proposal(props: ProposalInputs) {
               {Number(props.proposalId) + 1} - {proposal.title}
             </h4>
             <p className="text-base text-body-color line-clamp-3">
-              {proposal.summary}
+              {proposal.summary || DEFAULT_PROPOSAL_METADATA_SUMMARY}
             </p>
           </div>
 
           <div className="md:w-5/12 lg:w-1/4 xl:1/5">
-            {proposal.tally && (
+            <If condition={proposal.tally}>
               <Button
                 className="w-full"
                 size="sm"
@@ -78,7 +103,7 @@ export default function Proposal(props: ProposalInputs) {
               >
                 {getProposalVariantStatus(proposal as Proposal).label}
               </Button>
-            )}
+            </If>
           </div>
         </Link>
       </Card>

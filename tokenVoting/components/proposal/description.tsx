@@ -20,9 +20,9 @@ const etherscanKey: string = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY || "";
 export default function ProposalDescription(proposal: Proposal) {
   const publicClient = usePublicClient();
   const [decodedActions, setDecodedActions] = useState<FunctionData[]>([]);
+  const proposalActions = proposal?.actions || [];
 
   const getFunctionData = async (action: Action) => {
-    console.log("Data: ", action.data)
     const abiLoader = new whatsabi.loaders.EtherscanABILoader({
       apiKey: etherscanKey,
     });
@@ -41,7 +41,7 @@ export default function ProposalDescription(proposal: Proposal) {
 
   const fetchActionData = useCallback(async () => {
     const decodedActions = await Promise.all(
-      proposal.actions.map(async (action) => {
+      proposalActions.map(async (action) => {
         let functionData: any;
         if (action.data != "0x") {
           functionData = await getFunctionData(action);
@@ -65,10 +65,10 @@ export default function ProposalDescription(proposal: Proposal) {
         Actions
       </h2>
       <div className="flex flex-row space-between">
-        <IfNot condition={proposal.actions.length}>
+        <IfNot condition={proposalActions.length}>
           <p className="pt-2">The proposal has no actions</p>
         </IfNot>
-        <If condition={proposal.actions.length && !decodedActions?.length}>
+        <If condition={proposalActions.length && !decodedActions?.length}>
           <PleaseWaitSpinner />
         </If>
         {decodedActions?.map?.((action, i) => (
@@ -128,18 +128,19 @@ const ActionCard = function ({
       <div>
         <h3>Parameters</h3>
         <ul className="list-disc pl-4">
-          {action?.args?.length && action?.args?.map((arg: any, j: number) => (
-            <li key={`arg-${j}`}>
-              <IfCase condition={isAddress(arg)}>
-                <Then>
-                  <AddressText>{arg.toString()}</AddressText>
-                </Then>
-                <Else>
-                  <code>{arg.toString()}</code>
-                </Else>
-              </IfCase>
-            </li>
-          ))}
+          {action?.args?.length &&
+            action?.args?.map((arg: any, j: number) => (
+              <li key={`arg-${j}`}>
+                <IfCase condition={isAddress(arg)}>
+                  <Then>
+                    <AddressText>{arg.toString()}</AddressText>
+                  </Then>
+                  <Else>
+                    <code>{arg.toString()}</code>
+                  </Else>
+                </IfCase>
+              </li>
+            ))}
         </ul>
       </div>
     </Card>

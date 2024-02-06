@@ -5,7 +5,7 @@ import { uploadToIPFS } from '@/utils/ipfs'
 import { useContractWrite } from 'wagmi';
 import { Address, toHex } from 'viem'
 import { TokenVotingAbi } from '@/artifacts/TokenVoting.sol';
-import { useAlertContext } from '../../context/AlertContext';
+import { useAlertContext } from '@/context/AlertContext';
 import WithdrawalInput from '@/components/input/withdrawal'
 import CustomActionInput from '@/components/input/custom-action'
 import { Action } from '@/utils/types'

@@ -4,7 +4,7 @@ import { whatsabi } from "@shazow/whatsabi";
 import { usePublicClient } from "wagmi";
 import { InputText } from '@aragon/ods'
 import { AbiFunction } from "abitype";
-import { PleaseWaitSpinner } from "../please-wait";
+import { PleaseWaitSpinner } from "@/components/please-wait";
 
 interface CustomActionInputProps {
     setAction: Function;

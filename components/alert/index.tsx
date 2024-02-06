@@ -3,8 +3,6 @@ import React, { useEffect, useContext, useState, useRef } from "react";
 import { IAlert } from "@/utils/types";
 import { useWaitForTransaction } from "wagmi";
 import { AlertCard } from "@aragon/ods";
-import { Else, If, IfCase, Then } from "../if";
-import { TransactionText } from "../text/transaction";
 
 const ALERT_TIMEOUT = 9 * 1000;
 

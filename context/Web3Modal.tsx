@@ -1,15 +1,12 @@
 import { createWeb3Modal } from "@web3modal/wagmi/react";
-// import { WagmiConfig } from "wagmi";
 import { WagmiConfig, createConfig, configureChains } from "wagmi";
-import { mainnet, polygon, optimism } from "@wagmi/core/chains";
-// import { publicProvider } from 'wagmi/providers/public'
+import { polygon } from "@wagmi/core/chains";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { ReactNode } from "react";
-import { publicProvider } from "wagmi/providers/public";
-import { walletConnectProvider, EIP6963Connector } from "@web3modal/wagmi";
+import { EIP6963Connector } from "@web3modal/wagmi";
 
 // 1. Get projectId
 const projectId: string = process.env.NEXT_PUBLIC_WC_PROJECT_ID || "";

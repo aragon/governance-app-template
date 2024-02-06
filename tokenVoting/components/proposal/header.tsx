@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AlertInline, Button, Tag } from '@aragon/ods'
-import { Proposal, ProposalCreatedLogResponse } from '@/utils/types'
+import { Proposal, ProposalCreatedLogResponse } from '@/tokenVoting/utils/types'
 import dayjs from "dayjs";
 import { AlertVariant } from '@aragon/ods/dist/types/src/components/alerts/utils';
 import { Else, If, IfCase, Then } from "@/components/if";

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Address, getAbiItem } from 'viem';
-import { TokenVotingAbi } from '@/artifacts/TokenVoting.sol';
-import { Proposal, VoteCastEvent, VoteCastResponse } from '@/utils/types';
+import { TokenVotingAbi } from '@/tokenVoting/artifacts/TokenVoting.sol';
+import { Proposal, VoteCastEvent, VoteCastResponse } from '@/tokenVoting/utils/types';
 
 export function useProposalVotes(publicClient: any, address: Address, proposalId: string, proposal: Proposal) {
   const [proposalLogs, setLogs] = useState<VoteCastEvent[]>([]);

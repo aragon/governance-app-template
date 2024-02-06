@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { usePublicClient } from "wagmi";
 import { Address } from "viem";
-import { Proposal } from "@/utils/types";
-import { useProposal } from "@/hooks/useProposal";
+import { Proposal } from "@/tokenVoting/utils/types";
+import { useProposal } from "@/tokenVoting/hooks/useProposal";
 import { Button } from "@aragon/ods";
 import { ReactNode } from "react";
 import { ButtonVariant } from "@aragon/ods/dist/types/src/components/button/button.api";

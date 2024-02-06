@@ -19,23 +19,21 @@ import { Else, If, IfCase, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useRouter } from "next/router";
 
-const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
+const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
 
 export default function Proposal() {
   const publicClient = usePublicClient();
   const { query } = useRouter();
-  let proposalId = "";
-  if (typeof query.proposalId === "string") proposalId = query.proposalId;
-  else if (Array.isArray(query.proposalId)) proposalId = query.proposalId[0];
+  const proposalId = resolveQueryParam(query.proposalId);
 
   const proposal = useProposal(
     publicClient,
-    pluginAddress,
+    PLUGIN_ADDRESS,
     proposalId
   ) as Proposal;
   const votes = useProposalVotes(
     publicClient,
-    pluginAddress,
+    PLUGIN_ADDRESS,
     proposalId,
     proposal
   );
@@ -45,20 +43,19 @@ export default function Proposal() {
     no: 0,
     abstain: 0,
   });
-  const [userVote, setUserVote] = useState<number|undefined>(undefined)
+  const [votedOption, setVotedOption] = useState<number | undefined>(undefined);
   const [showDescriptionView, toggleDetailsView] = useState<boolean>(true);
   const [showVotingModal, setShowVotingModal] = useState(false);
-  const [userVotedOption, setUserVotedOption] = useState<number>();
+  const [selectedVoteOption, setSelectedVoteOption] = useState<number>();
   const { addAlert } = useAlertContext() as AlertContextProps;
   const { address, isConnected, isDisconnected } = useAccount();
   const { write: voteWrite } = useContractWrite({
     abi: TokenVotingAbi,
-    address: pluginAddress,
+    address: PLUGIN_ADDRESS,
     functionName: "vote",
-    args: [proposalId, userVotedOption, 1],
+    args: [proposalId, selectedVoteOption, 1],
     onSuccess(data) {
-      // console.log("Success creating the proposal", data);
-      addAlert("We got your vote!", data.hash);
+      addAlert("Your vote has been registered", data.hash);
     },
   });
 
@@ -80,17 +77,25 @@ export default function Proposal() {
   }, [proposal.tally]);
 
   useEffect(() => {
-    setUserVote(votes.find((vote) => vote.voter === address)?.voteOption)
-  }, [votes])
+    setVotedOption(votes.find((vote) => vote.voter === address)?.voteOption);
+  }, [votes]);
 
-  const voteFor = (option: number) => {
-    setUserVotedOption(option);
+  const onDismissModal = () => {
+    setSelectedVoteOption(0);
+    setShowVotingModal(false);
+  };
+
+  const onSelectVoteOption = (selectedVoteOption: number) => {
+    setSelectedVoteOption(selectedVoteOption);
     setShowVotingModal(false);
   };
 
   useEffect(() => {
-    if (userVotedOption && !showVotingModal) voteWrite?.();
-  }, [userVotedOption, showVotingModal]);
+    if (showVotingModal) return;
+    else if (!selectedVoteOption) return;
+
+    voteWrite?.();
+  }, [selectedVoteOption, showVotingModal]);
 
   if (!proposal.title || !proposal?.parameters?.supportThreshold) {
     return (
@@ -105,9 +110,9 @@ export default function Proposal() {
         <ProposalHeader
           proposalNumber={Number(proposalId)}
           proposal={proposal}
-          userVote={userVote}
+          userVote={votedOption}
           userCanVote={userCanVote as boolean}
-          setShowVotingModal={setShowVotingModal}
+          onShowVotingModal={() => setShowVotingModal(true)}
         />
       </div>
 
@@ -178,11 +183,16 @@ export default function Proposal() {
 
       <If condition={showVotingModal}>
         <VotingModal
-          show={showVotingModal}
-          setShow={setShowVotingModal}
-          voteFor={voteFor}
+          onDismissModal={onDismissModal}
+          selectedVote={onSelectVoteOption}
         />
       </If>
     </section>
   );
+}
+
+function resolveQueryParam(value: string | string[] | undefined): string {
+  if (typeof value === "string") return value;
+  else if (Array.isArray(value)) return value[0];
+  return "";
 }

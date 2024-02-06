@@ -21,7 +21,7 @@ export function useProposal(publicClient: any, address: Address, proposalId: str
       watch: true,
       onSuccess(data) {
         setProposal({
-          open: (data as Array<boolean>)[0],
+          active: (data as Array<boolean>)[0],
           executed: (data as Array<boolean>)[1],
           parameters: (data as Array<ProposalParameters>)[2],
           tally: (data as Array<Tally>)[3],

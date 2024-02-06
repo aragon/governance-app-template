@@ -39,7 +39,7 @@ export type Tally = {
 }
 
 export type Proposal = {
-  open: boolean;
+  active: boolean;
   executed: boolean;
   parameters: ProposalParameters;
   tally: Tally;

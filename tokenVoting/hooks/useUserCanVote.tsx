@@ -1,8 +1,6 @@
 import { Address } from 'viem'
-import { Proposal } from '@/utils/types'
-import { useState, useEffect } from 'react'
-import { useContractReads, useContractRead, useBalance, useAccount } from 'wagmi';
-import { TokenVotingAbi } from '@/artifacts/TokenVoting.sol';
+import { useContractRead, useAccount } from 'wagmi';
+import { TokenVotingAbi } from '@/tokenVoting/artifacts/TokenVoting.sol';
 
 
 const pluginAddress = ((process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address)

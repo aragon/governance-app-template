@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Blockies from "react-blockies";
-import { VoteCastEvent } from "@/utils/types";
+import { VoteCastEvent } from "@/tokenVoting/utils/types";
 import { formatUnits } from "viem";
 import { ReactNode } from "react";
 import { AddressText } from "@/components/text/address";

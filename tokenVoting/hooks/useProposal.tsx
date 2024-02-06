@@ -3,8 +3,9 @@ import { Address } from 'viem'
 import { useContractRead } from 'wagmi';
 import { fetchFromIPFS } from '@/utils/ipfs';
 import { getAbiItem } from 'viem';
-import { TokenVotingAbi } from '@/artifacts/TokenVoting.sol';
-import { Proposal, ProposalMetadata, ProposalParameters, Tally, Action, ProposalCreatedLogResponse } from '@/utils/types';
+import { TokenVotingAbi } from '@/tokenVoting/artifacts/TokenVoting.sol';
+import { Action } from '@/utils/types';
+import { Proposal, ProposalMetadata, ProposalParameters, Tally, ProposalCreatedLogResponse } from '@/tokenVoting/utils/types';
 import { useQuery } from 'react-query';
 
 export function useProposal(publicClient: any, address: Address, proposalId: string) {

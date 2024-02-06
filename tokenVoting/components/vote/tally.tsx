@@ -1,4 +1,4 @@
-import { VoteCastEvent } from "@/utils/types";
+import { VoteCastEvent } from "@/tokenVoting/utils/types";
 import { FC, ReactNode } from "react";
 import { formatUnits } from "viem";
 

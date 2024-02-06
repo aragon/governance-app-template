@@ -3,7 +3,7 @@ import Blockies from "react-blockies";
 import { VoteCastEvent } from "@/utils/types";
 import { formatUnits } from "viem";
 import { ReactNode } from "react";
-import { AddressText } from "../text/address";
+import { AddressText } from "@/components/text/address";
 
 export default function VotesSection({
   votes,

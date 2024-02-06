@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 import { AlertInline, Button, Tag } from '@aragon/ods'
 import { Proposal, ProposalCreatedLogResponse } from '@/utils/types'
-import { formatAddress } from '@/utils/addressHelper';
 import dayjs from "dayjs";
 import { AlertVariant } from '@aragon/ods/dist/types/src/components/alerts/utils';
-import { TagVariant } from "@aragon/ods/dist/types/src/components/tag/tag";
-import { Else, If, IfCase, Then } from "../if";
-import { StatusTag } from "../text/status-tag";
-import { AddressText } from "../text/address";
+import { Else, If, IfCase, Then } from "@/components/if";
+import { AddressText } from "@/components/text/address";
 
 interface ProposalHeaderProps {
   proposalNumber: number;

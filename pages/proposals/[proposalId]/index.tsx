@@ -1,7 +1,7 @@
 import { usePublicClient, useAccount, useContractWrite } from "wagmi";
 import { useState, useContext, useEffect } from "react";
 import { Address } from "viem";
-import { Proposal } from "../../../utils/types";
+import { Proposal } from "@/utils/types";
 import { useProposal } from "@/hooks/useProposal";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
 import { Button } from "@aragon/ods";

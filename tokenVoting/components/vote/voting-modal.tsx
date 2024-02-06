@@ -21,10 +21,10 @@ const VotingModal: React.FC<VotingModalProps> = ({
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          className="relative w-auto my-6 mx-2 max-w-sm min-w-64"
+          className="relative w-auto my-6 mx-2 max-w-sm min-w-64 drop-shadow-xl"
         >
           {/*content*/}
-          <div className="rounded-lg shadow-lg relative flex flex-col w-full bg-neutral-100 outline-none focus:outline-none">
+          <div className="rounded-lg relative flex flex-col w-full bg-neutral-100 outline-none focus:outline-none">
             {/*header*/}
             <div className="flex items-start justify-between p-3 rounded-t">
               <h3 className="text-lg pr-4 font-semibold text-neutral-700">

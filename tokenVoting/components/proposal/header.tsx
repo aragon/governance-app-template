@@ -29,7 +29,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
   const getProposalVariantStatus = (proposal: Proposal) => {
     return {
       variant: proposal?.active ? 'info' : proposal?.executed ? 'success' : proposal?.tally?.no >= proposal?.tally?.yes ? 'critical' : 'success' as AlertVariant,
-      label: proposal?.active ? 'Active' : proposal?.executed ? 'Executed' : proposal?.tally!.no >= proposal?.tally!.yes ? 'Defeated' : 'Executable',
+      label: proposal?.active ? 'Active' : proposal?.executed ? 'Executed' : proposal?.tally?.no >= proposal?.tally?.yes ? 'Defeated' : 'Executable',
     }
   }
 

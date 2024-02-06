@@ -19,7 +19,8 @@ import { Else, If, IfCase, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useRouter } from "next/router";
 
-const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
+const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS ||
+  "") as Address;
 
 export default function Proposal() {
   const publicClient = usePublicClient();
@@ -97,7 +98,13 @@ export default function Proposal() {
     voteWrite?.();
   }, [selectedVoteOption, showVotingModal]);
 
-  if (!proposal.title || !proposal?.parameters?.supportThreshold) {
+  if (!proposal.title && !proposal?.parameters?.supportThreshold) {
+    return (
+      <section className="flex justify-left items-left w-screen max-w-full min-w-full">
+        <PleaseWaitSpinner />
+      </section>
+    );
+  } else if (!proposal.title) {
     return (
       <section className="flex justify-left items-left w-screen max-w-full min-w-full">
         <PleaseWaitSpinner />
@@ -143,9 +150,9 @@ export default function Proposal() {
         />
 
         <ProposalDetails
-          supportThreshold={proposal.parameters.supportThreshold}
-          endDate={proposal.parameters.endDate}
-          snapshotBlock={proposal.parameters.snapshotBlock}
+          supportThreshold={proposal?.parameters?.supportThreshold}
+          endDate={proposal?.parameters?.endDate}
+          snapshotBlock={proposal?.parameters?.snapshotBlock}
         />
       </div>
       <div className="py-12 w-full">

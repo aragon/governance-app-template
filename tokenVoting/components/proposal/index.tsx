@@ -16,15 +16,15 @@ type ProposalInputs = {
 
 const getProposalVariantStatus = (proposal: Proposal) => {
   return {
-    variant: (proposal?.open
+    variant: (proposal?.active
       ? "secondary"
       : proposal?.executed
       ? "success"
       : proposal?.tally?.no >= proposal?.tally?.yes
       ? "critical"
       : "success") as ButtonVariant,
-    label: proposal?.open
-      ? "Open"
+    label: proposal?.active
+      ? "Active"
       : proposal?.executed
       ? "Executed"
       : proposal?.tally!.no >= proposal?.tally!.yes

@@ -107,12 +107,6 @@ export default function Proposal() {
         <PleaseWaitSpinner />
       </section>
     );
-  } else if (!proposal.title) {
-    return (
-      <section className="flex justify-left items-left w-screen max-w-full min-w-full">
-        <PleaseWaitSpinner />
-      </section>
-    );
   }
   return (
     <section className="flex flex-col items-center w-screen max-w-full min-w-full">

@@ -66,6 +66,7 @@ export default function ProposalCard(props: ProposalInputs) {
           >
             <div className="md:w-7/12 lg:w-3/4 xl:4/5 pr-4 text-nowrap text-ellipsis overflow-hidden">
               <h4 className="mb-1 text-lg text-neutral-300 line-clamp-1">
+                {Number(props.proposalId) + 1} -{" "}
                 {DEFAULT_PROPOSAL_METADATA_TITLE}
               </h4>
               <p className="text-base text-neutral-300 line-clamp-3">

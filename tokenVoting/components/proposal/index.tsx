@@ -6,7 +6,7 @@ import { useProposal } from "@/tokenVoting/hooks/useProposal";
 import { Button } from "@aragon/ods";
 import { ReactNode } from "react";
 import { ButtonVariant } from "@aragon/ods/dist/types/src/components/button/button.api";
-import { PleaseWaitSpinner } from "../please-wait";
+import { PleaseWaitSpinner } from "@/components/please-wait";
 
 const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
 

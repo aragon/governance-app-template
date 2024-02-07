@@ -1,10 +1,10 @@
 import { usePublicClient, useAccount, useContractWrite } from "wagmi";
-import { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Address } from "viem";
 import { Proposal } from "@/tokenVoting/utils/types";
 import { useProposal } from "@/tokenVoting/hooks/useProposal";
 import { useProposalVotes } from "@/tokenVoting/hooks/useProposalVotes";
-import { Button } from "@aragon/ods";
+import { ToggleGroup, Toggle } from "@aragon/ods";
 import ProposalDescription from "@/tokenVoting/components/proposal/description";
 import VotesSection from "@/tokenVoting/components/vote/votes-section";
 import ProposalHeader from "@/tokenVoting/components/proposal/header";
@@ -45,8 +45,8 @@ export default function Proposal() {
     no: 0,
     abstain: 0,
   });
-  const [userVote, setUserVote] = useState<number|undefined>(undefined)
-  const [showDescriptionView, toggleDetailsView] = useState<boolean>(true);
+  const [userVote, setUserVote] = useState<number | undefined>(undefined)
+  const [bottomSection, setBottomSection] = useState<string>("description");
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [userVotedOption, setUserVotedOption] = useState<number>();
   const { addAlert } = useAlertContext() as AlertContextProps;
@@ -136,7 +136,6 @@ export default function Proposal() {
           color="neutral"
           option={1}
         />
-
         <ProposalDetails
           supportThreshold={proposal.parameters.supportThreshold}
           endDate={proposal.parameters.endDate}
@@ -146,27 +145,21 @@ export default function Proposal() {
       <div className="py-12 w-full">
         <div className="flex flex-row space-between">
           <h2 className="flex-grow text-3xl text-neutral-900 font-semibold">
-            {showDescriptionView ? "Description" : "Votes"}
+            {bottomSection === "description" ? "Description" : "Votes"}
           </h2>
-          <div className="flex flex-row gap-4">
-            <Button
-              onClick={() => toggleDetailsView(true)}
-              size="md"
-              variant={showDescriptionView ? "primary" : "secondary"}
-            >
-              Description
-            </Button>
-            <Button
-              onClick={() => toggleDetailsView(false)}
-              size="md"
-              variant={showDescriptionView ? "secondary" : "primary"}
-            >
-              Votes
-            </Button>
-          </div>
+          <ToggleGroup value={bottomSection} isMultiSelect={false} onChange={(val: string | undefined) => setBottomSection(val!)}>
+            <Toggle
+              label="Description"
+              value="description"
+            />
+            <Toggle
+              label="Votes"
+              value="votes"
+            />
+          </ToggleGroup>
         </div>
 
-        <IfCase condition={showDescriptionView}>
+        <IfCase condition={bottomSection === "description"}>
           <Then>
             <ProposalDescription {...proposal} />
           </Then>

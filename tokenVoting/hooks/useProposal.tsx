@@ -71,6 +71,10 @@ export function useProposal(
       .then((logs: ProposalCreatedLogResponse[]) => {
         setProposalCreationEvent(logs[0].args);
         setMetadata(logs[0].args.metadata);
+      })
+      .catch((err) => {
+        console.error("Could not fetch the proposal defailt", err);
+        return null;
       });
   }, [proposalData?.tally]);
 

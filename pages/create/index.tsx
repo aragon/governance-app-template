@@ -1,5 +1,5 @@
 import { create } from 'ipfs-http-client';
-import { Button, IconType, Icon, InputText } from '@aragon/ods'
+import { Button, IconType, Icon, InputText, TextAreaRichText } from '@aragon/ods'
 import React, { useEffect, useState } from 'react'
 import { uploadToIPFS } from '@/utils/ipfs'
 import { useContractWrite } from 'wagmi';
@@ -65,15 +65,12 @@ export default function Create() {
     const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTitle(event?.target?.value);
     };
-    const handleSummaryInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setSummary(event?.target?.value);
-    };
 
     return (
         <section className="flex flex-col items-center w-screen max-w-full min-w-full">
             <div className="justify-between py-5 w-full">
                 <h1 className="font-semibold text-neutral-900 text-3xl mb-10">Create Proposal</h1>
-                <div className="mb-6 pb-6">
+                <div className="mb-6">
                     <InputText
                         className=""
                         label="Title"
@@ -85,15 +82,13 @@ export default function Create() {
                     />
                 </div>
                 <div className="mb-6">
-                    <label className="block mb-2 text-lg font-semibold text-neutral-600">Summary</label>
-                    <textarea
-                        id="message"
-                        rows={6}
-                        className="block p-2.5 w-full text-md placeholder-neutral-300 text-neutral-600 bg-white rounded-xl border border-neutral-100 focus:ring-primary-300 focus:border-primary-300"
-                        placeholder="A detailed description for what the proposal is all about"
+                    <TextAreaRichText
+                        label="Summary"
+                        className='pt-2'
                         value={summary}
-                        onChange={handleSummaryInput}
-                    ></textarea>
+                        onChange={setSummary}
+                        placeholder="A detailed description for what the proposal is all about"
+                    />
                 </div>
                 <div className="mb-6">
                     <span className="block mb-2 text-lg text-neutral-900 ">Select proposal action</span>

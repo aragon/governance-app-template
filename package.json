@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@aragon/ods": "1.0.7",
+    "@aragon/ods": "1.0.11",
     "@shazow/whatsabi": "^0.9.1",
     "@typescript-eslint/eslint-plugin": "latest",
     "@web3modal/wagmi": "^3.5.6",

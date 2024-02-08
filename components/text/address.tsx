@@ -1,4 +1,4 @@
-import { formatHexString, getAddressExplorerLink } from "@/utils/evm";
+import { formatHexString } from "@/utils/evm";
 import { getChildrenText } from "@/utils/content";
 import { ReactNode, useState, useEffect } from "react";
 import { usePublicClient } from 'wagmi'
@@ -12,9 +12,7 @@ export const AddressText = ({ children }: { children: ReactNode }) => {
   const formattedAddress = formatHexString(address.trim());
 
   useEffect(() => {
-    console.log(address)
-    console.log(client)
-    setLink(getAddressExplorerLink(address, client?.chain?.name || ""))
+    setLink(client.chain.blockExplorers?.default.url + "/address/" + address)
   }, [address, client])
 
   if (!link) {

@@ -15,26 +15,6 @@ export function formatHexString(address: string): string {
   )}`;
 }
 
-export function getAddressExplorerLink(address: string, chainName: string) {
-  switch (chainName) {
-    case "Polygon":
-      return "https://polygonscan.com/address/" + address;
-    case "Ethereum":
-      return "https://etherscan.io/address/" + address;
-    case "Arbitrum":
-      return "https://arbiscan.io/address/" + address;
-    case "Base":
-      return "https://basescan.org/address/" + address;
-    case "Sepolia":
-      return "https://sepolia.etherscan.io/address/" + address;
-    case "Goerli":
-      return "https://goerli.etherscan.io/address/" + address;
-    case "Mumbai":
-      return "https://mumbai.polygonscan.com/address/" + address;
-  }
-  return "";
-}
-
 export function getTransactionExplorerLink(tx: string, chainName: string) {
   switch (chainName) {
     case "Polygon":

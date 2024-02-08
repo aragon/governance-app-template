@@ -19,6 +19,8 @@ import { Else, If, IfCase, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useRouter } from "next/router";
 
+type BottomSection = "description" | "votes";
+
 const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS ||
   "") as Address;
 
@@ -44,8 +46,8 @@ export default function Proposal() {
     no: 0,
     abstain: 0,
   });
+  const [bottomSection, setBottomSection] = useState<BottomSection>("description");
   const [votedOption, setVotedOption] = useState<number | undefined>(undefined);
-  const [bottomSection, setBottomSection] = useState<string>("description");
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [selectedVoteOption, setSelectedVoteOption] = useState<number>();
   const { addAlert } = useAlertContext() as AlertContextProps;
@@ -153,15 +155,15 @@ export default function Proposal() {
           <h2 className="flex-grow text-3xl text-neutral-900 font-semibold">
             {bottomSection === "description" ? "Description" : "Votes"}
           </h2>
-          <ToggleGroup value={bottomSection} isMultiSelect={false} onChange={(val: string | undefined) => setBottomSection(val!)}>
-            <Toggle
-              label="Description"
-              value="description"
-            />
-            <Toggle
-              label="Votes"
-              value="votes"
-            />
+          <ToggleGroup
+            value={bottomSection}
+            isMultiSelect={false}
+            onChange={(val: string | undefined) =>
+              setBottomSection(val as BottomSection)
+            }
+          >
+            <Toggle label="Description" value="description" />
+            <Toggle label="Votes" value="votes" />
           </ToggleGroup>
         </div>
 

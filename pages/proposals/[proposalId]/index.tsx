@@ -18,6 +18,7 @@ import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
 import { Else, If, IfCase, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useRouter } from "next/router";
+import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 
 type BottomSection = "description" | "votes";
 
@@ -25,15 +26,17 @@ const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS ||
   "") as Address;
 
 export default function Proposal() {
+  const skipRender = useSkipFirstRender();
   const publicClient = usePublicClient();
   const { query } = useRouter();
   const proposalId = resolveQueryParam(query.proposalId);
 
-  const proposal = useProposal(
+  const { proposal, status: proposalFetchStatus } = useProposal(
     publicClient,
     PLUGIN_ADDRESS,
-    proposalId
-  ) as Proposal;
+    proposalId,
+    true
+  );
   const votes = useProposalVotes(
     publicClient,
     PLUGIN_ADDRESS,
@@ -64,7 +67,7 @@ export default function Proposal() {
   });
 
   useEffect(() => {
-    if (!proposal.tally) return;
+    if (!proposal?.tally) return;
 
     const yesVotes = Number(formatUnits(proposal.tally.yes || BigInt(0), 18));
     const noVotes = Number(formatUnits(proposal.tally.no || BigInt(0), 18));
@@ -78,7 +81,7 @@ export default function Proposal() {
       no: (noVotes / totalVotes) * 100,
       abstain: (abstainVotes / totalVotes) * 100,
     });
-  }, [proposal.tally]);
+  }, [proposalFetchStatus.proposalLoading, proposalFetchStatus.proposalReady]);
 
   useEffect(() => {
     setVotedOption(votes.find((vote) => vote.voter === address)?.voteOption);
@@ -101,13 +104,16 @@ export default function Proposal() {
     voteWrite?.();
   }, [selectedVoteOption, showVotingModal]);
 
-  if (!proposal.title && !proposal?.parameters?.supportThreshold) {
+  const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
+
+  if (skipRender || !proposal || showLoading) {
     return (
       <section className="flex justify-left items-left w-screen max-w-full min-w-full">
         <PleaseWaitSpinner />
       </section>
     );
   }
+
   return (
     <section className="flex flex-col items-center w-screen max-w-full min-w-full">
       <div className="flex justify-between py-5 w-full">
@@ -192,4 +198,15 @@ function resolveQueryParam(value: string | string[] | undefined): string {
   if (typeof value === "string") return value;
   else if (Array.isArray(value)) return value[0];
   return "";
+}
+
+function getShowProposalLoading(
+  proposal: ReturnType<typeof useProposal>["proposal"],
+  status: ReturnType<typeof useProposal>["status"]
+) {
+  if (!proposal || status.proposalLoading) return true;
+  else if (status.metadataLoading && !status.metadataError) return true;
+  else if (!proposal?.title && !status.metadataError) return true;
+
+  return false;
 }

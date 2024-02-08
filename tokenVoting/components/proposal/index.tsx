@@ -40,13 +40,15 @@ const getProposalVariantStatus = (proposal: Proposal) => {
 
 export default function ProposalCard(props: ProposalInputs) {
   const publicClient = usePublicClient();
-  const proposal = useProposal(
+  const { proposal, status } = useProposal(
     publicClient,
     PLUGIN_ADDRESS,
     props.proposalId.toString()
   );
 
-  if (!proposal?.parameters?.supportThreshold) {
+  const showLoading = getShowProposalLoading(proposal, status);
+
+  if (!proposal || showLoading) {
     return (
       <section className="pb-3 pt-3 w-full">
         <Card>
@@ -56,7 +58,7 @@ export default function ProposalCard(props: ProposalInputs) {
         </Card>
       </section>
     );
-  } else if (!proposal.title) {
+  } else if (status.metadataReady && !proposal?.title) {
     return (
       <section className="pb-3 pt-3 w-full">
         <Card>
@@ -125,3 +127,14 @@ const Card = function ({ children }: { children: ReactNode }) {
     </div>
   );
 };
+
+function getShowProposalLoading(
+  proposal: ReturnType<typeof useProposal>["proposal"],
+  status: ReturnType<typeof useProposal>["status"]
+) {
+  if (!proposal || status.proposalLoading) return true;
+  else if (status.metadataLoading && !status.metadataError) return true;
+  else if (!proposal?.title && !status.metadataError) return true;
+
+  return false;
+}

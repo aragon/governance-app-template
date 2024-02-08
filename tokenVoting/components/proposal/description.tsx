@@ -9,6 +9,8 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import { AddressText } from "@/components/text/address";
 import { isAddress } from "@/utils/evm";
 
+const DEFAULT_PROPOSAL_SUMMARY = "(No description available)";
+
 type FunctionData = {
   args: readonly unknown[] | undefined;
   functionName: string;
@@ -60,7 +62,7 @@ export default function ProposalDescription(proposal: Proposal) {
 
   return (
     <div className="pt-2">
-      <p className="pb-6">{proposal?.summary}</p>
+      <p className="pb-6">{proposal?.summary || DEFAULT_PROPOSAL_SUMMARY}</p>
       <h2 className="flex-grow text-2xl text-neutral-900 font-semibold pt-10 pb-3">
         Actions
       </h2>

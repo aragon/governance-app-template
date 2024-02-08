@@ -14,23 +14,3 @@ export function formatHexString(address: string): string {
     address.length - 3
   )}`;
 }
-
-export function getTransactionExplorerLink(tx: string, chainName: string) {
-  switch (chainName) {
-    case "Polygon":
-      return "https://polygonscan.com/tx/" + tx;
-    case "Ethereum":
-      return "https://etherscan.io/tx/" + tx;
-    case "Arbitrum":
-      return "https://arbiscan.io/tx/" + tx;
-    case "Base":
-      return "https://basescan.org/tx/" + tx;
-    case "Sepolia":
-      return "https://sepolia.etherscan.io/tx/" + tx;
-    case "Goerli":
-      return "https://goerli.etherscan.io/tx/" + tx;
-    case "Mumbai":
-      return "https://mumbai.polygonscan.com/tx/" + tx;
-  }
-  return "";
-}

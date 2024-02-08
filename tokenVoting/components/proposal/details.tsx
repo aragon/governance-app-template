@@ -1,5 +1,10 @@
+import { useVotingToken } from "@/tokenVoting/hooks/useToken";
 import dayjs from "dayjs";
 import { ReactNode } from "react";
+import { usePublicClient } from "wagmi";
+import { formatEther } from "viem";
+
+const SUPPORT_THRESHOLD_BASE = BigInt(1e6);
 
 interface ProposalDetailsProps {
   supportThreshold?: number;
@@ -12,26 +17,38 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
   endDate,
   snapshotBlock,
 }) => {
+  const publicClient = usePublicClient();
+  const { supply: tokenSupply } = useVotingToken(publicClient);
+  let threshold = BigInt(0);
+  if (supportThreshold) {
+    threshold =
+      (BigInt(supportThreshold) * tokenSupply) / SUPPORT_THRESHOLD_BASE;
+  }
+
   return (
     <>
       <Card>
         <h2 className="text-xl flex-grow font-semibold text-neutral-600 pr-6">
-          Threshold
+          Support threshold
         </h2>
         <div className="items-right text-right flex-wrap">
-          <span className="text-xl font-semibold">{supportThreshold?.toLocaleString()}</span>
+          <span className="text-xl font-semibold">
+            {formatEther(threshold)}
+          </span>
           <p className="text-neutral-600">voting power</p>
         </div>
       </Card>
       <Card>
         <h2 className="text-xl flex-grow font-semibold pr-6 text-neutral-600">
-          Ends
+          Ending
         </h2>
         <div className="items-right text-right flex-wrap">
-          <span className="text-xl mr-2 font-semibold">
+          <span className="text-xl font-semibold">
             {dayjs(Number(endDate) * 1000).format("DD/MM/YYYY")}
           </span>
-          <p className="text-neutral-600">unix time</p>
+          <p className="text-neutral-600">
+            {dayjs(Number(endDate) * 1000).format("HH:mm")}h
+          </p>
         </div>
       </Card>
       <Card>
@@ -52,10 +69,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
 // This should be encapsulated as soon as ODS exports this widget
 const Card = function ({ children }: { children: ReactNode }) {
   return (
-    <div className="p-4 xl:p-6 w-full flex flex-col space-y-6
+    <div
+      className="p-4 xl:p-6 w-full flex flex-col space-y-6
     box-border border border-neutral-100
     focus:outline-none focus:ring focus:ring-primary
-    bg-neutral-0 rounded-xl">
+    bg-neutral-0 rounded-xl"
+    >
       {children}
     </div>
   );

@@ -1,5 +1,7 @@
 import { Tag } from "@aragon/ods";
-import { TagVariant } from "@aragon/ods/dist/types/src/components/tag/tag";
+import type { ITagProps } from "@aragon/ods";
+
+type TagVariant = NonNullable<ITagProps["variant"]>;
 
 export const StatusTag = ({
   label,

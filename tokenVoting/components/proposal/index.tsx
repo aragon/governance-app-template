@@ -5,7 +5,7 @@ import { Proposal } from "@/tokenVoting/utils/types";
 import { useProposal } from "@/tokenVoting/hooks/useProposal";
 import { Button } from "@aragon/ods";
 import { ReactNode } from "react";
-import { ButtonVariant } from "@aragon/ods/dist/types/src/components/button/button.api";
+import { IButtonProps } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { If } from "@/components/if";
 
@@ -15,6 +15,7 @@ const DEFAULT_PROPOSAL_METADATA_SUMMARY =
 const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS ||
   "") as Address;
 
+type ButtonVariant = IButtonProps["variant"];
 type ProposalInputs = {
   proposalId: bigint;
 };

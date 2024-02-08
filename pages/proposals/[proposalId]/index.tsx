@@ -204,7 +204,7 @@ function getShowProposalLoading(
   proposal: ReturnType<typeof useProposal>["proposal"],
   status: ReturnType<typeof useProposal>["status"]
 ) {
-  if (!proposal || status.proposalLoading) return true;
+  if (!proposal && status.proposalLoading) return true;
   else if (status.metadataLoading && !status.metadataError) return true;
   else if (!proposal?.title && !status.metadataError) return true;
 

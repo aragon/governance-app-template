@@ -93,12 +93,6 @@ export function useProposal(
     metadataContent
   );
 
-  if (proposalId === "1")
-    console.log(
-      "UseProposal",
-      `Status: ${proposalFetchStatus}, meta load: ${metadataLoading}, meta ready ${metadataReady}`
-    );
-
   return {
     proposal,
     status: {

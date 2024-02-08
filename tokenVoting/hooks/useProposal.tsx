@@ -1,61 +1,147 @@
-import { useState, useEffect } from 'react';
-import { Address } from 'viem'
-import { useContractRead } from 'wagmi';
-import { fetchFromIPFS } from '@/utils/ipfs';
-import { getAbiItem } from 'viem';
-import { TokenVotingAbi } from '@/tokenVoting/artifacts/TokenVoting.sol';
-import { Action } from '@/utils/types';
-import { Proposal, ProposalMetadata, ProposalParameters, Tally, ProposalCreatedLogResponse } from '@/tokenVoting/utils/types';
-import { useQuery } from 'react-query';
+import { useState, useEffect } from "react";
+import { Address } from "viem";
+import { PublicClient, useContractRead } from "wagmi";
+import { fetchJsonFromIpfs } from "@/utils/ipfs";
+import { getAbiItem } from "viem";
+import { TokenVotingAbi } from "@/tokenVoting/artifacts/TokenVoting.sol";
+import { Action } from "@/utils/types";
+import {
+  Proposal,
+  ProposalMetadata,
+  ProposalParameters,
+  Tally,
+} from "@/tokenVoting/utils/types";
+import { useQuery } from "react-query";
 
-export function useProposal(publicClient: any, address: Address, proposalId: string) {
-    const [proposal, setProposal] = useState<Proposal>();
-    const [proposalLogs, setLogs] = useState<ProposalCreatedLogResponse>();
-    const [proposalMetadata, setMetadata] = useState<string>();
-  
-    useContractRead({
-      address,
-      abi: TokenVotingAbi,
-      functionName: 'getProposal',
-      args: [proposalId],
-      watch: true,
-      onSuccess(data) {
-        setProposal({
-          active: (data as Array<boolean>)[0],
-          executed: (data as Array<boolean>)[1],
-          parameters: (data as Array<ProposalParameters>)[2],
-          tally: (data as Array<Tally>)[3],
-          actions: (data as Array<Array<Action>>)[4],
-          allowFailureMap: (data as Array<bigint>)[5],
-        } as Proposal)
-      }
-    });
-  
-    useEffect(() => {
-      async function getLogs() {
-        if (!proposal) return;
-        const event = getAbiItem({ abi: TokenVotingAbi, name: 'ProposalCreated' });
-        const logs: ProposalCreatedLogResponse[] = await publicClient.getLogs({
-          address,
-          event,
-          args: {
-            proposalId: proposalId,
-          } as any,
-          fromBlock: proposal.parameters.snapshotBlock,
-          toBlock: proposal.parameters.startDate,
-        });
-        setLogs(logs[0]);
+type ProposalCreatedLogResponse = {
+  args: {
+    actions: Action[];
+    allowFailureMap: bigint;
+    creator: string;
+    endDate: bigint;
+    startDate: bigint;
+    metadata: string;
+    proposalId: bigint;
+  };
+};
+
+const ProposalCreatedEvent = getAbiItem({
+  abi: TokenVotingAbi,
+  name: "ProposalCreated",
+});
+
+export function useProposal(
+  publicClient: PublicClient,
+  address: Address,
+  proposalId: string,
+  autoRefresh = false
+) {
+  const [proposalCreationEvent, setProposalCreationEvent] =
+    useState<ProposalCreatedLogResponse["args"]>();
+  const [metadataUri, setMetadata] = useState<string>();
+
+  // Proposal on-chain data
+  const {
+    data: proposalResult,
+    error: proposalError,
+    fetchStatus: proposalFetchStatus,
+  } = useContractRead<typeof TokenVotingAbi, "getProposal", any[]>({
+    address,
+    abi: TokenVotingAbi,
+    functionName: "getProposal",
+    args: [proposalId],
+    watch: autoRefresh,
+  });
+  const proposalData = decodeProposalResultData(proposalResult);
+
+  // Creation event
+  useEffect(() => {
+    if (!proposalData) return;
+
+    publicClient
+      .getLogs({
+        address,
+        event: ProposalCreatedEvent,
+        args: {
+          proposalId: proposalId,
+        } as any,
+        fromBlock: proposalData.parameters.snapshotBlock,
+        toBlock: proposalData.parameters.startDate,
+      })
+      .then((logs: ProposalCreatedLogResponse[]) => {
+        setProposalCreationEvent(logs[0].args);
         setMetadata(logs[0].args.metadata);
-      }
-  
-      getLogs();
-    }, [proposal?.tally]);
-  
-    const { data: ipfsResponse, isLoading: ipfsLoading, error } = useQuery<ProposalMetadata, Error>(
-      `ipfsData${proposalId}`,
-      () => fetchFromIPFS(proposalMetadata),
-      { enabled: proposalMetadata ? true : false }
-    );
-  
-    return { ...proposalLogs, ...ipfsResponse, ...proposal };
-  }
+      })
+      .catch((err) => {
+        console.error("Could not fetch the proposal defailt", err);
+        return null;
+      });
+  }, [proposalData?.tally]);
+
+  // JSON metadata
+  const {
+    data: metadataContent,
+    isLoading: metadataLoading,
+    isSuccess: metadataReady,
+    error: metadataError,
+  } = useQuery<ProposalMetadata, Error>(
+    `ipfsData:${proposalId}`,
+    () =>
+      metadataUri ? fetchJsonFromIpfs(metadataUri) : Promise.resolve(null),
+    { enabled: !!metadataUri }
+  );
+
+  const proposal = arrangeProposalData(
+    proposalData,
+    proposalCreationEvent,
+    metadataContent
+  );
+
+  return {
+    proposal,
+    status: {
+      proposalReady: proposalFetchStatus === "idle",
+      proposalLoading: proposalFetchStatus === "fetching",
+      proposalError,
+      metadataReady,
+      metadataLoading,
+      metadataError,
+    },
+  };
+}
+
+// Helpers
+
+function decodeProposalResultData(data?: Array<any>) {
+  if (!data?.length || data.length < 6) return null;
+
+  return {
+    active: data[0] as boolean,
+    executed: data[1] as boolean,
+    parameters: data[2] as ProposalParameters,
+    tally: data[3] as Tally,
+    actions: data[4] as Array<Action>,
+    allowFailureMap: data[5] as bigint,
+  };
+}
+
+function arrangeProposalData(
+  proposalData?: ReturnType<typeof decodeProposalResultData>,
+  creationEvent?: ProposalCreatedLogResponse["args"],
+  metadata?: ProposalMetadata
+): Proposal | null {
+  if (!proposalData) return null;
+
+  return {
+    actions: proposalData.actions,
+    active: proposalData.active,
+    executed: proposalData.executed,
+    parameters: proposalData.parameters,
+    tally: proposalData.tally,
+    allowFailureMap: proposalData.allowFailureMap,
+    creator: creationEvent?.creator || "",
+    title: metadata?.title || "",
+    summary: metadata?.summary || "",
+    resources: metadata?.resources || [],
+  };
+}

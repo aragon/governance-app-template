@@ -1,26 +1,14 @@
-import { Address } from 'viem'
-import { Action } from '@/utils/types'
+import { Address } from "viem";
+import { Action } from "@/utils/types";
 
 export type ProposalInputs = {
   proposalId: bigint;
-}
-
-export type ProposalCreatedLogResponse = {
-  args: {
-    actions: Action[];
-    allowFailureMap: bigint;
-    creator: string;
-    endDate: bigint;
-    startDate: bigint;
-    metadata: string;
-    proposalId: bigint;
-  }
-}
+};
 
 enum VotingMode {
   Standard,
   EarlyExecution,
-  VoteReplacement
+  VoteReplacement,
 }
 
 export type ProposalParameters = {
@@ -30,13 +18,13 @@ export type ProposalParameters = {
   endDate: bigint;
   snapshotBlock: bigint;
   minVotingPower: bigint;
-}
+};
 
 export type Tally = {
   abstain: bigint;
   yes: bigint;
   no: bigint;
-}
+};
 
 export type Proposal = {
   active: boolean;
@@ -45,30 +33,25 @@ export type Proposal = {
   tally: Tally;
   actions: Action[];
   allowFailureMap: bigint;
+  creator: string;
   title: string;
   summary: string;
   resources: string[];
-
-}
-
-export type GetProposalCallResponse = {
-  data: Proposal;
-  isLoading: boolean;
-}
+};
 
 export type ProposalMetadata = {
   title: string;
   summary: string;
   resources: string[];
-}
+};
 
 export type VoteCastResponse = {
   args: VoteCastEvent[];
-}
+};
 
 export type VoteCastEvent = {
   voter: Address;
   proposalId: bigint;
   voteOption: number;
   votingPower: bigint;
-}
+};

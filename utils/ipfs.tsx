@@ -1,37 +1,40 @@
-import { CID } from 'ipfs-http-client';
-import { fromHex } from 'viem';
-import { Address } from 'viem'
+import { CID, IPFSHTTPClient } from "ipfs-http-client";
+import { fromHex } from "viem";
 
-const ipfsEndpoint = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
-const ipfsKey = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
+const IPFS_ENDPOINT = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
+const IPFS_API_KEY = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
 
-export function getPath(hexedIpfs: Address) {
-  const ipfsPath = fromHex(hexedIpfs, 'string')
-  const path = ipfsPath.includes('ipfs://') ? ipfsPath.substring(7) : ipfsPath
-  return path
+export function fetchJsonFromIpfs(hexIpfsUri: string) {
+  return fetchFromIPFS(hexIpfsUri).then((res) => res.json());
 }
-export async function fetchFromIPFS(ipfsPath: string | undefined) {
-  if (!ipfsPath) return
-  const path = getPath((ipfsPath as Address))
-  const response = await fetch(`${ipfsEndpoint}/cat?arg=${path}`, {
-    method: 'POST',
+
+export function uploadToIPFS(client: IPFSHTTPClient, blob: Blob) {
+  return client.add(blob).then(({ cid }: { cid: CID }) => {
+    return cid.toString();
+  });
+}
+
+async function fetchFromIPFS(hexIpfsUri: string): Promise<Response> {
+  if (!hexIpfsUri) throw new Error("Invalid IPFS URI");
+
+  const path = getPath(hexIpfsUri);
+  const response = await fetch(`${IPFS_ENDPOINT}/cat?arg=${path}`, {
+    method: "POST",
     headers: {
-      'X-API-KEY': ipfsKey,
-      'Accept': 'application/json',
-    }
+      "X-API-KEY": IPFS_API_KEY,
+      Accept: "application/json",
+    },
   });
   if (!response.ok) {
-    throw new Error('Network response was not ok');
+    throw new Error("Could not connect to the IPFS endpoint");
   }
-  return response.json(); // or .text(), .blob(), etc., depending on the data format
+  return response; // .json(), .text(), .blob(), etc.
 }
 
-
-export async function uploadToIPFS(client: any, blob: Blob) {
-  try {
-    const { cid }: {cid: CID} = await client.add(blob);
-    return cid.toString()
-  } catch (error) {
-    console.error('Error uploading file: ', error);
-  }
+function getPath(hexIpfsUri: string) {
+  const decodedUri = fromHex(hexIpfsUri as `0x${string}`, "string");
+  const path = decodedUri.includes("ipfs://")
+    ? decodedUri.substring(7)
+    : decodedUri;
+  return path;
 }

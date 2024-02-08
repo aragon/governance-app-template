@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Address } from "viem";
-import { PublicClient, useContractRead } from "wagmi";
+import { PublicClient, useBlockNumber, useReadContract } from "wagmi";
 import { fetchJsonFromIpfs } from "@/utils/ipfs";
 import { getAbiItem } from "viem";
 import { TokenVotingAbi } from "@/tokenVoting/artifacts/TokenVoting.sol";
@@ -11,7 +11,7 @@ import {
   ProposalParameters,
   Tally,
 } from "@/tokenVoting/utils/types";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -39,20 +39,25 @@ export function useProposal(
   const [proposalCreationEvent, setProposalCreationEvent] =
     useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();
+  const { data: blockNumber} = useBlockNumber();
 
   // Proposal on-chain data
   const {
     data: proposalResult,
     error: proposalError,
     fetchStatus: proposalFetchStatus,
-  } = useContractRead<typeof TokenVotingAbi, "getProposal", any[]>({
+    refetch: proposalRefetch
+  } = useReadContract<typeof TokenVotingAbi, "getProposal", any[]>({
     address,
     abi: TokenVotingAbi,
     functionName: "getProposal",
     args: [proposalId],
-    watch: autoRefresh,
   });
   const proposalData = decodeProposalResultData(proposalResult);
+
+  useEffect(() => {
+    if (autoRefresh) proposalRefetch()
+  }, [blockNumber])
 
   // Creation event
   useEffect(() => {
@@ -84,12 +89,11 @@ export function useProposal(
     isLoading: metadataLoading,
     isSuccess: metadataReady,
     error: metadataError,
-  } = useQuery<ProposalMetadata, Error>(
-    `ipfsData:${proposalId}`,
-    () =>
-      metadataUri ? fetchJsonFromIpfs(metadataUri) : Promise.resolve(null),
-    { enabled: !!metadataUri }
-  );
+  } = useQuery<ProposalMetadata, Error>({
+    queryKey: [`ipfsData:${proposalId}`],
+    queryFn: () => metadataUri ? fetchJsonFromIpfs(metadataUri) : Promise.resolve(null),
+    enabled: !!metadataUri
+});
 
   const proposal = arrangeProposalData(
     proposalData,
@@ -105,7 +109,7 @@ export function useProposal(
       proposalError,
       metadataReady,
       metadataLoading,
-      metadataError,
+      metadataError: metadataError !== undefined,
     },
   };
 }

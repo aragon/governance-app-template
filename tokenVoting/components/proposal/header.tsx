@@ -11,10 +11,10 @@ interface ProposalHeaderProps {
   proposal: Proposal;
   userVote: number | undefined;
   userCanVote: boolean;
-  setShowVotingModal: Function;
+  onShowVotingModal: Function;
 }
 
-const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposal, userVote, userCanVote, setShowVotingModal }) => {
+const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposal, userVote, userCanVote, onShowVotingModal }) => {
   const [proposalVariant, setProposalVariant] = useState({variant: '', label: ''});
   const [userVoteData, setUserVoteData] = useState({variant: '', label: ''});
 
@@ -28,8 +28,8 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
 
   const getProposalVariantStatus = (proposal: Proposal) => {
     return {
-      variant: proposal?.open ? 'info' : proposal?.executed ? 'success' : proposal?.tally?.no >= proposal?.tally?.yes ? 'critical' : 'success' as AlertVariant,
-      label: proposal?.open ? 'Open' : proposal?.executed ? 'Executed' : proposal?.tally!.no >= proposal?.tally!.yes ? 'Defeated' : 'Executable',
+      variant: proposal?.active ? 'info' : proposal?.executed ? 'success' : proposal?.tally?.no >= proposal?.tally?.yes ? 'critical' : 'success' as AlertVariant,
+      label: proposal?.active ? 'Active' : proposal?.executed ? 'Executed' : proposal?.tally?.no >= proposal?.tally?.yes ? 'Defeated' : 'Executable',
     }
   }
 
@@ -74,7 +74,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalNumber, proposa
               className="flex h-5 items-center"
               size="lg"
               variant="primary"
-              onClick={() => setShowVotingModal(true)}
+              onClick={() => onShowVotingModal()}
             >Vote</Button>
             </Then>
             <Else>

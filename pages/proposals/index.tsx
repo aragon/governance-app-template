@@ -1,6 +1,6 @@
 import { useContractRead } from "wagmi";
 import { ReactNode, useEffect, useState } from "react";
-import Proposal from "@/tokenVoting/components/proposal";
+import ProposalCard from "@/tokenVoting/components/proposal";
 import { Address } from "viem";
 import { TokenVotingAbi } from "@/tokenVoting/artifacts/TokenVoting.sol";
 import { Button, IconType } from "@aragon/ods";
@@ -20,14 +20,14 @@ export default function Proposals() {
 
   const [currentPage, setCurrentPage] = useState(0);
   const [paginatedProposals, setPaginatedProposals] = useState<number[]>([]);
-
+  
   useEffect(() => {
     const start = currentPage * PROPOSALS_PER_PAGE;
     const end = (currentPage + 1) * PROPOSALS_PER_PAGE;
     const propIds = new Array(proposalCount).fill(0).map((_, i) => i);
     setPaginatedProposals(propIds.slice(start, end));
   }, [proposalCount, currentPage]);
-
+  
   const { isLoading, isFetching, isError } = useContractRead({
     address: PLUGIN_ADDRESS,
     abi: TokenVotingAbi,
@@ -59,7 +59,7 @@ export default function Proposals() {
       </SectionView>
       <If condition={proposalCount}>
         {paginatedProposals.map((_, i) => (
-          <Proposal
+          <ProposalCard
             key={i}
             proposalId={BigInt(
               proposalCount! - 1 - currentPage * PROPOSALS_PER_PAGE - i

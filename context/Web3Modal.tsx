@@ -1,6 +1,6 @@
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { WagmiConfig, createConfig, configureChains } from "wagmi";
-import { polygon } from "@wagmi/core/chains";
+import { mainnet, polygon, goerli, optimism } from "@wagmi/core/chains";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";

@@ -43,7 +43,7 @@ const Sidebar = () => {
   return (
     <header className="h-screen">
       <SidebarSwitchButton />
-      <div className={`md:w-72 bg-neutral-100 shadow h-full flex flex-col justify-between ${isOpen ? 'absolute md:relative w-full' : 'hidden md:block'}`}>
+      <div className={`md:w-72 bg-neutral-100 h-full flex flex-col justify-between ${isOpen ? 'absolute md:relative w-full' : 'hidden md:block'}`}>
         <div className="flex-1 grow">
           <div className="w-full flex items-center pt-14 py-3 px-3 md:pt-3">
             <Image

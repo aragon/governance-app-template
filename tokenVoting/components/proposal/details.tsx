@@ -2,9 +2,9 @@ import dayjs from "dayjs";
 import { ReactNode } from "react";
 
 interface ProposalDetailsProps {
-  supportThreshold: number;
-  endDate: bigint;
-  snapshotBlock: bigint;
+  supportThreshold?: number;
+  endDate?: bigint;
+  snapshotBlock?: bigint;
 }
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({
@@ -19,7 +19,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
           Threshold
         </h2>
         <div className="items-right text-right flex-wrap">
-          <span className="text-xl font-semibold">{supportThreshold.toLocaleString()}</span>
+          <span className="text-xl font-semibold">{supportThreshold?.toLocaleString()}</span>
           <p className="text-neutral-600">voting power</p>
         </div>
       </Card>
@@ -41,7 +41,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
         <div className="items-right text-right flex-wrap">
           <p className="text-neutral-600">Taken at block</p>
           <span className="text-xl mr-2 font-semibold">
-            {snapshotBlock.toLocaleString()}
+            {snapshotBlock?.toLocaleString()}
           </span>
         </div>
       </Card>

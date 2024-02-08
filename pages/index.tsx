@@ -43,7 +43,7 @@ export default function Home() {
 const Card = function ({ children }: { children: ReactNode }) {
   return (
     <div
-      className="w-full flex flex-col space-y-6 shadow-lg
+      className="w-full flex flex-col space-y-6 drop-shadow-sm
     box-border border border-neutral-0
     focus:outline-none focus:ring focus:ring-primary
     px-4 py-5 xs:px-10 md:px-6 lg:px-7 mb-6

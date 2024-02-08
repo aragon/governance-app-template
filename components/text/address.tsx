@@ -1,14 +1,19 @@
-import { formatHexString, getAddressExplorerLink } from "@/utils/evm";
+import { formatHexString } from "@/utils/evm";
 import { getChildrenText } from "@/utils/content";
-import { ReactNode } from "react";
-import { useWalletClient } from "wagmi";
+import { ReactNode, useState, useEffect } from "react";
+import { usePublicClient } from 'wagmi'
+// import { Link } from '@aragon/ods'
 
 export const AddressText = ({ children }: { children: ReactNode }) => {
   const address = getChildrenText(children);
-  const { data: client } = useWalletClient();
+  const client = usePublicClient()
+  const [link, setLink] = useState<string>();
 
   const formattedAddress = formatHexString(address.trim());
-  const link = getAddressExplorerLink(address, client?.chain?.name || "");
+
+  useEffect(() => {
+    setLink(client.chain.blockExplorers?.default.url + "/address/" + address)
+  }, [address, client])
 
   if (!link) {
     return (
@@ -16,8 +21,15 @@ export const AddressText = ({ children }: { children: ReactNode }) => {
     );
   }
   return (
-    <a href={link} target="_blank" className="text-primary-400 font-semibold underline">
-      {formattedAddress}
-    </a>
+    <>
+      {/**
+        <Link href={link} iconRight="LINK_EXTERNAL">
+          {formattedAddress}
+        </Link>
+     */}
+      <a href={link} target="_blank" className="text-primary-400 font-semibold underline">
+        {formattedAddress}
+      </a>
+    </>
   );
 };

@@ -1,7 +1,7 @@
 import { Action } from "@/utils/types";
 import { FC, useEffect, useState } from "react";
-import { InputText } from '@aragon/ods'
-import { Address } from "viem";
+import { InputText, InputNumber } from '@aragon/ods'
+import { Address, parseEther } from "viem";
 import { isAddress } from "@/utils/evm";
 
 interface WithdrawalInputProps {
@@ -23,9 +23,6 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
         setTo(event?.target?.value as Address);
     }
 
-    const handleValue = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(event?.target?.value);
-    }
     return (
         <div className="my-6">
             <div className="mb-3 pb-3">
@@ -39,13 +36,13 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setAction }) => {
                     />
             </div>
             <div className="mb-6">
-                <InputText
+                <InputNumber
                     className=""
-                    label="Amount (in wei)"
-                    placeholder="1000000000000000000" 
+                    label="Amount"
+                    placeholder="1" 
+                    helpText="in ether"
                     variant={(typeof value === "undefined" || isNumeric(value)) ? "default" : "critical"}
-                    value={value}
-                    onChange={handleValue}
+                    onChange={(val: string) => setValue(parseEther(val).toString())}
                     />
             </div>
         </div>

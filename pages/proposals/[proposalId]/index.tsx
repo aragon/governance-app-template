@@ -1,4 +1,4 @@
-import { usePublicClient, useAccount, useContractWrite } from "wagmi";
+import { usePublicClient, useAccount, useWriteContract } from "wagmi";
 import { useState, useEffect } from "react";
 import { Address } from "viem";
 import { Proposal } from "@/tokenVoting/utils/types";
@@ -55,15 +55,7 @@ export default function Proposal() {
   const [selectedVoteOption, setSelectedVoteOption] = useState<number>();
   const { addAlert } = useAlertContext() as AlertContextProps;
   const { address, isConnected, isDisconnected } = useAccount();
-  const { write: voteWrite } = useContractWrite({
-    abi: TokenVotingAbi,
-    address: PLUGIN_ADDRESS,
-    functionName: "vote",
-    args: [proposalId, selectedVoteOption, 1],
-    onSuccess(data) {
-      addAlert("Your vote has been registered", data.hash);
-    },
-  });
+  const { writeContract: voteWrite, data: voteResponse } = useWriteContract();
 
   useEffect(() => {
     if (!proposal?.tally) return;
@@ -97,10 +89,19 @@ export default function Proposal() {
   };
 
   useEffect(() => {
+      if(voteResponse) addAlert("Your vote has been registered", voteResponse);
+  }, [voteResponse])
+
+  useEffect(() => {
     if (showVotingModal) return;
     else if (!selectedVoteOption) return;
 
-    voteWrite?.();
+    voteWrite({
+      abi: TokenVotingAbi,
+      address: PLUGIN_ADDRESS,
+      functionName: "vote",
+      args: [proposalId, selectedVoteOption, 1],
+    });
   }, [selectedVoteOption, showVotingModal]);
 
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);

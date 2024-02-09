@@ -4,8 +4,9 @@ import { Address } from "viem";
 import { Proposal } from "@/tokenVoting/utils/types";
 import { useProposal } from "@/tokenVoting/hooks/useProposal";
 import { Card, Tag } from "@aragon/ods";
+import { TagVariant } from "@aragon/ods/dist"
 import * as DOMPurify from 'dompurify';
-import { ButtonVariant } from "@aragon/ods/dist/types/src/components/button/button.api";
+// import { ButtonVariant } from "@aragon/ods/dist/types/src/components/button/button.api";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { If } from "@/components/if";
 
@@ -27,7 +28,7 @@ const getProposalVariantStatus = (proposal: Proposal) => {
         ? "success"
         : proposal?.tally?.no >= proposal?.tally?.yes
           ? "critical"
-          : "success") as ButtonVariant,
+          : "success"),
     label: proposal?.active
       ? "Active"
       : proposal?.executed

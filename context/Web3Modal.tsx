@@ -26,10 +26,12 @@ export const config = createConfig({
   connectors: [
     walletConnect({ projectId, metadata, showQrModal: false }),
     injected({ shimDisconnect: true }),
+    /*
     coinbaseWallet({
       appName: metadata.name,
       appLogoUrl: metadata.icons[0]
     })
+    */
   ],
   // ssr: false,
 })

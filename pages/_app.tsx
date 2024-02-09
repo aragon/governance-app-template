@@ -9,6 +9,8 @@ const manrope = Manrope({
 });
 
 export default function AragonetteApp({ Component, pageProps }: any) {
+  // const initialState = cookieToInitialState(config, headers().get('cookie'))
+
   return (
     <div className={manrope.className}>
       <RootContextProvider>

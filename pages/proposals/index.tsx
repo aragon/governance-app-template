@@ -1,4 +1,4 @@
-import { useContractRead } from "wagmi";
+import { useBlockNumber, useReadContract } from "wagmi";
 import { ReactNode, useEffect, useState } from "react";
 import ProposalCard from "@/tokenVoting/components/proposal";
 import { Address } from "viem";
@@ -16,6 +16,7 @@ const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS ||
 
 export default function Proposals() {
   const [proposalCount, setProposalCount] = useState(0);
+  const {data: blockNumber } = useBlockNumber({watch: true})
   const canCreate = useCanCreateProposal();
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -27,16 +28,21 @@ export default function Proposals() {
     const propIds = new Array(proposalCount).fill(0).map((_, i) => i);
     setPaginatedProposals(propIds.slice(start, end));
   }, [proposalCount, currentPage]);
-
-  const { isLoading, isFetching, isError } = useContractRead({
+  
+  const { data: proposalCountResponse, isLoading, refetch } = useReadContract({
     address: PLUGIN_ADDRESS,
     abi: TokenVotingAbi,
     functionName: "proposalCount",
-    watch: true,
-    onSuccess(data) {
-      setProposalCount(Number(data));
-    },
   });
+
+  useEffect(() => {
+    if(!proposalCountResponse) return
+    setProposalCount(Number(proposalCountResponse))
+  }, [proposalCountResponse])
+
+  useEffect(() => { 
+    refetch()
+  }, [blockNumber])
 
   const skipRender = useSkipFirstRender();
   if (skipRender) return <></>;

@@ -1,12 +1,9 @@
-import { createWeb3Modal } from "@web3modal/wagmi/react";
-import { WagmiConfig, createConfig, configureChains } from "wagmi";
-import { mainnet, polygon, goerli, optimism } from "@wagmi/core/chains";
-import { InjectedConnector } from "wagmi/connectors/injected";
-import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
-import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
-import { alchemyProvider } from "wagmi/providers/alchemy";
-import { ReactNode } from "react";
-import { EIP6963Connector } from "@web3modal/wagmi";
+import { http, createConfig } from "wagmi";
+import { polygon } from "@wagmi/core/chains";
+import { injected } from 'wagmi/connectors'
+import { coinbaseWallet } from 'wagmi/connectors'
+import { walletConnect } from 'wagmi/connectors'
+
 
 // 1. Get projectId
 const projectId: string = process.env.NEXT_PUBLIC_WC_PROJECT_ID || "";
@@ -20,46 +17,24 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [polygon],
-  [
-    alchemyProvider({ apiKey: alchemyKey }),
-  ]
-);
-
 // const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors: [
-    new WalletConnectConnector({
-      chains,
-      options: { projectId, showQrModal: false, metadata },
-    }),
-    new EIP6963Connector({ chains }),
-    new InjectedConnector({ chains, options: { shimDisconnect: true } }),
-    new CoinbaseWalletConnector({
-      chains,
-      options: { appName: metadata.name },
-    }),
-  ],
-  publicClient,
-  webSocketPublicClient,
-});
-
-// 3. Create modal
-createWeb3Modal({
-  wagmiConfig,
-  projectId,
-  chains,
-  themeVariables: {
-    // '--w3m-color-mix': '#00BB7F',
-    "--w3m-accent": "#3164FA",
-    "--w3m-color-mix": "#3164FA",
-    "--w3m-color-mix-strength": 30,
-    "--w3m-border-radius-master": "12px",
+export const config = createConfig({
+  chains: [polygon],
+  transports: {
+    [polygon.id]: http('https://polygon-mainnet.g.alchemy.com/v2/' + alchemyKey, {batch: true}),
   },
-});
+  connectors: [
+    walletConnect({ projectId, metadata, showQrModal: false }),
+    injected({ shimDisconnect: true }),
+    /*
+    coinbaseWallet({
+      appName: metadata.name,
+      appLogoUrl: metadata.icons[0]
+    })
+    */
+  ],
+  // ssr: false,
+})
 
-export function Web3ModalProvider({ children }: { children: ReactNode }) {
-  return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>;
-}
+
+

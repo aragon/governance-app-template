@@ -2,7 +2,7 @@ import { create } from 'ipfs-http-client';
 import { Button, IconType, Icon, InputText, TextAreaRichText } from '@aragon/ods'
 import React, { useEffect, useState } from 'react'
 import { uploadToIPFS } from '@/utils/ipfs'
-import { useContractWrite } from 'wagmi';
+import { useContractWrite, useWriteContract } from 'wagmi';
 import { Address, toHex } from 'viem'
 import { TokenVotingAbi } from '@/tokenVoting/artifacts/TokenVoting.sol';
 import { useAlertContext } from '@/context/AlertContext';
@@ -26,15 +26,7 @@ export default function Create() {
     const [summary, setSummary] = useState<string>('');
     const [action, setAction] = useState<Action[]>([]);
     const { addAlert } = useAlertContext()
-    const { write: createProposalWrite } = useContractWrite({
-        abi: TokenVotingAbi,
-        address: PLUGIN_ADDRESS,
-        functionName: 'createProposal',
-        args: [toHex(ipfsPin), action, 0, 0, 0, 0, 0],
-        onSuccess(data) {
-            addAlert("We got your proposal!", data.hash)
-        },
-    });
+    const { writeContract: createProposalWrite, data: proposalCreated } = useWriteContract();
     const [actionType, setActionType] = useState<ActionType>(ActionType.Signaling)
 
     const changeActionType = (actionType: ActionType) => {
@@ -48,7 +40,17 @@ export default function Create() {
     });
 
     useEffect(() => {
-        if (ipfsPin !== '') createProposalWrite?.()
+       if(proposalCreated) addAlert("We got your proposal!", proposalCreated)
+    }, [proposalCreated])
+
+    useEffect(() => {
+        if (ipfsPin !== '') 
+            createProposalWrite({
+                abi: TokenVotingAbi,
+                address: PLUGIN_ADDRESS,
+                functionName: 'createProposal',
+                args: [toHex(ipfsPin), action, 0, 0, 0, 0, 0],
+            })
     }, [ipfsPin])
 
     const submitProposal = async () => {

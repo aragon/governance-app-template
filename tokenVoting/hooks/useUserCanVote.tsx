@@ -1,20 +1,25 @@
 import { Address } from 'viem'
-import { useContractRead, useAccount } from 'wagmi';
+import { useAccount, useBlockNumber, useReadContract } from 'wagmi';
 import { TokenVotingAbi } from '@/tokenVoting/artifacts/TokenVoting.sol';
+import { useEffect } from 'react';
 
 
 const pluginAddress = ((process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address)
 
 export function useUserCanVote(proposalId: bigint) {
-    const { address, isConnecting, isDisconnected } = useAccount()
+    const { address } = useAccount()
+    const { data: blockNumber } = useBlockNumber({watch: true})
 
-    const { data: canVote, isError, isLoading } = useContractRead({
+    const { data: canVote, refetch: canVoteRefetch } = useReadContract({
                 address: pluginAddress,
                 abi: TokenVotingAbi,
                 functionName: 'canVote',
-                watch: true,
                 args: [proposalId, address, 1]
     })
+
+    useEffect(() => {
+        canVoteRefetch()
+    }, [blockNumber])
 
     return canVote
 }

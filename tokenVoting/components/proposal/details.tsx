@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import { ReactNode } from "react";
-import { usePublicClient } from "wagmi";
 import { formatEther } from "viem";
 import { useVotingToken } from "@/tokenVoting/hooks/useVotingToken";
 

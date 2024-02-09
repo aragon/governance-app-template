@@ -49,7 +49,8 @@ export default function Proposal() {
     no: 0,
     abstain: 0,
   });
-  const [bottomSection, setBottomSection] = useState<BottomSection>("description");
+  const [bottomSection, setBottomSection] =
+    useState<BottomSection>("description");
   const [votedOption, setVotedOption] = useState<number | undefined>(undefined);
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [selectedVoteOption, setSelectedVoteOption] = useState<number>();
@@ -165,7 +166,7 @@ export default function Proposal() {
             value={bottomSection}
             isMultiSelect={false}
             onChange={(val: string | undefined) =>
-              setBottomSection(val as BottomSection)
+              val ? setBottomSection(val as BottomSection) : ""
             }
           >
             <Toggle label="Description" value="description" />

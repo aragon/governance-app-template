@@ -2,13 +2,14 @@ import { create } from 'ipfs-http-client';
 import { Button, IconType, Icon, InputText, TextAreaRichText } from '@aragon/ods'
 import React, { useEffect, useState } from 'react'
 import { uploadToIPFS } from '@/utils/ipfs'
-import { useContractWrite, useWriteContract } from 'wagmi';
+import { useWriteContract } from 'wagmi';
 import { Address, toHex } from 'viem'
 import { TokenVotingAbi } from '@/tokenVoting/artifacts/TokenVoting.sol';
 import { useAlertContext } from '@/context/AlertContext';
 import WithdrawalInput from '@/components/input/withdrawal'
 import CustomActionInput from '@/components/input/custom-action'
 import { Action } from '@/utils/types'
+import { getPlainText } from '@/utils/html';
 
 const IPFS_ENDPOINT = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
 const IPFS_KEY = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
@@ -20,47 +21,64 @@ enum ActionType {
     Custom
 }
 
+const ipfsClient = create({
+    url: IPFS_ENDPOINT,
+    headers: { 'X-API-KEY': IPFS_KEY, 'Accept': 'application/json' }
+});
+
 export default function Create() {
     const [ipfsPin, setIpfsPin] = useState<string>('');
     const [title, setTitle] = useState<string>('');
     const [summary, setSummary] = useState<string>('');
-    const [action, setAction] = useState<Action[]>([]);
+    const [actions, setActions] = useState<Action[]>([]);
     const { addAlert } = useAlertContext()
     const { writeContract: createProposalWrite, data: proposalCreated } = useWriteContract();
     const [actionType, setActionType] = useState<ActionType>(ActionType.Signaling)
 
     const changeActionType = (actionType: ActionType) => {
-        setAction([])
+        setActions([])
         setActionType(actionType)
     }
 
-    const client = create({
-        url: IPFS_ENDPOINT,
-        headers: { 'X-API-KEY': IPFS_KEY, 'Accept': 'application/json' }
-    });
-
     useEffect(() => {
-       if(proposalCreated) addAlert("We got your proposal!", proposalCreated)
+       if(proposalCreated) addAlert("The proposal has been created", proposalCreated)
     }, [proposalCreated])
 
     useEffect(() => {
-        if (ipfsPin !== '') 
-            createProposalWrite({
-                abi: TokenVotingAbi,
-                address: PLUGIN_ADDRESS,
-                functionName: 'createProposal',
-                args: [toHex(ipfsPin), action, 0, 0, 0, 0, 0],
-            })
+        if (!ipfsPin) return;
+
+        createProposalWrite({
+            abi: TokenVotingAbi,
+            address: PLUGIN_ADDRESS,
+            functionName: 'createProposal',
+            args: [toHex(ipfsPin), actions, 0, 0, 0, 0, 0],
+        })
     }, [ipfsPin])
 
     const submitProposal = async () => {
-        if(!title.trim()) return alert("Please, enter a title");
-        else if(!summary.trim()) return alert("Please, enter a summary");
+        // Check metadata
+        if (!title.trim()) return alert("Please, enter a title");
         
+        const plainSummary = getPlainText(summary).trim()
+        if (!plainSummary.trim()) return alert("Please, enter a summary of what the proposal is about");
+
+        // Check the action
+        switch (actionType) {
+            case ActionType.Signaling: break;
+            case ActionType.Withdrawal: 
+                if (!actions.length) {
+                    return alert("Please ensure that the withdrawal address and the amount to transfer are valid");
+                }
+            default:
+                if (!actions.length || actions[0].data === "0x") {
+                    return alert("Please ensure that the values of the action to execute are correct");
+                }
+        }
+          
         const proposalMetadataJsonObject = { title, summary };
         const blob = new Blob([JSON.stringify(proposalMetadataJsonObject)], { type: 'application/json' });
 
-        const ipfsPin = await uploadToIPFS(client, blob);
+        const ipfsPin = await uploadToIPFS(ipfsClient, blob);
         setIpfsPin(ipfsPin!)
     }
 
@@ -77,7 +95,7 @@ export default function Create() {
                         className=""
                         label="Title"
                         maxLength={100}
-                        placeholder="A short title that descrives the main purpose"
+                        placeholder="A short title that describes the main purpose"
                         variant="default"
                         value={title}
                         onChange={handleTitleInput}
@@ -127,8 +145,8 @@ export default function Create() {
                         </div>
                     </div>
                     <div className="mb-6">
-                        {actionType === ActionType.Withdrawal && (<WithdrawalInput setAction={setAction} />)}
-                        {actionType === ActionType.Custom && (<CustomActionInput setAction={setAction} />)}
+                        {actionType === ActionType.Withdrawal && (<WithdrawalInput setActions={setActions} />)}
+                        {actionType === ActionType.Custom && (<CustomActionInput setActions={setActions} />)}
                     </div>
                 </div>
 

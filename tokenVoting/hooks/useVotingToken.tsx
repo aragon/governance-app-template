@@ -1,5 +1,6 @@
-import { Address } from "viem";
-import { useContractRead, useToken } from "wagmi";
+import { Address, erc20Abi } from "viem";
+import { useReadContract } from "wagmi";
+
 import { TokenVotingAbi } from "@/tokenVoting/artifacts/TokenVoting.sol";
 
 const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
@@ -9,22 +10,25 @@ export function useVotingToken() {
     data: tokenAddress,
     isError: error1,
     isLoading: loading1,
-  } = useContractRead({
+  } = useReadContract({
     address: pluginAddress,
     abi: TokenVotingAbi,
     functionName: "getVotingToken",
-    watch: false,
   });
 
   const {
-    data: token,
+    data: tokenSupply,
     isError: error2,
     isLoading: loading2,
-  } = useToken({ address: tokenAddress as Address });
+  } = useReadContract({ 
+    address: tokenAddress as Address,
+    abi: erc20Abi,
+    functionName: 'totalSupply'
+  });
 
   return {
     address: tokenAddress,
-    token,
+    tokenSupply,
     status: {
       isLoading: loading1 || loading2,
       isError: error1 || error2,

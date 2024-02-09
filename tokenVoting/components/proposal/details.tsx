@@ -18,11 +18,11 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
   endDate,
   snapshotBlock,
 }) => {
-  const { token: votingToken } = useVotingToken();
+  const { tokenSupply } = useVotingToken();
   let threshold = BigInt(0);
-  if (supportThreshold && votingToken?.totalSupply) {
+  if (supportThreshold && tokenSupply) {
     threshold =
-      (BigInt(supportThreshold) * votingToken.totalSupply.value) /
+      (BigInt(supportThreshold) * tokenSupply) /
       SUPPORT_THRESHOLD_BASE;
   }
 

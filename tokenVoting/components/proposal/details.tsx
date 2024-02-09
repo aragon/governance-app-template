@@ -1,8 +1,8 @@
-import { useVotingToken } from "@/tokenVoting/hooks/useToken";
 import dayjs from "dayjs";
 import { ReactNode } from "react";
 import { usePublicClient } from "wagmi";
 import { formatEther } from "viem";
+import { useVotingToken } from "@/tokenVoting/hooks/useVotingToken";
 
 const SUPPORT_THRESHOLD_BASE = BigInt(1e6);
 
@@ -13,16 +13,18 @@ interface ProposalDetailsProps {
 }
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({
+  /** Ratio value ranging between 0 and 1_000_000 */
   supportThreshold,
+  /** Timestamp */
   endDate,
   snapshotBlock,
 }) => {
-  const publicClient = usePublicClient();
-  const { supply: tokenSupply } = useVotingToken(publicClient);
+  const { token: votingToken } = useVotingToken();
   let threshold = BigInt(0);
-  if (supportThreshold) {
+  if (supportThreshold && votingToken?.totalSupply) {
     threshold =
-      (BigInt(supportThreshold) * tokenSupply) / SUPPORT_THRESHOLD_BASE;
+      (BigInt(supportThreshold) * votingToken.totalSupply.value) /
+      SUPPORT_THRESHOLD_BASE;
   }
 
   return (

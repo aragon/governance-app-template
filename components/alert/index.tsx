@@ -1,7 +1,7 @@
 import { AlertContext } from "@/context/AlertContext";
 import React, { useEffect, useContext, useState, useRef } from "react";
 import { IAlert } from "@/utils/types";
-import { useWaitForTransaction } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 import { AlertCard } from "@aragon/ods";
 
 const ALERT_TIMEOUT = 9 * 1000;
@@ -10,7 +10,7 @@ const Alert: React.FC<IAlert> = ({ message, txHash, id }) => {
   const alertContext = useContext(AlertContext);
   const removeAlert = alertContext ? alertContext.removeAlert : () => { };
   const [hide, setHide] = useState<boolean>(false);
-  const { isSuccess } = useWaitForTransaction({
+  const { isSuccess } = useWaitForTransactionReceipt({
     hash: txHash as `0x${string}`,
   });
   const timerRef = useRef<NodeJS.Timeout | null>(null);

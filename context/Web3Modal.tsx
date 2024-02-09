@@ -1,13 +1,11 @@
 import { http, createConfig } from "wagmi";
-import { polygon } from "@wagmi/core/chains";
+import { polygon, mainnet, sepolia, goerli } from "@wagmi/core/chains";
 import { injected } from 'wagmi/connectors'
-import { coinbaseWallet } from 'wagmi/connectors'
 import { walletConnect } from 'wagmi/connectors'
 
-
 // 1. Get projectId
-const projectId: string = process.env.NEXT_PUBLIC_WC_PROJECT_ID || "";
-const alchemyKey: string = process.env.NEXT_PUBLIC_ALCHEMY || "";
+const WALLET_CONNECT_PROJECT_ID: string = process.env.NEXT_PUBLIC_WC_PROJECT_ID || "";
+const ALCHEMY_KEY: string = process.env.NEXT_PUBLIC_ALCHEMY || "";
 
 // 2. Create wagmiConfig
 const metadata = {
@@ -17,21 +15,18 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 
-// const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
 export const config = createConfig({
   chains: [polygon],
   transports: {
-    [polygon.id]: http('https://polygon-mainnet.g.alchemy.com/v2/' + alchemyKey, {batch: true}),
+    [polygon.id]: http('https://polygon-mainnet.g.alchemy.com/v2/' + ALCHEMY_KEY, {batch: true}),
+    // [mainnet.id]: http('https://eth-mainnet.g.alchemy.com/v2/demo' + ALCHEMY_KEY, {batch: true}),
+    // [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/' + ALCHEMY_KEY, {batch: true})
+    // [goerli.id]: http('https://eth-goerli.g.alchemy.com/v2/' + ALCHEMY_KEY, {batch: true})
   },
   connectors: [
-    walletConnect({ projectId, metadata, showQrModal: false }),
+    walletConnect({ projectId: WALLET_CONNECT_PROJECT_ID, metadata, showQrModal: false }),
     injected({ shimDisconnect: true }),
-    /*
-    coinbaseWallet({
-      appName: metadata.name,
-      appLogoUrl: metadata.icons[0]
-    })
-    */
+    // coinbaseWallet({ appName: metadata.name, appLogoUrl: metadata.icons[0] }),
   ],
   // ssr: false,
 })

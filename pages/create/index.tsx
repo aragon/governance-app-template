@@ -70,7 +70,7 @@ export default function Create() {
                     return alert("Please ensure that the withdrawal address and the amount to transfer are valid");
                 }
             default:
-                if (!actions.length || actions[0].data === "0x") {
+                if (!actions.length || !actions[0].data || actions[0].data === "0x") {
                     return alert("Please ensure that the values of the action to execute are correct");
                 }
         }

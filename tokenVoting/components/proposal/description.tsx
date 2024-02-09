@@ -54,11 +54,11 @@ export default function ProposalDescription(proposal: Proposal) {
       })
     );
     setDecodedActions(decodedActions);
-  }, []);
+  }, [proposal]);
 
   useEffect(() => {
     fetchActionData();
-  }, []);
+  }, [proposal.actions]);
 
   return (
     <div className="pt-2">

@@ -1,6 +1,6 @@
 import { Address } from 'viem'
 import { useState, useEffect } from 'react'
-import { useContractReads, useBalance, useAccount } from 'wagmi';
+import { useBalance, useAccount, useReadContracts } from 'wagmi';
 import { TokenVotingAbi } from '@/tokenVoting/artifacts/TokenVoting.sol';
 
 
@@ -13,7 +13,7 @@ export function useCanCreateProposal() {
     const { address, isConnecting, isDisconnected } = useAccount()
     const {data: balance} = useBalance({ address, token: votingToken, })
 
-    const { data: contractReads, isError, isLoading } = useContractReads({
+    const { data: contractReads } = useReadContracts({
         contracts: [
             {
                 address: pluginAddress,

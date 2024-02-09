@@ -3,10 +3,9 @@ import { usePublicClient } from "wagmi";
 import { Address } from "viem";
 import { Proposal } from "@/tokenVoting/utils/types";
 import { useProposal } from "@/tokenVoting/hooks/useProposal";
+import { ITagProps } from "@aragon/ods";
 import { Card, Tag } from "@aragon/ods";
-import { TagVariant } from "@aragon/ods/dist"
 import * as DOMPurify from 'dompurify';
-// import { ButtonVariant } from "@aragon/ods/dist/types/src/components/button/button.api";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { If } from "@/components/if";
 
@@ -16,6 +15,7 @@ const DEFAULT_PROPOSAL_METADATA_SUMMARY =
 const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS ||
   "") as Address;
 
+type TagVariant = ITagProps["variant"];
 type ProposalInputs = {
   proposalId: bigint;
 };
@@ -28,7 +28,7 @@ const getProposalVariantStatus = (proposal: Proposal) => {
         ? "success"
         : proposal?.tally?.no >= proposal?.tally?.yes
           ? "critical"
-          : "success"),
+          : "success") as TagVariant,
     label: proposal?.active
       ? "Active"
       : proposal?.executed

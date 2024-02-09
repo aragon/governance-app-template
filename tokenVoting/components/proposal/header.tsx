@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { AlertInline, Button, Tag } from "@aragon/ods";
 import { Proposal } from "@/tokenVoting/utils/types";
 import dayjs from "dayjs";
-import { AlertVariant } from "@aragon/ods/dist/types/src/components/alerts/utils";
+import { IAlertCardProps } from "@aragon/ods";
 import { Else, If, IfCase, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
 
@@ -15,6 +15,7 @@ interface ProposalHeaderProps {
   userCanVote: boolean;
   onShowVotingModal: Function;
 }
+type AlertVariant = IAlertCardProps["variant"];
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposalNumber,
@@ -125,14 +126,6 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
       </h4>
       <p className="text-base text-l text-body-color dark:text-dark-6">
         Proposed by <AddressText>{proposal?.creator}</AddressText>
-        &nbsp;active until
-        <span className="text-primary-400 font-semibold">
-          {" "}
-          {dayjs(Number(proposal.parameters?.endDate) * 1000).format(
-            "DD/MM/YYYY hh:mm"
-          )}
-          h
-        </span>
       </p>
     </div>
   );

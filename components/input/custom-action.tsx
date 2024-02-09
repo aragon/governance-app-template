@@ -41,7 +41,7 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setActions }) => {
             followProxies: true,
             enableExperimentalMetadata: true
         });
-        setAbi(abi.filter(item => item.type === "function" && item.stateMutability !== "pure" && item.stateMutability !== "view") as any)
+        setAbi(abi.filter(item => item.type === "function") as any)
         setLoadingAbi(false)
     }, [to, publicClient?.account])
 
@@ -105,12 +105,15 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setActions }) => {
                     <div className="flex h-96 bg-neutral-50 rounded-lg border border-neutral-200">
                         <div className="w-2/5 bg-neutral-50 m-1 px-2 py-4 overflow-y-auto overflow-x-auto border-r border-neutral-200">
                             <ul className="space-y-2">
-                                {abi?.map((abiItemSelection, index) => (
+                                {abi?.map((targetFunc, index) => (
                                     <li
                                         key={index}
-                                        onClick={() => setSelectedAbiItem(abiItemSelection as AbiFunction) }
-                                        className={`w-full text-left font-sm hover:bg-neutral-100 py-3 px-4 rounded-xl hover:cursor-pointer ${abiItemSelection.name === selectedAbiItem?.name && 'bg-neutral-100 font-semibold'}`}>
-                                        {abiItemSelection.name}
+                                        onClick={() => setSelectedAbiItem(targetFunc as AbiFunction) }
+                                        className={`w-full text-left font-sm hover:bg-neutral-100 py-3 px-4 rounded-xl hover:cursor-pointer ${targetFunc.name === selectedAbiItem?.name && 'bg-neutral-100 font-semibold'}`}>
+                                        {targetFunc.name}
+                                        <If condition={["pure", "view"].includes(targetFunc.stateMutability)}>
+                                            {" "}<span>(read only)</span>
+                                        </If>
                                     </li>
                                 ))}
                             </ul>

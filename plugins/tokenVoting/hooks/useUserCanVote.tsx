@@ -1,6 +1,6 @@
 import { Address } from 'viem'
 import { useAccount, useBlockNumber, useReadContract } from 'wagmi';
-import { TokenVotingAbi } from '@/tokenVoting/artifacts/TokenVoting.sol';
+import { TokenVotingAbi } from '@/plugins/tokenVoting/artifacts/TokenVoting.sol';
 import { useEffect } from 'react';
 
 

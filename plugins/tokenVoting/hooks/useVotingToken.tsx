@@ -1,7 +1,7 @@
 import { Address, erc20Abi } from "viem";
 import { useReadContract } from "wagmi";
 
-import { TokenVotingAbi } from "@/tokenVoting/artifacts/TokenVoting.sol";
+import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 
 const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
 

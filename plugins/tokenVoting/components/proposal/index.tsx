@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { usePublicClient } from "wagmi";
 import { Address } from "viem";
-import { Proposal } from "@/tokenVoting/utils/types";
-import { useProposal } from "@/tokenVoting/hooks/useProposal";
+import { Proposal } from "@/plugins/tokenVoting/utils/types";
+import { useProposal } from "@/plugins/tokenVoting/hooks/useProposal";
 import { ITagProps } from "@aragon/ods";
 import { Card, Tag } from "@aragon/ods";
 import * as DOMPurify from 'dompurify';
@@ -99,15 +99,13 @@ export default function ProposalCard(props: ProposalInputs) {
           <h4 className=" mb-1 text-lg font-semibold text-dark line-clamp-1">
             {Number(props.proposalId) + 1} - {proposal.title}
           </h4>
-          <p className="text-ellipsis overflow-hidden">
-            {<div className="text-ellipsis overflow-hidden box line-clamp-2"
-              dangerouslySetInnerHTML={{
-                __html: proposal.summary
-                  ? DOMPurify.sanitize(proposal.summary)
-                  : DEFAULT_PROPOSAL_METADATA_SUMMARY
-              }} />
-            }
-          </p>
+          {<div className="text-ellipsis overflow-hidden box line-clamp-2"
+            dangerouslySetInnerHTML={{
+              __html: proposal.summary
+                ? DOMPurify.sanitize(proposal.summary)
+                : DEFAULT_PROPOSAL_METADATA_SUMMARY
+            }} />
+          }
         </div>
       </Card>
     </Link>

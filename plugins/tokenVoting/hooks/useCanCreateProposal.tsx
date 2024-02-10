@@ -1,7 +1,7 @@
 import { Address } from 'viem'
 import { useState, useEffect } from 'react'
 import { useBalance, useAccount, useReadContracts } from 'wagmi';
-import { TokenVotingAbi } from '@/tokenVoting/artifacts/TokenVoting.sol';
+import { TokenVotingAbi } from '@/plugins/tokenVoting/artifacts/TokenVoting.sol';
 
 
 const pluginAddress = ((process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address)

@@ -1,10 +1,10 @@
 import { useBlockNumber, useReadContract } from "wagmi";
 import { ReactNode, useEffect, useState } from "react";
-import ProposalCard from "@/tokenVoting/components/proposal";
+import ProposalCard from "@/plugins/tokenVoting/components/proposal";
 import { Address } from "viem";
-import { TokenVotingAbi } from "@/tokenVoting/artifacts/TokenVoting.sol";
+import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import { Button, IconType } from "@aragon/ods";
-import { useCanCreateProposal } from "@/tokenVoting/hooks/useCanCreateProposal";
+import { useCanCreateProposal } from "@/plugins/tokenVoting/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { If, IfNot } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";

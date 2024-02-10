@@ -1,5 +1,5 @@
 import { Action } from "@/utils/types";
-import { Proposal } from "@/tokenVoting/utils/types";
+import { Proposal } from "@/plugins/tokenVoting/utils/types";
 import { whatsabi } from "@shazow/whatsabi";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { usePublicClient } from "wagmi";

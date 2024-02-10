@@ -3,14 +3,14 @@ import { Address } from "viem";
 import { PublicClient, useBlockNumber, useReadContract } from "wagmi";
 import { fetchJsonFromIpfs } from "@/utils/ipfs";
 import { getAbiItem } from "viem";
-import { TokenVotingAbi } from "@/tokenVoting/artifacts/TokenVoting.sol";
+import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import { Action } from "@/utils/types";
 import {
   Proposal,
   ProposalMetadata,
   ProposalParameters,
   Tally,
-} from "@/tokenVoting/utils/types";
+} from "@/plugins/tokenVoting/utils/types";
 import { useQuery } from "@tanstack/react-query";
 
 type ProposalCreatedLogResponse = {

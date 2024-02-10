@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import { ReactNode } from "react";
 import { formatEther } from "viem";
-import { useVotingToken } from "@/tokenVoting/hooks/useVotingToken";
+import { useVotingToken } from "@/plugins/tokenVoting/hooks/useVotingToken";
 
 const SUPPORT_THRESHOLD_BASE = BigInt(1e6);
 

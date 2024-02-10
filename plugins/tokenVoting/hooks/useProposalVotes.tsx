@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Address, getAbiItem } from "viem";
 import { PublicClient } from "wagmi";
-import { TokenVotingAbi } from "@/tokenVoting/artifacts/TokenVoting.sol";
+import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import {
   Proposal,
   VoteCastEvent,
   VoteCastResponse,
-} from "@/tokenVoting/utils/types";
+} from "@/plugins/tokenVoting/utils/types";
 
 const event = getAbiItem({ abi: TokenVotingAbi, name: "VoteCast" });
 

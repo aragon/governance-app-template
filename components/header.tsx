@@ -1,6 +1,7 @@
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Button } from "@aragon/ods";
-import { Address, useAccount } from "wagmi";
+import { useAccount } from "wagmi";
+import { Address } from "viem"
 import { Else, IfCase, Then } from "@/components/if";
 import { formatHexString } from "@/utils/evm";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";

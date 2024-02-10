@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { AlertInline, Button, Tag } from "@aragon/ods";
 import { Proposal } from "@/tokenVoting/utils/types";
-import dayjs from "dayjs";
 import { IAlertCardProps } from "@aragon/ods";
 import { Else, If, IfCase, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";

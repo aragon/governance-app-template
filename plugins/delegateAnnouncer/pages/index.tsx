@@ -18,6 +18,12 @@ const TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_TOKEN_ADDRESS || "") as Address
 export default function DelegateAnnouncements() {
     const publicClient = usePublicClient();
     const account = useAccount()
+    const { data: delegates } = useReadContract({
+      abi: iVotesAbi,
+      address: TOKEN_ADDRESS,
+      functionName: "delegates",
+      args: [account.address!]
+  })
     const { delegateAnnouncements, isLoading: delegateAnnouncementsIsLoading } = useDelegateAnnouncements(publicClient as PublicClient)
 
     const skipRender = useSkipFirstRender();
@@ -33,6 +39,7 @@ export default function DelegateAnnouncements() {
                       <SelfDelegationProfileCard 
                         address={account.address!}
                         tokenAddress={TOKEN_ADDRESS} 
+                        delegates={delegates}
                         message={delegateAnnouncements.findLast((an) => an.delegate === account.address)?.message }/>
                       </div>
                     </If>
@@ -53,7 +60,7 @@ export default function DelegateAnnouncements() {
             <If condition={delegateAnnouncements.length}>
                 <div className="grid grid-cols-1 lg:grid-cols-2 mt-4 mb-14 gap-4">
                     {delegateAnnouncements.map((announcement) => (
-                        <DelegateCard key={announcement.logIndex} delegate={announcement.delegate} message={announcement.message} tokenAddress={TOKEN_ADDRESS} />
+                        <DelegateCard key={announcement.logIndex} delegates={delegates} delegate={announcement.delegate} message={announcement.message} tokenAddress={TOKEN_ADDRESS} />
                     ))}
                 </div>
             </If>
@@ -81,20 +88,23 @@ type DelegateCardProps = {
     delegate: Address;
     tokenAddress: Address;
     message: string;
+    delegates: Address;
 }
 
 const iVotesAbi = parseAbi([
     'function getVotes(address owner) view returns (uint256)',
-    'function delegate(address delegatee) external'
+    'function delegate(address delegatee) external',
+    'function delegates(address account) public view returns (address)'
 ])
 
 type SelfDelegationProfileCardProps = {
   address: Address;
   tokenAddress: Address;
   message: string | undefined;
+  delegates: Address;
 }
 
-const SelfDelegationProfileCard = ({ address, tokenAddress, message }: SelfDelegationProfileCardProps) => {
+const SelfDelegationProfileCard = ({ address, tokenAddress, message, delegates }: SelfDelegationProfileCardProps) => {
   const result = useEnsName({
         chainId: mainnet.id,
         address,
@@ -138,9 +148,11 @@ const SelfDelegationProfileCard = ({ address, tokenAddress, message }: SelfDeleg
             <p className="text-md text-neutral-500 m-1 grow">
                 {message}
             </p>
+            <If condition={delegates !== address}>
                 <div className="mt-1">
                     <Button variant="tertiary" size="sm" onClick={() => delegateTo()}>Delegate</Button>
                 </div>
+            </If>
         </Card>
   )
 }
@@ -191,7 +203,7 @@ const DelegateCard = ({ delegate, message, tokenAddress }: DelegateCardProps) =>
             <p className="text-md text-neutral-500 m-1 grow">
                 {message}
             </p>
-            <If condition={account.address}>
+            <If condition={account.address && account.address !== delegate}>
                 <div className="mt-1">
                     <Button variant="tertiary" size="sm" onClick={() => delegateTo()}>Delegate</Button>
                 </div>

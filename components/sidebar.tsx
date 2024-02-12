@@ -113,7 +113,7 @@ const Sidebar = () => {
               className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 rounded-lg shadow-lg hover:bg-neutral-200`}
             >
               <Link
-                href="#"
+                href="/plugins?pageName=delegateAnnouncer"
                 className="flex items-center focus:outline-none focus:ring-2 focus:ring-white w-full p-3"
               >
                 <Icon
@@ -124,7 +124,7 @@ const Sidebar = () => {
                     md: "lg",
                   }}
                 />
-                <span className="block py-2 pr-4 pl-3 lg:p-0">Forum</span>
+                <span className="block py-2 pr-4 pl-3 lg:p-0">Delegates</span>
               </Link>
             </li>
             <li

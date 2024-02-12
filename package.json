@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@aragon/ods": "1.0.11",
+    "@aragon/ods": "1.0.12",
     "@shazow/whatsabi": "^0.9.1",
     "@tanstack/react-query": "^5.18.1",
     "@typescript-eslint/eslint-plugin": "latest",

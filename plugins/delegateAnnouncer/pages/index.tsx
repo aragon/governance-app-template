@@ -28,13 +28,18 @@ export default function DelegateAnnouncements() {
             <If condition={account?.address}>
                 <SectionView>
                     <If condition={delegateAnnouncements.length}>
+                      <div>
+                      <h2 className="text-xl font-semibold text-neutral-700 pb-3">Your profile</h2>
+                      <SelfDelegationProfileCard 
+                        address={account.address!}
+                        tokenAddress={TOKEN_ADDRESS} 
+                        message={delegateAnnouncements.findLast((an) => an.delegate === account.address)?.message }/>
+                      </div>
                     </If>
                 </SectionView>
             </If>
 
-            <h2 className="text-xl font-semibold text-neutral-700 pt-1">
-                Delegates
-            </h2>
+            <h2 className="text-xl font-semibold text-neutral-700 pt-1">Delegates</h2>
             <IfNot condition={delegateAnnouncements.length}>
                 <If condition={delegateAnnouncementsIsLoading}>
                     <SectionView>
@@ -82,6 +87,63 @@ const iVotesAbi = parseAbi([
     'function getVotes(address owner) view returns (uint256)',
     'function delegate(address delegatee) external'
 ])
+
+type SelfDelegationProfileCardProps = {
+  address: Address;
+  tokenAddress: Address;
+  message: string | undefined;
+}
+
+const SelfDelegationProfileCard = ({ address, tokenAddress, message }: SelfDelegationProfileCardProps) => {
+  const result = useEnsName({
+        chainId: mainnet.id,
+        address,
+    })
+    const avatarResult = useEnsAvatar({
+        name: normalize(result.data!),
+        chainId: mainnet.id,
+        gatewayUrls: ['https://cloudflare-ipfs.com']
+    })
+    const { data: votingPower } = useReadContract({
+        abi: iVotesAbi,
+        address: tokenAddress,
+        functionName: "getVotes",
+        args: [address]
+    })
+    const { writeContract: delegateWrite } = useWriteContract()
+
+    const delegateTo = () => {
+        delegateWrite({
+            abi: iVotesAbi,
+            address: tokenAddress,
+            functionName: 'delegate',
+            args: [address],
+        })
+    }
+  return (
+    <Card className="flex flex-col p-3 space-between">
+            <div className="flex flex-row">
+                <Image
+                    src={avatarResult.data ? avatarResult.data : '/profile.jpg'}
+                    width="48"
+                    height="48"
+                    className="rounded-xl w-24 m-2"
+                    alt="profile pic"
+                />
+                <div className="flex flex-col justify-center">
+                    <Link className="!text-xl !font-xl">{result.data ? result.data : formatHexString(address)}</Link>
+                    <p className="text-md text-neutral-300">{votingPower ? formatUnits(votingPower!, 18)! : 0} Voting Power</p>
+                </div>
+            </div>
+            <p className="text-md text-neutral-500 m-1 grow">
+                {message}
+            </p>
+                <div className="mt-1">
+                    <Button variant="tertiary" size="sm" onClick={() => delegateTo()}>Delegate</Button>
+                </div>
+        </Card>
+  )
+}
 
 const DelegateCard = ({ delegate, message, tokenAddress }: DelegateCardProps) => {
     const account = useAccount()

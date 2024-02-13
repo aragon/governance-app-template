@@ -1,47 +1,15 @@
-import { useState, useEffect } from "react";
 import Blockies from "react-blockies";
-import { VoteCastEvent } from "@/plugins/tokenVoting/utils/types";
+import { VetoCastEvent } from "@/plugins/dualGovernance/utils/types";
 import { formatUnits } from "viem";
-import { ReactNode } from "react";
 import { AddressText } from "@/components/text/address";
 import { Card, Tag } from '@aragon/ods'
 
-export default function VotesSection({
-  votes,
-}: {
-  votes: Array<VoteCastEvent>;
-}) {
-  const [abstainVotes, setAbstainVotes] = useState<VoteCastEvent[]>([])
-  const [yesVotes, setYesVotes] = useState<VoteCastEvent[]>([])
-  const [noVotes, setNoVotes] = useState<VoteCastEvent[]>([])
-
-  useEffect(() => {
-    if (votes) {
-      setAbstainVotes(votes.filter((vote) => vote.voteOption === 1))
-      setYesVotes(votes.filter((vote) => vote.voteOption === 2))
-      setNoVotes(votes.filter((vote) => vote.voteOption === 3))
-    }
-  }, [votes])
-
+export default function VotesSection({ vetoes }: { vetoes: Array<VetoCastEvent> }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 mt-4 mb-14 gap-4">
       <div>
         <div className="grid gap-2">
-          {yesVotes.map((vote, i) => (
-            <VoteCard key={i} vote={vote} type="Yes" />
-          ))}
-        </div>
-      </div>
-      <div>
-        <div className="grid gap-2">
-          {noVotes.map((vote, i) => (
-            <VoteCard key={i} vote={vote} type="No" />
-          ))}
-        </div>
-      </div>
-      <div>
-        <div className="grid gap-2">
-          {abstainVotes.map((vote, i) => (
+          {vetoes.map((vote, i) => (
             <VoteCard key={i} vote={vote} />
           ))}
         </div>
@@ -50,17 +18,7 @@ export default function VotesSection({
   );
 }
 
-const VoteCard = function({
-  vote,
-  type = "Abstain",
-}: {
-  vote: VoteCastEvent;
-  type?: "Yes" | "No" | "Abstain";
-}) {
-  let colorType = "neutral";
-  if (type === "No") colorType = "critical";
-  else if (type === "Yes") colorType = "success";
-
+const VoteCard = function({ vote }: { vote: VetoCastEvent; }) {
   return (
     <Card className="p-3">
       <div className="flex flex-row space-between">
@@ -75,8 +33,8 @@ const VoteCard = function({
         </div>
         <Tag
           className="!text-sm"
-          variant={colorType}
-          label={type}
+          variant="critical"
+          label="Veto"
         />
       </div>
     </Card>

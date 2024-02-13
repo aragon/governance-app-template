@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AlertInline, Button, Tag } from "@aragon/ods";
-import { Proposal } from "@/plugins/tokenVoting/utils/types";
+import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { IAlertCardProps } from "@aragon/ods";
 import { Else, If, IfCase, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
@@ -43,14 +43,14 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
         ? "info"
         : proposal?.executed
         ? "success"
-        : proposal?.tally?.no >= proposal?.tally?.yes
+        : proposal?.vetoTally >= proposal?.parameters.minVetoVotingPower
         ? "critical"
         : ("success" as AlertVariant),
       label: proposal?.active
         ? "Active"
         : proposal?.executed
         ? "Executed"
-        : proposal?.tally?.no >= proposal?.tally?.yes
+        : proposal?.vetoTally >= proposal?.parameters.minVetoVotingPower
         ? "Defeated"
         : "Executable",
     };

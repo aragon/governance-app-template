@@ -9,7 +9,7 @@ export type ProposalParameters = {
   startDate: bigint;
   endDate: bigint;
   snapshotBlock: bigint;
-  minVetoPower: bigint;
+  minVetoVotingPower: bigint;
 };
 
 export type Proposal = {
@@ -32,12 +32,11 @@ export type ProposalMetadata = {
 };
 
 export type VoteCastResponse = {
-  args: VoteCastEvent[];
+  args: VetoCastEvent[];
 };
 
-export type VoteCastEvent = {
+export type VetoCastEvent = {
   voter: Address;
   proposalId: bigint;
-  voteOption: number;
   votingPower: bigint;
 };

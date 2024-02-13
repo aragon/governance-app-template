@@ -1,5 +1,5 @@
 import { Action } from "@/utils/types";
-import { Proposal } from "@/plugins/tokenVoting/utils/types";
+import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { whatsabi } from "@shazow/whatsabi";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { usePublicClient } from "wagmi";
@@ -8,6 +8,7 @@ import { Else, If, IfCase, IfNot, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { AddressText } from "@/components/text/address";
 import { isAddress } from "@/utils/evm";
+import { goerli } from "viem/chains";
 
 const DEFAULT_PROPOSAL_SUMMARY = "(No description available)";
 
@@ -20,7 +21,7 @@ type FunctionData = {
 const etherscanKey: string = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY || "";
 
 export default function ProposalDescription(proposal: Proposal) {
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({chainId: goerli.id});
   const [decodedActions, setDecodedActions] = useState<FunctionData[]>([]);
   const proposalActions = proposal?.actions || [];
 

@@ -1,44 +1,20 @@
 import dayjs from "dayjs";
 import { ReactNode } from "react";
-import { formatEther } from "viem";
-import { useVotingToken } from "@/plugins/tokenVoting/hooks/useVotingToken";
-
-const SUPPORT_THRESHOLD_BASE = BigInt(1e6);
 
 interface ProposalDetailsProps {
-  supportThreshold?: number;
+  minVetoVotingPower?: bigint;
   endDate?: bigint;
   snapshotBlock?: bigint;
 }
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({
-  /** Ratio value ranging between 0 and 1_000_000 */
-  supportThreshold,
   /** Timestamp */
   endDate,
   snapshotBlock,
 }) => {
-  const { tokenSupply } = useVotingToken();
-  let threshold = BigInt(0);
-  if (supportThreshold && tokenSupply) {
-    threshold =
-      (BigInt(supportThreshold) * tokenSupply) /
-      SUPPORT_THRESHOLD_BASE;
-  }
 
   return (
     <>
-      <Card>
-        <h2 className="text-xl flex-grow font-semibold text-neutral-600 pr-6">
-          Support threshold
-        </h2>
-        <div className="items-right text-right flex-wrap">
-          <span className="text-xl font-semibold">
-            {formatEther(threshold)}
-          </span>
-          <p className="text-neutral-600">voting power</p>
-        </div>
-      </Card>
       <Card>
         <h2 className="text-xl flex-grow font-semibold pr-6 text-neutral-600">
           Ending

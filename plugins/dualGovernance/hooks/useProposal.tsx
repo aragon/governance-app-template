@@ -63,10 +63,6 @@ export function useProposal(
   // Creation event
   useEffect(() => {
     if (!proposalData) return;
-    console.log('id: ', proposalId)
-    console.log(ProposalCreatedEvent)
-    
-
     publicClient
       .getLogs({
         address,
@@ -78,7 +74,6 @@ export function useProposal(
         toBlock: proposalData.parameters.startDate,
       })
       .then((logs: ProposalCreatedLogResponse[]) => {
-        console.log('Logs: ', logs)
         setProposalCreationEvent(logs[0].args);
         setMetadata(logs[0].args.metadata);
       })

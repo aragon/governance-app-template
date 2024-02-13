@@ -7,6 +7,8 @@ import { plugins } from "@/plugins";
 import { ParsedUrlQuery } from "querystring";
 import { resolveQueryParam } from "@/utils/query";
 import { PUB_DISCORD_URL } from "@/constants";
+import { Else, IfCase, Then } from "./if";
+import { CloseIcon, MenuIcon } from "./icons";
 
 const Sidebar = () => {
   const { pathname, query } = useRouter();
@@ -22,21 +24,14 @@ const Sidebar = () => {
       className="md:hidden block absolute mt-2 ml-2 z-50"
       onClick={() => setIsOpen(!isOpen)}
     >
-      <svg className="h-6 w-6 fill-current" viewBox="0 0 24 24">
-        {isOpen ? (
-          <path
-            fillRule="evenodd"
-            d="M18.278 16.864a1 1 0 01-1.414 1.414l-8-8a1 1 0 011.414-1.414l8 8zm0-6a1 1 0 01-1.414 1.414l-8-8a1 1 0 011.414-1.414l8 8z"
-            clipRule="evenodd"
-          />
-        ) : (
-          <path
-            fillRule="evenodd"
-            d="M4 5h16a1 1 0 010 2H4a1 1 0 110-2zm0 6h16a1 1 0 010 2H4a1 1 0 010-2zm0 6h16a1 1 0 010 2H4a1 1 0 010-2z"
-            clipRule="evenodd"
-          />
-        )}
-      </svg>
+      <IfCase condition={isOpen}>
+        <Then>
+          <CloseIcon className="h-6 w-6 fill-current" />
+        </Then>
+        <Else>
+          <MenuIcon className="h-6 w-6 fill-current" />
+        </Else>
+      </IfCase>
     </Button>
   );
 
@@ -44,7 +39,7 @@ const Sidebar = () => {
     <header className="h-screen">
       <SidebarSwitchButton />
       <div
-        className={`md:w-72 bg-neutral-100 h-full flex flex-col justify-between ${
+        className={`md:w-72 bg-neutral-100 h-full flex flex-col justify-between z-40 ${
           isOpen ? "absolute md:relative w-full" : "hidden md:block"
         }`}
       >
@@ -124,7 +119,10 @@ const Sidebar = () => {
             <li
               className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 rounded-lg shadow-lg hover:bg-neutral-200`}
             >
-              <Link href={PUB_DISCORD_URL} className="flex items-center w-full p-3">
+              <Link
+                href={PUB_DISCORD_URL}
+                className="flex items-center w-full p-3"
+              >
                 <Icon
                   className="mr-2"
                   icon={IconType.QUESTION}

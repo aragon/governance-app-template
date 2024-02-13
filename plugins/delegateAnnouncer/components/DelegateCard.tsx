@@ -9,6 +9,7 @@ import { mainnet } from 'wagmi/chains'
 import { useReadContract, useWriteContract } from "wagmi";
 import { iVotesAbi } from "../artifacts/iVotes.sol";
 import { formatHexString } from "@/utils/evm";
+import * as DOMPurify from 'dompurify'
 
 type DelegateCardProps = {
     delegate: Address;
@@ -59,9 +60,9 @@ export const DelegateCard = ({ delegate, message, tokenAddress }: DelegateCardPr
                     <p className="text-sm text-neutral-300">{votingPower ? formatUnits(votingPower!, 18)! : 0} Voting Power</p>
                 </div>
             </div>
-            <p className="text-md text-neutral-500 m-1 grow">
-                {message}
-            </p>
+            <div className="text-md text-neutral-500 m-1 grow"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message)}}
+            />
             <If condition={account.address && account.address !== delegate}>
                 <div className="mt-1">
                     <Button variant="tertiary" size="sm" onClick={() => delegateTo()}>Delegate</Button>

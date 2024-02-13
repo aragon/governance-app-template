@@ -10,6 +10,7 @@ import { useReadContract, useWriteContract } from "wagmi";
 import { iVotesAbi } from "../artifacts/iVotes.sol";
 import { formatHexString } from "@/utils/evm";
 import { DelegateAnnouncerAbi } from "@/plugins/delegateAnnouncer/artifacts/DelegateAnnouncer.sol";
+import * as DOMPurify from 'dompurify'
 
 const DELEGATION_CONTRACT = (process.env.NEXT_PUBLIC_DELEGATION_CONTRACT || "") as Address;
 const DAO_ADDRESS = (process.env.NEXT_PUBLIC_DAO_ADDRESS || "") as Address;
@@ -76,7 +77,11 @@ export const SelfDelegationProfileCard = ({ address, tokenAddress, message, dele
                 </div>
             </div>
             <div className="text-md text-neutral-500 m-1 grow">
-                <If condition={message}><span>{message}</span></If>
+                <If condition={message}>
+                    <div dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(message)
+                    }}/>
+                </If>
                 <If condition={!message}>
                     <TextAreaRichText
                         label="Summary"

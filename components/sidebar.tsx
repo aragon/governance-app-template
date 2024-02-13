@@ -6,7 +6,7 @@ import { useState } from "react";
 import { plugins } from "@/plugins";
 import { ParsedUrlQuery } from "querystring";
 import { resolveQueryParam } from "@/utils/query";
-import { DISCORD_URL } from "./constants";
+import { DISCORD_URL } from "@/constants";
 
 const Sidebar = () => {
   const { pathname, query } = useRouter();

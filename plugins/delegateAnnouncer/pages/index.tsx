@@ -2,29 +2,32 @@ import Image from "next/image";
 import { mainnet } from 'wagmi/chains'
 import { usePublicClient, useReadContract, useWriteContract } from "wagmi";
 import { useAccount } from 'wagmi'
-import { Address, PublicClient, parseAbi, formatUnits } from "viem";
+import { Address, PublicClient, parseAbi, formatUnits, toHex } from "viem";
 import { ReactNode, useEffect, useState } from "react";
 import { If, IfNot } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useDelegateAnnouncements } from "../hooks/useDelegateAnnouncements";
-import { Button, Card, Link } from "@aragon/ods";
+import { Button, Card, Link, TextAreaRichText } from "@aragon/ods";
 import { useEnsName, useEnsAvatar } from 'wagmi'
 import { normalize } from 'viem/ens'
+import { DelegateAnnouncerAbi } from "@/plugins/delegateAnnouncer/artifacts/DelegateAnnouncer.sol";
 import { formatHexString } from "@/utils/evm";
 
 const TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_TOKEN_ADDRESS || "") as Address
+const DELEGATION_CONTRACT = (process.env.NEXT_PUBLIC_DELEGATION_CONTRACT || "") as Address;
+const DAO_ADDRESS = (process.env.NEXT_PUBLIC_DAO_ADDRESS || "") as Address;
 
 export default function DelegateAnnouncements() {
     const publicClient = usePublicClient();
     const account = useAccount()
     const { data: delegates } = useReadContract({
-      abi: iVotesAbi,
-      address: TOKEN_ADDRESS,
-      functionName: "delegates",
-      args: [account.address!]
-  })
-    const { delegateAnnouncements, isLoading: delegateAnnouncementsIsLoading } = useDelegateAnnouncements(publicClient as PublicClient)
+        abi: iVotesAbi,
+        address: TOKEN_ADDRESS,
+        functionName: "delegates",
+        args: [account.address!]
+    })
+    const { delegateAnnouncements, isLoading: delegateAnnouncementsIsLoading } = useDelegateAnnouncements(publicClient as PublicClient, DELEGATION_CONTRACT, DAO_ADDRESS)
 
     const skipRender = useSkipFirstRender();
     if (skipRender) return <></>;
@@ -34,14 +37,12 @@ export default function DelegateAnnouncements() {
             <If condition={account?.address}>
                 <SectionView>
                     <If condition={delegateAnnouncements.length}>
-                      <div>
-                      <h2 className="text-xl font-semibold text-neutral-700 pb-3">Your profile</h2>
-                      <SelfDelegationProfileCard 
-                        address={account.address!}
-                        tokenAddress={TOKEN_ADDRESS} 
-                        delegates={delegates}
-                        message={delegateAnnouncements.findLast((an) => an.delegate === account.address)?.message }/>
-                      </div>
+                            <h2 className="text-xl font-semibold text-neutral-700 pb-3">Your profile</h2>
+                            <SelfDelegationProfileCard
+                                address={account.address!}
+                                tokenAddress={TOKEN_ADDRESS}
+                                delegates={delegates!}
+                                message={delegateAnnouncements.findLast((an) => an.delegate === account.address)?.message} />
                     </If>
                 </SectionView>
             </If>
@@ -60,7 +61,7 @@ export default function DelegateAnnouncements() {
             <If condition={delegateAnnouncements.length}>
                 <div className="grid grid-cols-1 lg:grid-cols-2 mt-4 mb-14 gap-4">
                     {delegateAnnouncements.map((announcement) => (
-                        <DelegateCard key={announcement.logIndex} delegates={delegates} delegate={announcement.delegate} message={announcement.message} tokenAddress={TOKEN_ADDRESS} />
+                        <DelegateCard key={announcement.logIndex} delegates={delegates!} delegate={announcement.delegate} message={announcement.message} tokenAddress={TOKEN_ADDRESS} />
                     ))}
                 </div>
             </If>
@@ -78,7 +79,7 @@ function MainSection({ children }: { children: ReactNode }) {
 
 function SectionView({ children }: { children: ReactNode }) {
     return (
-        <div className="flex flex-row justify-between content-center w-full mb-6">
+        <div className="flex flex-col w-full mb-6">
             {children}
         </div>
     );
@@ -98,14 +99,15 @@ const iVotesAbi = parseAbi([
 ])
 
 type SelfDelegationProfileCardProps = {
-  address: Address;
-  tokenAddress: Address;
-  message: string | undefined;
-  delegates: Address;
+    address: Address;
+    tokenAddress: Address;
+    message: string | undefined;
+    delegates: Address;
 }
 
 const SelfDelegationProfileCard = ({ address, tokenAddress, message, delegates }: SelfDelegationProfileCardProps) => {
-  const result = useEnsName({
+    const [inputDescription, setInputDescription] = useState<string>();
+    const result = useEnsName({
         chainId: mainnet.id,
         address,
     })
@@ -121,6 +123,7 @@ const SelfDelegationProfileCard = ({ address, tokenAddress, message, delegates }
         args: [address]
     })
     const { writeContract: delegateWrite } = useWriteContract()
+    const { writeContract: delegateAnnouncementWrite } = useWriteContract()
 
     const delegateTo = () => {
         delegateWrite({
@@ -130,8 +133,19 @@ const SelfDelegationProfileCard = ({ address, tokenAddress, message, delegates }
             args: [address],
         })
     }
-  return (
-    <Card className="flex flex-col p-3 space-between">
+
+    const announceDelegate = () => {
+        console.log(inputDescription)
+        delegateAnnouncementWrite({
+            abi: DelegateAnnouncerAbi,
+            address: DELEGATION_CONTRACT,
+            functionName: 'announceDelegation',
+            args: [DAO_ADDRESS, toHex(inputDescription!)]
+        })
+    }
+
+    return (
+        <Card className="flex flex-col p-3 space-between">
             <div className="flex flex-row">
                 <Image
                     src={avatarResult.data ? avatarResult.data : '/profile.jpg'}
@@ -145,16 +159,32 @@ const SelfDelegationProfileCard = ({ address, tokenAddress, message, delegates }
                     <p className="text-md text-neutral-300">{votingPower ? formatUnits(votingPower!, 18)! : 0} Voting Power</p>
                 </div>
             </div>
-            <p className="text-md text-neutral-500 m-1 grow">
-                {message}
-            </p>
+            <div className="text-md text-neutral-500 m-1 grow">
+                <If condition={message}><span>{message}</span></If>
+                <If condition={!message}>
+                    <TextAreaRichText
+                        label="Summary"
+                        className='pt-2'
+                        value={inputDescription}
+                        onChange={setInputDescription}
+                        placeholder="A short description of who are you and what do you bring into the DAO."
+                    />
+                </If>
+            </div>
+            <div className="flex flex-row gap-2">
             <If condition={delegates !== address}>
                 <div className="mt-1">
-                    <Button variant="tertiary" size="sm" onClick={() => delegateTo()}>Delegate</Button>
+                    <Button variant="secondary" size="sm" onClick={() => delegateTo()}>Delegate</Button>
                 </div>
             </If>
+            <If condition={inputDescription === ''}>
+                <div className="mt-1">
+                    <Button variant="primary" size="sm" onClick={() => announceDelegate()}>Announce yourself!</Button>
+                </div>
+            </If>
+            </div>
         </Card>
-  )
+    )
 }
 
 const DelegateCard = ({ delegate, message, tokenAddress }: DelegateCardProps) => {

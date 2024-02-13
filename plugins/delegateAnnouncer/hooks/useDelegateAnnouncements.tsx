@@ -5,11 +5,11 @@ import { Address, PublicClient, getAbiItem, fromHex } from "viem";
 import { DelegateAnnounce } from "../utils/types";
 
 const AnnounceDelegationEvent = getAbiItem({abi: DelegateAnnouncerAbi, name: "AnnounceDelegation"})
-const DELEGATION_CONTRACT = (process.env.NEXT_PUBLIC_DELEGATION_CONTRACT || "") as Address;
-const DAO_ADDRESS = (process.env.NEXT_PUBLIC_DAO_ADDRESS || "") as Address;
 
 export function useDelegateAnnouncements(
     publicClient: PublicClient,
+    delegationContract: Address,
+    daoAddress: Address
 ) {
     // const { data: blockNumber } = useBlockNumber({watch: true})
     const [delegateAnnouncements, setDelegateAnnouncements] = useState<DelegateAnnounce[]>([])
@@ -19,10 +19,10 @@ export function useDelegateAnnouncements(
         setIsLoading(true)
             
         publicClient.getLogs({
-            address: DELEGATION_CONTRACT,
+            address: delegationContract,
             event: AnnounceDelegationEvent,
             args: {
-                dao: DAO_ADDRESS
+                dao: daoAddress
             } as any,
             fromBlock: BigInt(53386422),
             toBlock: 'latest'

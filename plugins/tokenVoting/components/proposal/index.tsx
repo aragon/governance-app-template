@@ -4,7 +4,7 @@ import { Address } from "viem";
 import { Proposal } from "@/plugins/tokenVoting/utils/types";
 import { useProposal } from "@/plugins/tokenVoting/hooks/useProposal";
 import { ITagProps } from "@aragon/ods";
-import { Card, Tag } from "@aragon/ods";
+import { Card, Tag, ActionItem } from "@aragon/ods";
 import * as DOMPurify from 'dompurify';
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { If } from "@/components/if";
@@ -81,11 +81,8 @@ export default function ProposalCard(props: ProposalInputs) {
   }
 
   return (
-    <Link
-      href={`/proposals/${props.proposalId}`}
-      className="w-full cursor-pointer mb-4"
-    >
-      <Card className="p-4">
+    <ActionItem className="w-full mb-4 p-5" href={`/proposals/${props.proposalId}`} >
+      <div className="">
         <If condition={proposal.tally}>
           <div className="flex mb-2">
             <Tag
@@ -107,8 +104,8 @@ export default function ProposalCard(props: ProposalInputs) {
             }} />
           }
         </div>
-      </Card>
-    </Link>
+      </div>
+    </ActionItem>
   );
 }
 

@@ -132,25 +132,19 @@ export default function Proposal() {
           voteType="Yes"
           voteCount={proposal?.tally?.yes}
           votePercentage={votingPercentages.yes}
-          votes={votes}
           color="success"
-          option={2}
         />
         <VoteTally
           voteType="No"
           voteCount={proposal?.tally?.no}
           votePercentage={votingPercentages.no}
-          votes={votes}
           color="critical"
-          option={3}
         />
         <VoteTally
           voteType="Abstain"
           voteCount={proposal?.tally?.abstain}
           votePercentage={votingPercentages.abstain}
-          votes={votes}
           color="neutral"
-          option={1}
         />
         <ProposalDetails
           supportThreshold={proposal?.parameters?.supportThreshold}

@@ -32,25 +32,27 @@ export default function DelegateAnnouncements() {
             <If condition={account?.address}>
                 <SectionView>
                     <If condition={delegateAnnouncements.length}>
-                            <h2 className="text-xl font-semibold text-neutral-700 pb-3">Your profile</h2>
-                            <SelfDelegationProfileCard
-                                address={account.address!}
-                                tokenAddress={TOKEN_ADDRESS}
-                                delegates={delegates!}
-                                message={delegateAnnouncements.findLast((an) => an.delegate === account.address)?.message} />
+                        <h2 className="text-xl font-semibold text-neutral-700 pb-3">Your profile</h2>
+                        <SelfDelegationProfileCard
+                            address={account.address!}
+                            tokenAddress={TOKEN_ADDRESS}
+                            delegates={delegates!}
+                            message={delegateAnnouncements.findLast((an) => an.delegate === account.address)?.message} />
                     </If>
                 </SectionView>
             </If>
 
-            <h2 className="text-xl font-semibold text-neutral-700 pt-1">Delegates</h2>
+            <h2 className="text-3xl font-semibold text-neutral-700 pt-1">Delegates</h2>
             <IfNot condition={delegateAnnouncements.length}>
                 <If condition={delegateAnnouncementsIsLoading}>
                     <SectionView>
-                        <PleaseWaitSpinner />
+                        <span className="my-3">
+                            <PleaseWaitSpinner />
+                        </span>
                     </SectionView>
                 </If>
                 <If condition={!delegateAnnouncementsIsLoading}>
-                    <span className="my-3">There haven't been any delegation casts for this DAO</span>
+                    <span className="my-3">No delegations have been registered on this DAO</span>
                 </If>
             </IfNot>
             <If condition={delegateAnnouncements.length}>

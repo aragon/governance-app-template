@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { uploadToIPFS } from '@/utils/ipfs'
 import { useWriteContract } from 'wagmi';
 import { Address, toHex } from 'viem'
-import { TokenVotingAbi } from '@/tokenVoting/artifacts/TokenVoting.sol';
+import { TokenVotingAbi } from '@/plugins/tokenVoting/artifacts/TokenVoting.sol';
 import { useAlertContext } from '@/context/AlertContext';
 import WithdrawalInput from '@/components/input/withdrawal'
 import CustomActionInput from '@/components/input/custom-action'

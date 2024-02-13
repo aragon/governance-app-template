@@ -17,7 +17,6 @@ import ProposalDetails from "@/plugins/tokenVoting/components/proposal/details";
 import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
 import { Else, If, IfCase, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useRouter } from "next/router";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 
 type BottomSection = "description" | "votes";
@@ -25,11 +24,9 @@ type BottomSection = "description" | "votes";
 const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS ||
   "") as Address;
 
-export default function Proposal() {
+export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const skipRender = useSkipFirstRender();
   const publicClient = usePublicClient();
-  const { query } = useRouter();
-  const proposalId = resolveQueryParam(query.proposalId);
 
   const { proposal, status: proposalFetchStatus } = useProposal(
     publicClient,
@@ -90,8 +87,8 @@ export default function Proposal() {
   };
 
   useEffect(() => {
-      if(voteResponse) addAlert("Your vote has been registered", voteResponse);
-  }, [voteResponse])
+    if (voteResponse) addAlert("Your vote has been registered", voteResponse);
+  }, [voteResponse]);
 
   useEffect(() => {
     if (showVotingModal) return;
@@ -193,12 +190,6 @@ export default function Proposal() {
       </If>
     </section>
   );
-}
-
-function resolveQueryParam(value: string | string[] | undefined): string {
-  if (typeof value === "string") return value;
-  else if (Array.isArray(value)) return value[0];
-  return "";
 }
 
 function getShowProposalLoading(

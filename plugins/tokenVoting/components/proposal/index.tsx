@@ -81,7 +81,6 @@ export default function ProposalCard(props: ProposalInputs) {
   }
 
   return (
-
     <ActionItem className="w-full mb-4 p-5" href={`#/proposals/${props.proposalId}`} >
       <div className="">
         <If condition={proposal.tally}>

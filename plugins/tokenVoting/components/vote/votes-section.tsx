@@ -26,21 +26,21 @@ export default function VotesSection({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 mt-4 mb-14 gap-4">
       <div>
-        <div className="grid gap-2">
+        <div className="grid gap-3">
           {yesVotes.map((vote, i) => (
             <VoteCard key={i} vote={vote} type="Yes" />
           ))}
         </div>
       </div>
       <div>
-        <div className="grid gap-2">
+        <div className="grid gap-3">
           {noVotes.map((vote, i) => (
             <VoteCard key={i} vote={vote} type="No" />
           ))}
         </div>
       </div>
       <div>
-        <div className="grid gap-2">
+        <div className="grid gap-3">
           {abstainVotes.map((vote, i) => (
             <VoteCard key={i} vote={vote} />
           ))}

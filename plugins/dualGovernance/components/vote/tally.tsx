@@ -6,7 +6,7 @@ interface VoteTallyProps {
   votePercentage: number;
 }
 
-const VoteTally: FC<VoteTallyProps> = ({ voteCount, votePercentage }) => (
+const VetoTally: FC<VoteTallyProps> = ({ voteCount, votePercentage }) => (
   <Card>
     <div className="flex flex-row space-between pb-2">
       <p className={`flex-grow text-xl text-critical-700 font-semibold`}>Veto</p>
@@ -29,4 +29,4 @@ const Card = function ({ children }: { children: ReactNode }) {
   );
 };
 
-export default VoteTally
+export default VetoTally

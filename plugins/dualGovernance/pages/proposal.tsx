@@ -1,24 +1,23 @@
-import { usePublicClient, useAccount, useWriteContract } from "wagmi";
+import { usePublicClient, useWriteContract } from "wagmi";
 import { useState, useEffect } from "react";
 import { Address } from "viem";
-import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
 import { useProposalVetoes } from "@/plugins/dualGovernance/hooks/useProposalVetoes";
 import { ToggleGroup, Toggle } from "@aragon/ods";
 import ProposalDescription from "@/plugins/dualGovernance/components/proposal/description";
-import VotesSection from "@/plugins/dualGovernance/components/vote/votes-section";
+import VetoesSection from "@/plugins/dualGovernance/components/vote/vetoes-section";
 import ProposalHeader from "@/plugins/dualGovernance/components/proposal/header";
 import { useUserCanVeto } from "@/plugins/dualGovernance/hooks/useUserCanVeto";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
-import VoteTally from "@/plugins/dualGovernance/components/vote/tally";
+import VetoTally from "@/plugins/dualGovernance/components/vote/tally";
 import ProposalDetails from "@/plugins/dualGovernance/components/proposal/details";
 import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
-import { Else, If, IfCase, Then } from "@/components/if";
+import { Else, IfCase, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { goerli } from "viem/chains";
 
-type BottomSection = "description" | "votes";
+type BottomSection = "description" | "vetoes";
 
 const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS || "") as Address;
 
@@ -32,7 +31,7 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
     proposalId,
     true
   );
-  const votes = useProposalVetoes(
+  const vetoes = useProposalVetoes(
     publicClient,
     PLUGIN_ADDRESS,
     proposalId,
@@ -75,12 +74,12 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
           proposalNumber={Number(proposalId)}
           proposal={proposal}
           userCanVeto={userCanVeto as boolean}
-          onShowVotingModal={() => vetoProposal()}
+          onVetoPressed={() => vetoProposal()}
         />
       </div>
 
       <div className="grid xl:grid-cols-3 lg:grid-cols-2 my-10 gap-10 w-full">
-        <VoteTally
+        <VetoTally
           voteCount={proposal?.vetoTally}
           votePercentage={Number(proposal?.vetoTally / proposal?.parameters?.minVetoVotingPower) * 100}
         />
@@ -112,7 +111,7 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
             <ProposalDescription {...proposal} />
           </Then>
           <Else>
-            <VotesSection vetoes={votes} />
+            <VetoesSection vetoes={vetoes} />
           </Else>
         </IfCase>
       </div>

@@ -3,11 +3,9 @@ import { usePublicClient } from "wagmi";
 import { Address } from "viem";
 import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
-import { ITagProps } from "@aragon/ods";
-import { Card, Tag } from "@aragon/ods";
+import { Card, Tag, TagVariant } from "@aragon/ods";
 import * as DOMPurify from 'dompurify';
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { If } from "@/components/if";
 import { goerli } from "viem/chains";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
@@ -16,29 +14,20 @@ const DEFAULT_PROPOSAL_METADATA_SUMMARY =
 const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS ||
   "") as Address;
 
-type TagVariant = ITagProps["variant"];
 type ProposalInputs = {
   proposalId: bigint;
 };
 
 const getProposalVariantStatus = (proposal: Proposal) => {
-  return {
-    variant: (proposal?.active
-      ? "primary"
-      : proposal?.executed
-        ? "success"
-        : proposal?.vetoTally >= proposal?.parameters?.minVetoPower
-          ? "critical"
-          : "success") as TagVariant,
-    label: proposal?.active
-      ? "Active"
-      : proposal?.executed
-        ? "Executed"
-        : proposal?.vetoTally >= proposal?.parameters?.minVetoPower
-          ? "Defeated"
-          : "Executable",
-  };
-};
+  return proposal?.vetoTally >= proposal.parameters.minVetoVotingPower 
+    ? { variant: 'critical', label: 'Defeated' }
+    : proposal.active
+      ? { variant: 'primary', label: 'Active' }
+      : proposal.executed 
+        ? { variant: 'success', label: 'Executed' }
+        : { variant: 'success', label: 'Executable' }
+  
+}
 
 export default function ProposalCard(props: ProposalInputs) {
   const publicClient = usePublicClient({chainId: goerli.id});
@@ -87,15 +76,12 @@ export default function ProposalCard(props: ProposalInputs) {
       className="w-full cursor-pointer mb-4"
     >
       <Card className="p-4">
-        <If condition={proposal.vetoTally}>
           <div className="flex mb-2">
             <Tag
-              variant={getProposalVariantStatus(proposal as Proposal).variant}
+              variant={getProposalVariantStatus(proposal as Proposal).variant as TagVariant}
               label={getProposalVariantStatus(proposal as Proposal).label}
             />
           </div>
-        </If>
-
         <div className="text-ellipsis overflow-hidden">
           <h4 className=" mb-1 text-lg font-semibold text-dark line-clamp-1">
             {Number(props.proposalId) + 1} - {proposal.title}

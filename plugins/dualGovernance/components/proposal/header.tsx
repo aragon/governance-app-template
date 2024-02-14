@@ -10,8 +10,7 @@ const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 interface ProposalHeaderProps {
   proposalNumber: number;
   proposal: Proposal;
-  userVote: number | undefined;
-  userCanVote: boolean;
+  userCanVeto: boolean;
   onShowVotingModal: Function;
 }
 type AlertVariant = IAlertCardProps["variant"];
@@ -19,55 +18,28 @@ type AlertVariant = IAlertCardProps["variant"];
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposalNumber,
   proposal,
-  userVote,
-  userCanVote,
+  userCanVeto,
   onShowVotingModal,
 }) => {
   const [proposalVariant, setProposalVariant] = useState({
     variant: "",
     label: "",
   });
-  const [userVoteData, setUserVoteData] = useState({ variant: "", label: "" });
 
   useEffect(() => {
     setProposalVariant(getProposalVariantStatus(proposal));
   }, [proposal]);
 
-  useEffect(() => {
-    setUserVoteData(getUserVoteData());
-  }, [userVote]);
-
   const getProposalVariantStatus = (proposal: Proposal) => {
-    return {
-      variant: proposal?.active
-        ? "info"
-        : proposal?.executed
-        ? "success"
-        : proposal?.vetoTally >= proposal?.parameters.minVetoVotingPower
-        ? "critical"
-        : ("success" as AlertVariant),
-      label: proposal?.active
-        ? "Active"
-        : proposal?.executed
-        ? "Executed"
-        : proposal?.vetoTally >= proposal?.parameters.minVetoVotingPower
-        ? "Defeated"
-        : "Executable",
-    };
-  };
-
-  const getUserVoteData = () => {
-    if (userVote === 3) {
-      return { variant: "critical" as AlertVariant, label: "Against" };
-    } else if (userVote === 1) {
-      return { variant: "info" as AlertVariant, label: "Abstain" };
-    } else {
-      return { variant: "success" as AlertVariant, label: "For" };
-    }
-  };
-
-  if (userVoteData.variant === "") return <></>;
-
+  return proposal?.vetoTally >= proposal.parameters.minVetoVotingPower 
+    ? { variant: 'critical', label: 'Defeated' }
+    : proposal.active
+      ? { variant: 'primary', label: 'Active' }
+      : proposal.executed 
+        ? { variant: 'success', label: 'Executed' }
+        : { variant: 'success', label: 'Executable' }
+  
+}
   return (
     <div className="w-full">
       <div className="flex flex-row pb-2 h-16 items-center">
@@ -76,7 +48,6 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
             {/** bg-info-200 bg-success-200 bg-critical-200
              * text-info-800 text-success-800 text-critical-800
              */}
-            <If condition={proposal.tally}>
               <div className="flex">
                 <Tag
                   className="text-center text-critical-800"
@@ -84,14 +55,13 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                   variant={proposalVariant.variant as AlertVariant}
                 />
               </div>
-            </If>
             <span className="text-xl font-semibold text-neutral-700 pt-1">
               Proposal {proposalNumber + 1}
             </span>
           </div>
         </div>
         <div className="flex ">
-          <IfCase condition={userCanVote}>
+          <IfCase condition={userCanVeto}>
             <Then>
               <Button
                 className="flex h-5 items-center"
@@ -99,19 +69,19 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 variant="primary"
                 onClick={() => onShowVotingModal()}
               >
-                Vote
+                Veto
               </Button>
             </Then>
             <Else>
-              <If condition={userVote}>
+              <If condition={false}>
                 <div className="flex items-center align-center">
                   <span className="text-md text-neutral-800 font-semibold pr-4">
                     Voted:{" "}
                   </span>
                   <AlertInline
                     className="flex h-5 items-center"
-                    variant={userVoteData.variant as AlertVariant}
-                    message={userVoteData.label}
+                    variant='critical'
+                    message='User vetoed'
                   />
                 </div>
               </If>

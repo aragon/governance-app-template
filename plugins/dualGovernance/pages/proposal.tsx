@@ -8,16 +8,13 @@ import { ToggleGroup, Toggle } from "@aragon/ods";
 import ProposalDescription from "@/plugins/dualGovernance/components/proposal/description";
 import VotesSection from "@/plugins/dualGovernance/components/vote/votes-section";
 import ProposalHeader from "@/plugins/dualGovernance/components/proposal/header";
-import { formatUnits } from "viem";
-import { useUserCanVote } from "@/plugins/dualGovernance/hooks/useUserCanVote";
+import { useUserCanVeto } from "@/plugins/dualGovernance/hooks/useUserCanVeto";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import VoteTally from "@/plugins/dualGovernance/components/vote/tally";
-import VotingModal from "@/plugins/dualGovernance/components/vote/voting-modal";
 import ProposalDetails from "@/plugins/dualGovernance/components/proposal/details";
 import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
 import { Else, If, IfCase, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useRouter } from "next/router";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { goerli } from "viem/chains";
 
@@ -42,42 +39,25 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
     proposalId,
     proposal
   );
-  const userCanVote = useUserCanVote(BigInt(proposalId));
+  const userCanVeto = useUserCanVeto(BigInt(proposalId));
   
   const [bottomSection, setBottomSection] =
     useState<BottomSection>("description");
-  const [votedOption, setVotedOption] = useState<number | undefined>(undefined);
-  const [showVotingModal, setShowVotingModal] = useState(false);
-  const [selectedVoteOption, setSelectedVoteOption] = useState<number>();
   const { addAlert } = useAlertContext() as AlertContextProps;
-  const { address, isConnected, isDisconnected } = useAccount();
   const { writeContract: vetoWrite, data: vetoResponse } = useWriteContract();
-
-  const onDismissModal = () => {
-    setSelectedVoteOption(0);
-    setShowVotingModal(false);
-  };
-
-  const onSelectVoteOption = (selectedVoteOption: number) => {
-    setSelectedVoteOption(selectedVoteOption);
-    setShowVotingModal(false);
-  };
 
   useEffect(() => {
       if(vetoResponse) addAlert("Your veto has been registered", vetoResponse);
   }, [vetoResponse])
 
-  useEffect(() => {
-    if (showVotingModal) return;
-    else if (!selectedVoteOption) return;
-
+  const vetoProposal = () => {
     vetoWrite({
       abi: OptimisticTokenVotingPluginAbi,
       address: PLUGIN_ADDRESS,
       functionName: "veto",
       args: [proposalId],
     });
-  }, [selectedVoteOption, showVotingModal]);
+  };
 
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
 
@@ -95,9 +75,8 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
         <ProposalHeader
           proposalNumber={Number(proposalId)}
           proposal={proposal}
-          userVote={votedOption}
-          userCanVote={userCanVote as boolean}
-          onShowVotingModal={() => setShowVotingModal(true)}
+          userCanVeto={userCanVeto as boolean}
+          onShowVotingModal={() => vetoProposal()}
         />
       </div>
 
@@ -138,22 +117,10 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
           </Else>
         </IfCase>
       </div>
-
-      <If condition={showVotingModal}>
-        <VotingModal
-          onDismissModal={onDismissModal}
-          selectedVote={onSelectVoteOption}
-        />
-      </If>
     </section>
   );
 }
 
-function resolveQueryParam(value: string | string[] | undefined): string {
-  if (typeof value === "string") return value;
-  else if (Array.isArray(value)) return value[0];
-  return "0";
-}
 
 function getShowProposalLoading(
   proposal: ReturnType<typeof useProposal>["proposal"],

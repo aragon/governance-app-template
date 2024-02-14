@@ -1,7 +1,15 @@
 import { contracts } from "@aragon/osx-commons-configs";
 import { DEPLOYMENT_TARGET_CHAIN_ID } from "./constants";
+import { Address } from "viem";
 
-export async function ensurePluginRepo(): Promise<string> {
+export async function ensurePluginRepo(): Promise<Address> {
+  if (!contracts[DEPLOYMENT_TARGET_CHAIN_ID]) {
+    throw new Error(
+      "The DAO Factory address is not available for " +
+        DEPLOYMENT_TARGET_CHAIN_ID
+    );
+  }
+
   const pluginRepo =
     contracts[DEPLOYMENT_TARGET_CHAIN_ID]["v1.3.0"]?.TokenVotingRepoProxy
       .address;
@@ -15,7 +23,6 @@ export async function ensurePluginRepo(): Promise<string> {
 
   console.log(`\nToken voting plugin (${DEPLOYMENT_TARGET_CHAIN_ID})`);
   console.log("- Plugin repo at", pluginRepo);
-  console.log("  (No action needed)");
 
-  return pluginRepo;
+  return pluginRepo as Address;
 }

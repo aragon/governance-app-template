@@ -15,7 +15,10 @@ import { PREPARE_INSTALLATION_ABI as TokenVotingPrepareInstallationAbi } from ".
 import { ipfsClient } from "../util/ipfs";
 import { encodeAbiParameters } from "viem";
 
-export async function deployDao(): Promise<string> {
+export async function deployDao(
+  tokenVotingPluginRepo: Address,
+  dualGovernancePluginRepo: Address
+): Promise<Address> {
   const daoFactoryAddr = getDaoFactoryAddress();
 
   console.log("Using the DAO factory at", daoFactoryAddr);
@@ -27,7 +30,7 @@ export async function deployDao(): Promise<string> {
     trustedForwarder: ADDRESS_ZERO,
   };
   const pluginSettings: PluginInstallSettings[] = [
-    getTokenVotingInstallSettings(),
+    getTokenVotingInstallSettings(tokenVotingPluginRepo),
     getDualGovernanceInstallSettings(),
   ];
 
@@ -67,8 +70,10 @@ function pinDaoMetadata() {
   return uploadToIPFS(ipfsClient, blob).then((res) => toHex(res));
 }
 
-function getTokenVotingInstallSettings(): PluginInstallSettings {
-  // prepareInstallation(_, data)
+function getTokenVotingInstallSettings(
+  tokenVotingPluginRepo: Address
+): PluginInstallSettings {
+  // Encode prepareInstallation(_, data)
   const encodedPrepareInstallationData = encodeAbiParameters(
     TokenVotingPrepareInstallationAbi,
     [
@@ -94,7 +99,7 @@ function getTokenVotingInstallSettings(): PluginInstallSettings {
   return {
     data: encodedPrepareInstallationData,
     pluginSetupRef: {
-      pluginSetupRepo: getTokenVotingPluginRepoAddress(),
+      pluginSetupRepo: tokenVotingPluginRepo,
       versionTag: {
         release: 1,
         build: 1,
@@ -126,26 +131,6 @@ function getDaoFactoryAddress(): Address {
 
   const result =
     contracts[DEPLOYMENT_TARGET_CHAIN_ID]["v1.3.0"]?.DAOFactory.address;
-  if (!result) {
-    throw new Error(
-      "The DAO Factory address is not available for " +
-        DEPLOYMENT_TARGET_CHAIN_ID
-    );
-  }
-  return result as Address;
-}
-
-function getTokenVotingPluginRepoAddress(): Address {
-  if (!contracts[DEPLOYMENT_TARGET_CHAIN_ID]) {
-    throw new Error(
-      "The DAO Factory address is not available for " +
-        DEPLOYMENT_TARGET_CHAIN_ID
-    );
-  }
-
-  const result =
-    contracts[DEPLOYMENT_TARGET_CHAIN_ID]["v1.3.0"]?.TokenVotingRepoProxy
-      .address;
   if (!result) {
     throw new Error(
       "The DAO Factory address is not available for " +

@@ -22,5 +22,9 @@ export const DEPLOYMENT_ENS_SUBDOMAIN = "";
 
 // TOKEN VOTING
 
+// DUAL GOVERNANCE
+export const DUAL_GOVERNANCE_ENS_SUBDOMAIN =
+  "dual-test-" + Math.random().toString().slice(2);
+
 // OTHER
 export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";

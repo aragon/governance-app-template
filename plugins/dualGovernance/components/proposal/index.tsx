@@ -83,7 +83,7 @@ export default function ProposalCard(props: ProposalInputs) {
 
   return (
     <Link
-      href={`/proposals/${props.proposalId}`}
+      href={`#/proposals/${props.proposalId}`}
       className="w-full cursor-pointer mb-4"
     >
       <Card className="p-4">

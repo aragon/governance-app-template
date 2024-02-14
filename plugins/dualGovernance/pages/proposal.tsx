@@ -26,11 +26,9 @@ type BottomSection = "description" | "votes";
 const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS ||
   "") as Address;
 
-export default function Proposal() {
+export default function ProposalDetail({ id: proposalId}: {id: string}) {
   const skipRender = useSkipFirstRender();
   const publicClient = usePublicClient({chainId: goerli.id});
-  const { query } = useRouter();
-  const proposalId = resolveQueryParam(query.proposalId);
 
   const { proposal, status: proposalFetchStatus } = useProposal(
     publicClient,

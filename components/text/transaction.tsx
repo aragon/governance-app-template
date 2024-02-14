@@ -1,4 +1,4 @@
-import { formatHexString, getTransactionExplorerLink } from "@/utils/evm";
+import { formatHexString } from "@/utils/evm";
 import { getChildrenText } from "@/utils/content";
 import { ReactNode, useState, useEffect } from "react";
 import { usePublicClient } from 'wagmi'
@@ -9,27 +9,28 @@ export const TransactionText = ({ children }: { children: ReactNode }) => {
   const client = usePublicClient()
   const [link, setLink] = useState<string>();
 
-  const formattedAddress = formatHexString(txHash.trim());
   useEffect(() => {
+    if (!client) return;
+    
     setLink(client.chain.blockExplorers?.default.url + "/tx/" + txHash)
   }, [txHash, client])
-
-
+  
+  const formattedHexValue = formatHexString(txHash.trim());
   if (!link) {
     return (
-      <span className="text-primary-400 font-semibold underline">{formattedAddress}</span>
+      <span className="text-primary-400 font-semibold underline">{formattedHexValue}</span>
     );
   }
   return (
     <>
       {/**
         <Link href={link} iconRight="LINK_EXTERNAL">
-          {formattedAddress}
+          {formattedHexValue}
         </Link>
      */}
-    <a href={link} target="_blank" className="text-primary-400 font-semibold underline">
-      {formattedAddress}
-    </a>
+      <a href={link} target="_blank" className="text-primary-400 font-semibold underline">
+        {formattedHexValue}
+      </a>
     </>
   );
 };

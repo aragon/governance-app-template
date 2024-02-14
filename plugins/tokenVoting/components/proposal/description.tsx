@@ -3,13 +3,14 @@ import { Proposal } from "@/plugins/tokenVoting/utils/types";
 import { whatsabi } from "@shazow/whatsabi";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { usePublicClient } from "wagmi";
+import * as DOMPurify from "dompurify";
 import { Address, decodeFunctionData } from "viem";
 import { Else, If, IfCase, IfNot, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { AddressText } from "@/components/text/address";
 import { isAddress } from "@/utils/evm";
 
-const DEFAULT_PROPOSAL_SUMMARY = "(No description available)";
+const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(No description available)";
 
 type FunctionData = {
   args: readonly unknown[] | undefined;
@@ -23,6 +24,9 @@ export default function ProposalDescription(proposal: Proposal) {
   const publicClient = usePublicClient();
   const [decodedActions, setDecodedActions] = useState<FunctionData[]>([]);
   const proposalActions = proposal?.actions || [];
+  const htmlSummary = proposal?.summary
+    ? DOMPurify.sanitize(proposal?.summary)
+    : DEFAULT_PROPOSAL_METADATA_SUMMARY;
 
   const getFunctionData = async (action: Action) => {
     const abiLoader = new whatsabi.loaders.EtherscanABILoader({
@@ -62,7 +66,12 @@ export default function ProposalDescription(proposal: Proposal) {
 
   return (
     <div className="pt-2">
-      <p className="pb-6">{proposal?.summary || DEFAULT_PROPOSAL_SUMMARY}</p>
+      <div
+        className="pb-6"
+        dangerouslySetInnerHTML={{
+          __html: htmlSummary,
+        }}
+      />
       <h2 className="flex-grow text-2xl text-neutral-900 font-semibold pt-10 pb-3">
         Actions
       </h2>

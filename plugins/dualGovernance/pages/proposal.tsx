@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Address } from "viem";
 import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
-import { useProposalVotes } from "@/plugins/dualGovernance/hooks/useProposalVotes";
+import { useProposalVetoes } from "@/plugins/dualGovernance/hooks/useProposalVetoes";
 import { ToggleGroup, Toggle } from "@aragon/ods";
 import ProposalDescription from "@/plugins/dualGovernance/components/proposal/description";
 import VotesSection from "@/plugins/dualGovernance/components/vote/votes-section";
@@ -20,8 +20,7 @@ import { goerli } from "viem/chains";
 
 type BottomSection = "description" | "votes";
 
-const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS ||
-  "") as Address;
+const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS || "") as Address;
 
 export default function ProposalDetail({ id: proposalId}: {id: string}) {
   const skipRender = useSkipFirstRender();
@@ -33,7 +32,7 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
     proposalId,
     true
   );
-  const votes = useProposalVotes(
+  const votes = useProposalVetoes(
     publicClient,
     PLUGIN_ADDRESS,
     proposalId,

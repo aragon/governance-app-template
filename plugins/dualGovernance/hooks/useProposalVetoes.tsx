@@ -4,19 +4,19 @@ import { PublicClient } from "wagmi";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import {
   Proposal,
-  VoteCastEvent,
+  VetoCastEvent,
   VoteCastResponse,
-} from "@/plugins/tokenVoting/utils/types";
+} from "@/plugins/dualGovernance/utils/types";
 
 const event = getAbiItem({ abi: OptimisticTokenVotingPluginAbi, name: "VetoCast" });
 
-export function useProposalVotes(
+export function useProposalVetoes(
   publicClient: PublicClient,
   address: Address,
   proposalId: string,
   proposal: Proposal | null
 ) {
-  const [proposalLogs, setLogs] = useState<VoteCastEvent[]>([]);
+  const [proposalLogs, setLogs] = useState<VetoCastEvent[]>([]);
 
   async function getLogs() {
     if (!proposal?.parameters?.snapshotBlock) return;

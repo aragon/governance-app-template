@@ -4,14 +4,20 @@ import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { IAlertCardProps } from "@aragon/ods";
 import { Else, If, IfCase, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
+import { useWriteContract } from "wagmi";
+import { goerli } from "viem/chains";
+import { OptimisticTokenVotingPluginAbi } from "../../artifacts/OptimisticTokenVotingPlugin.sol";
+import { Address } from "viem";
+import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
 
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
+const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS || "") as Address;
 
 interface ProposalHeaderProps {
   proposalNumber: number;
   proposal: Proposal;
   userCanVeto: boolean;
-  onShowVotingModal: Function;
+  onVetoPressed: Function;
 }
 type AlertVariant = IAlertCardProps["variant"];
 
@@ -19,18 +25,34 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposalNumber,
   proposal,
   userCanVeto,
-  onShowVotingModal,
+  onVetoPressed,
 }) => {
+  const { writeContract: executeWrite, data: executeResponse } = useWriteContract()
+  const { addAlert } = useAlertContext() as AlertContextProps;
   const [proposalVariant, setProposalVariant] = useState({
     variant: "",
     label: "",
   });
 
+  const executeButtonPressed = () => {
+    executeWrite({
+      chainId: goerli.id,
+      abi: OptimisticTokenVotingPluginAbi,
+      address: PLUGIN_ADDRESS,
+      functionName: 'execute',
+      args: [proposalNumber]
+    })
+  }
+
   useEffect(() => {
-    setProposalVariant(getProposalVariantStatus(proposal));
+    if (executeResponse) addAlert('Your execution has been registered', executeResponse)
+  }, [executeResponse])
+
+  useEffect(() => {
+    setProposalVariant(getProposalVariantStatus());
   }, [proposal]);
 
-  const getProposalVariantStatus = (proposal: Proposal) => {
+  const getProposalVariantStatus = () => {
   return proposal?.vetoTally >= proposal.parameters.minVetoVotingPower 
     ? { variant: 'critical', label: 'Defeated' }
     : proposal.active
@@ -67,23 +89,21 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 className="flex h-5 items-center"
                 size="lg"
                 variant="primary"
-                onClick={() => onShowVotingModal()}
+                onClick={() => onVetoPressed()}
               >
                 Veto
               </Button>
             </Then>
             <Else>
-              <If condition={false}>
-                <div className="flex items-center align-center">
-                  <span className="text-md text-neutral-800 font-semibold pr-4">
-                    Voted:{" "}
-                  </span>
-                  <AlertInline
-                    className="flex h-5 items-center"
-                    variant='critical'
-                    message='User vetoed'
-                  />
-                </div>
+              <If condition={getProposalVariantStatus().label === 'Executable'}>
+                <Button
+                className="flex h-5 items-center"
+                size="lg"
+                variant="success"
+                onClick={() => executeButtonPressed()}
+              >
+                Execute
+              </Button>
               </If>
             </Else>
           </IfCase>

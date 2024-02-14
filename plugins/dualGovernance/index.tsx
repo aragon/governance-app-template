@@ -1,7 +1,7 @@
 import React from "react";
 import { useUrlHash } from "use-url-hash";
 import { NotFound } from "@/components/not-found";
-// import ProposalCreate from "./pages/new";
+import ProposalCreate from "./pages/new";
 import ProposalList from "./pages/proposal-list";
 import ProposalDetail from "./pages/proposal";
 
@@ -10,7 +10,7 @@ export default function PluginPage() {
   const hash = useUrlHash();
 
   if (!hash || hash === "/") return <ProposalList />;
-  // else if (hash === "/new") return <ProposalCreate />;
+  else if (hash === "/new") return <ProposalCreate />;
   else if (hash.startsWith("/proposals/")) {
     const id = hash.replace("/proposals/", "");
 

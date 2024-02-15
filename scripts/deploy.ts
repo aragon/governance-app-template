@@ -2,12 +2,13 @@ import { Address } from "viem";
 import { checkDependencies } from "./deploy/0-checks.js";
 import { deployTokenContracts } from "./deploy/1-governance-erc20-token.js";
 import { ensurePluginRepo as ensureTokenVoting } from "./deploy/2-token-voting.js";
-import { deployContract as deployDelegates } from "./deploy/3-delegate-announcer.js";
+import { deployContract as deployDelegationAnnouncer } from "./deploy/3-delegate-announcer.js";
 import { deployPlugin as deployDualGovernance } from "./deploy/4-dual-governance.js";
 import { deployDao } from "./deploy/5-dao.js";
 
 async function main() {
   let tokenVotingPluginRepo: Address;
+  let delegationAnnouncer: Address;
   let dualGovernancePluginRepo: Address;
 
   try {
@@ -22,7 +23,7 @@ async function main() {
 
     console.log("\nPlugins and helpers");
     tokenVotingPluginRepo = await ensureTokenVoting();
-    await deployDelegates();
+    delegationAnnouncer = await deployDelegationAnnouncer();
     dualGovernancePluginRepo = await deployDualGovernance(
       governanceErc20Base,
       governanceWrappedErc20Base
@@ -42,6 +43,9 @@ async function main() {
     console.log("- Plugins");
     console.log("  - Token voting:", installedPlugins[0]);
     console.log("  - Dual governance:", installedPlugins[1]);
+
+    console.log("- Other");
+    console.log("  - Delegation announcer:", delegationAnnouncer);
 
     console.log(
       "\nPlease, update the .env file to make use of the deployed contracts"

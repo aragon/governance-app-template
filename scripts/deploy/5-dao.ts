@@ -5,17 +5,18 @@ import {
   DEPLOYMENT_DAO_NAME,
   DEPLOYMENT_ENS_SUBDOMAIN,
   DEPLOYMENT_TARGET_CHAIN_ID,
+  DEPLOYMENT_TOKEN_RECEIVERS,
 } from "./constants";
 import { Address, Hex, Log, decodeEventLog, toHex } from "viem";
 import { publicClient, walletClient } from "../util/client";
 import { account } from "../util/account";
 import { uploadToIPFS } from "@/utils/ipfs";
+import { ipfsClient } from "../util/ipfs";
 import { ABI as DaoFactoryABI } from "../artifacts/dao-factory";
 import { ABI as DaoRegistryABI } from "../artifacts/dao-registry";
 import { ABI as PluginSetupProcessorABI } from "../artifacts/plugin-setup-processor";
 import { PREPARE_INSTALLATION_ABI as TokenVotingPrepareInstallationAbi } from "../artifacts/token-voting-plugin-setup";
 import { PREPARE_INSTALLATION_ABI as DualGovernancePrepareInstallationAbi } from "../artifacts/dual-governance-plugin-setup";
-import { ipfsClient } from "../util/ipfs";
 import { encodeAbiParameters } from "viem";
 
 const EXPECTED_PLUGIN_COUNT = 2;
@@ -82,7 +83,12 @@ function pinDaoMetadata(): Promise<Hex> {
     type: "application/json",
   });
 
-  return uploadToIPFS(ipfsClient, blob).then((res) => toHex(res));
+  return uploadToIPFS(ipfsClient, blob)
+    .then((res) => toHex(res))
+    .catch((err) => {
+      console.warn("Warning: Could not pin the DAO metadata on IPFS");
+      return "0x";
+    });
 }
 
 function getTokenVotingInstallSettings(
@@ -128,6 +134,8 @@ function getDualGovernanceInstallSettings(
   daoToken: Address,
   dualGovernancePluginRepo: Address
 ): PluginInstallSettings {
+  const creatorAddresses = DEPLOYMENT_TOKEN_RECEIVERS;
+
   const encodedPrepareInstallationData = encodeAbiParameters(
     DualGovernancePrepareInstallationAbi,
     [
@@ -138,7 +146,7 @@ function getDualGovernanceInstallSettings(
       },
       { token: daoToken, name: "", symbol: "" },
       { receivers: [], amounts: [] },
-      [account.address],
+      creatorAddresses,
     ]
   );
 

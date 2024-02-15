@@ -45,7 +45,7 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
   const { writeContract: vetoWrite, data: vetoResponse } = useWriteContract();
 
   useEffect(() => {
-      if(vetoResponse) addAlert("Your veto has been registered", vetoResponse);
+      if(vetoResponse) addAlert("Your veto has been submitted", vetoResponse);
   }, [vetoResponse])
 
   const vetoProposal = () => {

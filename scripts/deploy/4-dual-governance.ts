@@ -39,7 +39,9 @@ async function deployDualGovernancePluginSetupBase(
   governanceWrappedErc20Base: Address
 ): Promise<Address> {
   // Plugin setup deploy
-  console.log("- Deploying the Dual Governance Plugin Setup (implementation)");
+  console.log(
+    "- Deploying the Dual Governance Plugin Setup (base implementation)"
+  );
   const hash = await walletClient.deployContract({
     abi: DualGovernancePluginSetupABI,
     account,
@@ -67,7 +69,7 @@ async function publishPluginVersion(
   const pluginRepoFactoryAddr = getPluginRepoFactoryAddress();
 
   // New repo with version
-  console.log("- Creating Dual Governance version");
+  console.log("- Publishing Dual Governance version 1.1");
   const { request } = await publicClient.simulateContract({
     address: pluginRepoFactoryAddr,
     abi: PluginRepoFactoryABI,

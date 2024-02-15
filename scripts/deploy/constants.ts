@@ -25,8 +25,14 @@ export const DEPLOYMENT_ENS_SUBDOMAIN =
 // TOKEN
 export const DEPLOYMENT_TOKEN_NAME = "Aragonette DAO Coin";
 export const DEPLOYMENT_TOKEN_SYMBOL = "ADC";
-export const DEPLOYMENT_TOKEN_RECEIVERS = [account.address];
-export const DEPLOYMENT_TOKEN_AMOUNTS = [parseEther("1000")];
+export const DEPLOYMENT_TOKEN_RECEIVERS = [
+  account.address,
+  "0x8bF1e340055c7dE62F11229A149d3A1918de3d74",
+] as const;
+export const DEPLOYMENT_TOKEN_AMOUNTS = [
+  parseEther("1000"),
+  parseEther("1000"),
+];
 
 // DUAL GOVERNANCE
 export const DUAL_GOVERNANCE_ENS_SUBDOMAIN =

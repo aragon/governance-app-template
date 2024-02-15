@@ -8,9 +8,7 @@ import { deployDao } from "./deploy/5-dao.js";
 
 async function main() {
   let tokenVotingPluginRepo: Address;
-  let delegationAnnouncerAddress: Address;
   let dualGovernancePluginRepo: Address;
-  let daoAddress: Address;
 
   try {
     // Wallet checks
@@ -24,21 +22,29 @@ async function main() {
 
     console.log("\nPlugins and helpers");
     tokenVotingPluginRepo = await ensureTokenVoting();
-    delegationAnnouncerAddress = await deployDelegates();
+    await deployDelegates();
     dualGovernancePluginRepo = await deployDualGovernance(
       governanceErc20Base,
       governanceWrappedErc20Base
     );
 
-    daoAddress = await deployDao(
+    const { daoAddress, subdomain, installedPlugins } = await deployDao(
       daoToken,
       tokenVotingPluginRepo,
       dualGovernancePluginRepo
     );
-    console.log("\nDeployed DAO:", daoAddress);
+
+    console.log("\nSummary");
+    console.log("- DAO address:", daoAddress);
+    console.log("- DAO ENS:", subdomain + ".dao.eth");
+    console.log("- ERC20 token:", daoToken);
+
+    console.log("- Plugins");
+    console.log("  - Token voting:", installedPlugins[0]);
+    console.log("  - Dual governance:", installedPlugins[1]);
 
     console.log(
-      "\nPlease, update the environment files to make use of the deployed contracts"
+      "\nPlease, update the .env file to make use of the deployed contracts"
     );
     console.log("Deployment successful");
   } catch (err) {

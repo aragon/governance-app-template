@@ -6,22 +6,25 @@ import {
   DEPLOYMENT_ENS_SUBDOMAIN,
   DEPLOYMENT_TARGET_CHAIN_ID,
 } from "./constants";
-import { Address, Hex, decodeEventLog, toHex } from "viem";
+import { Address, Hex, Log, decodeEventLog, toHex } from "viem";
 import { publicClient, walletClient } from "../util/client";
 import { account } from "../util/account";
 import { uploadToIPFS } from "@/utils/ipfs";
 import { ABI as DaoFactoryABI } from "../artifacts/dao-factory";
 import { ABI as DaoRegistryABI } from "../artifacts/dao-registry";
+import { ABI as PluginSetupProcessorABI } from "../artifacts/plugin-setup-processor";
 import { PREPARE_INSTALLATION_ABI as TokenVotingPrepareInstallationAbi } from "../artifacts/token-voting-plugin-setup";
 import { PREPARE_INSTALLATION_ABI as DualGovernancePrepareInstallationAbi } from "../artifacts/dual-governance-plugin-setup";
 import { ipfsClient } from "../util/ipfs";
 import { encodeAbiParameters } from "viem";
 
+const EXPECTED_PLUGIN_COUNT = 2;
+
 export async function deployDao(
   daoToken: Address,
   tokenVotingPluginRepo: Address,
   dualGovernancePluginRepo: Address
-): Promise<Address> {
+) {
   const daoFactoryAddr = getDaoFactoryAddress();
 
   console.log("\nUsing the DAO factory at", daoFactoryAddr);
@@ -34,7 +37,7 @@ export async function deployDao(
   };
   const pluginSettings: PluginInstallSettings[] = [
     getTokenVotingInstallSettings(daoToken, tokenVotingPluginRepo),
-    await getDualGovernanceInstallSettings(daoToken, dualGovernancePluginRepo),
+    getDualGovernanceInstallSettings(daoToken, dualGovernancePluginRepo),
   ];
 
   console.log("- Deploying the DAO");
@@ -56,38 +59,13 @@ export async function deployDao(
     );
   }
 
-  const decodedEvents = [];
-  for (const item of receipt.logs) {
-    try {
-      decodedEvents.push(
-        decodeEventLog({
-          abi: DaoRegistryABI,
-          data: item.data,
-          // eventName: "DAORegistered",
-          topics: item.topics,
-          strict: false,
-        })
-      );
-    } catch (err) {}
-  }
+  const { daoAddress, subdomain } = resolveDaoRegisteredEvent(receipt.logs);
+  const installedPlugins = resolveInstallationAppliedEvent(receipt.logs);
 
-  // Search for DAORegistered(dao, creator, subdomain)
-  const creationEvent = decodedEvents.find(
-    (e) => e.eventName === "DAORegistered"
-  );
-  if (!creationEvent) {
-    throw new Error("The Dual Governance plugin repo couldn't be created");
-  }
-  console.log("  - DAO address:", (creationEvent.args as any).dao);
-  console.log(
-    "  - DAO ENS:",
-    (creationEvent.args as any).subdomain + ".dao.eth"
-  );
-
-  return (creationEvent.args as any).dao as Address;
+  return { daoAddress, subdomain, installedPlugins };
 }
 
-function pinDaoMetadata() {
+function pinDaoMetadata(): Promise<Hex> {
   // Add additional metadata fields if needed
   const daoMetadata = {
     name: DEPLOYMENT_DAO_NAME,
@@ -146,10 +124,10 @@ function getTokenVotingInstallSettings(
   };
 }
 
-async function getDualGovernanceInstallSettings(
+function getDualGovernanceInstallSettings(
   daoToken: Address,
   dualGovernancePluginRepo: Address
-): Promise<PluginInstallSettings> {
+): PluginInstallSettings {
   const encodedPrepareInstallationData = encodeAbiParameters(
     DualGovernancePrepareInstallationAbi,
     [
@@ -193,6 +171,63 @@ function getDaoFactoryAddress(): Address {
     );
   }
   return result as Address;
+}
+
+function resolveDaoRegisteredEvent(logs: Log<bigint, number, false>[]) {
+  const decodedEvents = [];
+  for (const item of logs) {
+    try {
+      decodedEvents.push(
+        decodeEventLog({
+          abi: DaoRegistryABI,
+          data: item.data,
+          // eventName: "DAORegistered",
+          topics: item.topics,
+          strict: false,
+        })
+      );
+    } catch (err) {}
+  }
+
+  // Search for DAORegistered(dao, creator, subdomain)
+  const creationEvent = decodedEvents.find(
+    (e) => e.eventName === "DAORegistered"
+  );
+  if (!creationEvent) {
+    throw new Error("The DAO couldn't be deployed");
+  }
+
+  return {
+    daoAddress: (creationEvent.args as any).dao as Address,
+    subdomain: (creationEvent.args as any).subdomain as Address,
+  };
+}
+
+function resolveInstallationAppliedEvent(logs: Log<bigint, number, false>[]) {
+  const decodedEvents = [];
+  for (const item of logs) {
+    try {
+      decodedEvents.push(
+        decodeEventLog({
+          abi: PluginSetupProcessorABI,
+          data: item.data,
+          // eventName: "InstallationApplied",
+          topics: item.topics,
+          strict: false,
+        })
+      );
+    } catch (err) {}
+  }
+
+  // Search for InstallationApplied(dao, plugin, setupId, appliedSetupId)
+  const installEvents = decodedEvents.filter(
+    (e) => e.eventName === "InstallationApplied"
+  );
+  if (installEvents.length !== EXPECTED_PLUGIN_COUNT) {
+    throw new Error("The DAO plugins couldn't be installed");
+  }
+
+  return installEvents.map((item) => (item.args as any).plugin as Address);
 }
 
 // TYPES

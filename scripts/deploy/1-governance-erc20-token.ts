@@ -26,7 +26,7 @@ export async function deployTokenContracts() {
 }
 
 async function deployGovernanceErc20Token(): Promise<Address> {
-  console.log("- Deploying ERC20 token (governance)");
+  console.log("- Deploying the DAO's token (GovernanceERC20)");
   const hash = await walletClient.deployContract({
     abi: GovernanceErc20ABI,
     account,
@@ -53,7 +53,7 @@ async function deployGovernanceErc20Token(): Promise<Address> {
 }
 
 async function deployGovernanceErc20Base(): Promise<Address> {
-  console.log("- Deploying GovernanceErc20 (implementation)");
+  console.log("- Deploying GovernanceErc20 (base implementation)");
 
   const hash = await walletClient.deployContract({
     abi: GovernanceErc20ABI,
@@ -75,7 +75,7 @@ async function deployGovernanceErc20Base(): Promise<Address> {
 }
 
 async function deployGovernanceWrappedErc20Base(): Promise<Address> {
-  console.log("- Deploying GovernanceWrappedErc20 (implementation)");
+  console.log("- Deploying GovernanceWrappedErc20 (base implementation)");
 
   const hash = await walletClient.deployContract({
     abi: GovernanceWrappedErc20ABI,

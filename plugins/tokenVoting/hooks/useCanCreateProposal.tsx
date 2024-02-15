@@ -29,6 +29,8 @@ export function useCanCreateProposal() {
     })
 
     useEffect(() => {
+        console.log('Results: ', contractReads)
+        console.log('Balance: ', balance)
         if (contractReads?.length) {
             setMinProposerVotingPower(contractReads[0]?.result as bigint)
 
@@ -37,7 +39,7 @@ export function useCanCreateProposal() {
     }, [contractReads])
 
     useEffect(() => {
-        if ( balance && minProposerVotingPower && balance?.value >= minProposerVotingPower) setIsCreator(true)
+        if ( balance !== undefined && minProposerVotingPower !== undefined && balance?.value >= minProposerVotingPower) setIsCreator(true)
     }, [balance])
 
     return isCreator

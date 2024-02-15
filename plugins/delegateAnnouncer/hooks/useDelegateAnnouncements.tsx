@@ -17,6 +17,7 @@ export function useDelegateAnnouncements(
 
     useEffect(() => {
         setIsLoading(true)
+        console.log('DAO', daoAddress)
             
         publicClient.getLogs({
             address: delegationContract,
@@ -24,9 +25,10 @@ export function useDelegateAnnouncements(
             args: {
                 dao: daoAddress
             } as any,
-            fromBlock: BigInt(53386422),
+            fromBlock: BigInt(10541166),
             toBlock: 'latest'
         }).then((logs: any) => {
+            console.log('Logs: ', logs)
             setDelegateAnnouncements(
                 logs.map((log) => ({
                     logIndex: log.logIndex,

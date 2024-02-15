@@ -52,7 +52,6 @@ export const SelfDelegationProfileCard = ({ address, tokenAddress, message, dele
     }
 
     const announceDelegate = () => {
-        console.log(inputDescription)
         delegateAnnouncementWrite({
             abi: DelegateAnnouncerAbi,
             address: DELEGATION_CONTRACT,

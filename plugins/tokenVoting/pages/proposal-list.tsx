@@ -11,8 +11,7 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 
 const PROPOSALS_PER_PAGE = 10;
-const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS ||
-  "") as Address;
+const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
 
 export default function Proposals() {
   const [proposalCount, setProposalCount] = useState(0);

@@ -37,7 +37,6 @@ export default function DelegateAnnouncements() {
     <MainSection>
       <If condition={account?.address}>
         <SectionView>
-          <If condition={delegateAnnouncements.length}>
             <h2 className="text-xl font-semibold text-neutral-700 pb-3">
               Your profile
             </h2>
@@ -51,7 +50,6 @@ export default function DelegateAnnouncements() {
                 )?.message
               }
             />
-          </If>
         </SectionView>
       </If>
 

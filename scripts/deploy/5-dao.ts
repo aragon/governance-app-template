@@ -6,22 +6,25 @@ import {
   DEPLOYMENT_ENS_SUBDOMAIN,
   DEPLOYMENT_TARGET_CHAIN_ID,
 } from "./constants";
-import { Address, Hex, parseEther, toHex } from "viem";
+import { Address, Hex, decodeEventLog, toHex } from "viem";
 import { publicClient, walletClient } from "../util/client";
 import { account } from "../util/account";
 import { uploadToIPFS } from "@/utils/ipfs";
 import { ABI as DaoFactoryABI } from "../artifacts/dao-factory";
-import { PREPARE_INSTALLATION_ABI as TokenVotingPrepareInstallationAbi } from "../artifacts/token-voting";
+import { ABI as DaoRegistryABI } from "../artifacts/dao-registry";
+import { PREPARE_INSTALLATION_ABI as TokenVotingPrepareInstallationAbi } from "../artifacts/token-voting-plugin-setup";
+import { PREPARE_INSTALLATION_ABI as DualGovernancePrepareInstallationAbi } from "../artifacts/dual-governance-plugin-setup";
 import { ipfsClient } from "../util/ipfs";
 import { encodeAbiParameters } from "viem";
 
 export async function deployDao(
+  daoToken: Address,
   tokenVotingPluginRepo: Address,
   dualGovernancePluginRepo: Address
 ): Promise<Address> {
   const daoFactoryAddr = getDaoFactoryAddress();
 
-  console.log("Using the DAO factory at", daoFactoryAddr);
+  console.log("\nUsing the DAO factory at", daoFactoryAddr);
 
   const daoSettings: DaoSettings = {
     metadata: await pinDaoMetadata(),
@@ -30,10 +33,11 @@ export async function deployDao(
     trustedForwarder: ADDRESS_ZERO,
   };
   const pluginSettings: PluginInstallSettings[] = [
-    getTokenVotingInstallSettings(tokenVotingPluginRepo),
-    getDualGovernanceInstallSettings(),
+    getTokenVotingInstallSettings(daoToken, tokenVotingPluginRepo),
+    await getDualGovernanceInstallSettings(daoToken, dualGovernancePluginRepo),
   ];
 
+  console.log("- Deploying the DAO");
   const { request } = await publicClient.simulateContract({
     address: daoFactoryAddr,
     abi: DaoFactoryABI,
@@ -43,11 +47,44 @@ export async function deployDao(
   });
   const hash = await walletClient.writeContract(request);
 
-  console.log("DAO:");
-  console.log("- Address:");
-  console.log("- ENS:");
+  console.log("  - Waiting for transaction (" + hash + ")");
 
-  return "";
+  const receipt = await publicClient.waitForTransactionReceipt({ hash });
+  if (!receipt) {
+    throw new Error(
+      "The Dual Governance plugin repository could not be created"
+    );
+  }
+
+  const decodedEvents = [];
+  for (const item of receipt.logs) {
+    try {
+      decodedEvents.push(
+        decodeEventLog({
+          abi: DaoRegistryABI,
+          data: item.data,
+          // eventName: "DAORegistered",
+          topics: item.topics,
+          strict: false,
+        })
+      );
+    } catch (err) {}
+  }
+
+  // Search for DAORegistered(dao, creator, subdomain)
+  const creationEvent = decodedEvents.find(
+    (e) => e.eventName === "DAORegistered"
+  );
+  if (!creationEvent) {
+    throw new Error("The Dual Governance plugin repo couldn't be created");
+  }
+  console.log("  - DAO address:", (creationEvent.args as any).dao);
+  console.log(
+    "  - DAO ENS:",
+    (creationEvent.args as any).subdomain + ".dao.eth"
+  );
+
+  return (creationEvent.args as any).dao as Address;
 }
 
 function pinDaoMetadata() {
@@ -71,6 +108,7 @@ function pinDaoMetadata() {
 }
 
 function getTokenVotingInstallSettings(
+  daoToken: Address,
   tokenVotingPluginRepo: Address
 ): PluginInstallSettings {
   // Encode prepareInstallation(_, data)
@@ -85,13 +123,13 @@ function getTokenVotingInstallSettings(
         votingMode: 1, // Standard, EarlyExecution, VoteReplacement
       },
       {
-        name: "Aragonette DAO Coin",
-        symbol: "ADC",
-        token: ADDRESS_ZERO,
+        name: "",
+        symbol: "",
+        token: daoToken,
       },
       {
-        amounts: [parseEther("1000")],
-        receivers: [account.address],
+        amounts: [],
+        receivers: [],
       },
     ]
   );
@@ -108,11 +146,28 @@ function getTokenVotingInstallSettings(
   };
 }
 
-function getDualGovernanceInstallSettings(): PluginInstallSettings {
+async function getDualGovernanceInstallSettings(
+  daoToken: Address,
+  dualGovernancePluginRepo: Address
+): Promise<PluginInstallSettings> {
+  const encodedPrepareInstallationData = encodeAbiParameters(
+    DualGovernancePrepareInstallationAbi,
+    [
+      {
+        minDuration: BigInt(60 * 60 * 24 * 6),
+        minProposerVotingPower: BigInt(0),
+        minVetoRatio: 200_000,
+      },
+      { token: daoToken, name: "", symbol: "" },
+      { receivers: [], amounts: [] },
+      [account.address],
+    ]
+  );
+
   return {
-    data: "",
+    data: encodedPrepareInstallationData,
     pluginSetupRef: {
-      pluginSetupRepo: "",
+      pluginSetupRepo: dualGovernancePluginRepo,
       versionTag: {
         release: 1,
         build: 1,

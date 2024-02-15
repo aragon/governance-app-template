@@ -1,9 +1,10 @@
 import { Address } from "viem";
 import { checkDependencies } from "./deploy/0-checks.js";
-import { ensurePluginRepo as ensureTokenVoting } from "./deploy/1-token-voting.js";
-import { deployContract as deployDelegates } from "./deploy/2-delegate-announcer.js";
-import { deployPlugin as deployDualGovernance } from "./deploy/3-dual-governance.js";
-import { deployDao } from "./deploy/4-dao.js";
+import { deployTokenContracts } from "./deploy/1-governance-erc20-token.js";
+import { ensurePluginRepo as ensureTokenVoting } from "./deploy/2-token-voting.js";
+import { deployContract as deployDelegates } from "./deploy/3-delegate-announcer.js";
+import { deployPlugin as deployDualGovernance } from "./deploy/4-dual-governance.js";
+import { deployDao } from "./deploy/5-dao.js";
 
 async function main() {
   let tokenVotingPluginRepo: Address;
@@ -17,23 +18,28 @@ async function main() {
     await checkDependencies();
 
     // Deployment
-    console.log("Plugins and helpers");
+    console.log("Token contracts");
+    const { daoToken, governanceErc20Base, governanceWrappedErc20Base } =
+      await deployTokenContracts();
 
+    console.log("\nPlugins and helpers");
     tokenVotingPluginRepo = await ensureTokenVoting();
-    // console.log("Deployed Delegates repo:", tokenVotingPluginRepo);
-
     delegationAnnouncerAddress = await deployDelegates();
-    // console.log("Delegate announcer:", delegationAnnouncerAddress);
-
-    dualGovernancePluginRepo = await deployDualGovernance();
-    console.log("Deployed DualGovernance repo:", dualGovernancePluginRepo);
+    dualGovernancePluginRepo = await deployDualGovernance(
+      governanceErc20Base,
+      governanceWrappedErc20Base
+    );
 
     daoAddress = await deployDao(
+      daoToken,
       tokenVotingPluginRepo,
       dualGovernancePluginRepo
     );
-    console.log("Deployed DAO:", daoAddress);
+    console.log("\nDeployed DAO:", daoAddress);
 
+    console.log(
+      "\nPlease, update the environment files to make use of the deployed contracts"
+    );
     console.log("Deployment successful");
   } catch (err) {
     console.error(err);

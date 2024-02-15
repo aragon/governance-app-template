@@ -1,7 +1,6 @@
 import { contracts } from "@aragon/osx-commons-configs";
 import { Address, decodeEventLog } from "viem";
 import {
-  ADDRESS_ZERO,
   DEPLOYMENT_TARGET_CHAIN_ID,
   DUAL_GOVERNANCE_ENS_SUBDOMAIN,
 } from "./constants";
@@ -12,22 +11,20 @@ import {
   ABI as DualGovernancePluginSetupABI,
   BYTECODE as DualGovernancePluginSetupBytecode,
 } from "../artifacts/dual-governance-plugin-setup";
-import {
-  ABI as GovernanceErc20ABI,
-  BYTECODE as GovernanceErc20Bytecode,
-} from "../artifacts/governance-erc20";
-import {
-  ABI as GovernanceWrappedErc20ABI,
-  BYTECODE as GovernanceWrappedErc20Bytecode,
-} from "../artifacts/governance-wrapped-erc20";
 import { account } from "../util/account";
 
-export async function deployPlugin(): Promise<Address> {
+export async function deployPlugin(
+  governanceErc20Base: Address,
+  governanceWrappedErc20Base: Address
+): Promise<Address> {
   console.log("\nDual governance plugin");
 
   // Plugin setup base
   const dualGovernancePluginSetupBase =
-    await deployDualGovernancePluginSetupBase();
+    await deployDualGovernancePluginSetupBase(
+      governanceErc20Base,
+      governanceWrappedErc20Base
+    );
 
   // Plugin repo with first version
   const pluginRepo = await publishPluginVersion(dualGovernancePluginSetupBase);
@@ -37,11 +34,10 @@ export async function deployPlugin(): Promise<Address> {
 
 // Helpers
 
-async function deployDualGovernancePluginSetupBase(): Promise<Address> {
-  // Base contracts deploy
-  const governanceErc20Base = await deployGovernanceErc20Base();
-  const governanceWrappedErc20Base = await deployGovernanceWrappedErc20Base();
-
+async function deployDualGovernancePluginSetupBase(
+  governanceErc20Base: Address,
+  governanceWrappedErc20Base: Address
+): Promise<Address> {
   // Plugin setup deploy
   console.log("- Deploying the Dual Governance Plugin Setup (implementation)");
   const hash = await walletClient.deployContract({
@@ -60,52 +56,6 @@ async function deployDualGovernancePluginSetupBase(): Promise<Address> {
   }
   console.log("  - Dual Governance Plugin Setup:", receipt.contractAddress);
   console.log();
-
-  return receipt.contractAddress;
-}
-
-async function deployGovernanceErc20Base(): Promise<Address> {
-  console.log(
-    "- Deploying GovernanceErc20 (implementation for dual governance plugin setup)"
-  );
-  const hash = await walletClient.deployContract({
-    abi: GovernanceErc20ABI,
-    account,
-    bytecode: GovernanceErc20Bytecode,
-    args: [ADDRESS_ZERO, "", "", { amounts: [], receivers: [] }],
-  });
-  console.log("  - Waiting for transaction (" + hash + ")");
-
-  const receipt = await publicClient.waitForTransactionReceipt({ hash });
-  if (!receipt.contractAddress) {
-    throw new Error(
-      "The base contract for GovernanceErc20 could not be deployed"
-    );
-  }
-  console.log("  - GovernanceErc20:", receipt.contractAddress);
-
-  return receipt.contractAddress;
-}
-
-async function deployGovernanceWrappedErc20Base(): Promise<Address> {
-  console.log(
-    "- Deploying GovernanceWrappedErc20 (implementation for dual governance plugin setup)"
-  );
-  const hash = await walletClient.deployContract({
-    abi: GovernanceWrappedErc20ABI,
-    account,
-    bytecode: GovernanceWrappedErc20Bytecode,
-    args: [ADDRESS_ZERO, "", ""],
-  });
-  console.log("  - Waiting for transaction (" + hash + ")");
-
-  const receipt = await publicClient.waitForTransactionReceipt({ hash });
-  if (!receipt.contractAddress) {
-    throw new Error(
-      "The base contract for GovernanceWrappedErc20 could not be deployed"
-    );
-  }
-  console.log("  - GovernanceWrappedErc20:", receipt.contractAddress);
 
   return receipt.contractAddress;
 }

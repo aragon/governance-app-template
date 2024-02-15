@@ -1,6 +1,7 @@
 import { SupportedNetworks } from "@aragon/osx-commons-configs";
-// import { activeContractsList } from "@aragon/osx-artifacts";
+import { account } from "../util/account";
 import { getEnv } from "../util/env";
+import { parseEther } from "viem";
 
 // NETWORK
 export const DEPLOYMENT_TARGET_CHAIN_ID = (getEnv(
@@ -10,21 +11,26 @@ export const DEPLOYMENT_TARGET_CHAIN_ID = (getEnv(
 
 // DAO
 export const DEPLOYMENT_DAO_NAME = "Aragonette DAO";
-export const DEPLOYMENT_DAO_DESCRIPTION = "This is a very flexible DAO.";
+export const DEPLOYMENT_DAO_DESCRIPTION = "This is a very flexible DAO";
 
 // NOTE:
 // Enter a value in order to request a new dao.eth subdomain (where available)
 // Be sure to define a name when the full setup is validated.
 // Once a dao.eth subdomain is assigned it cannot be transferred.
-export const DEPLOYMENT_ENS_SUBDOMAIN = "";
+export const DEPLOYMENT_ENS_SUBDOMAIN =
+  "aragonette-dao-test-" + Math.random().toString().slice(2);
 
 // PLUGINS
 
-// TOKEN VOTING
+// TOKEN
+export const DEPLOYMENT_TOKEN_NAME = "Aragonette DAO Coin";
+export const DEPLOYMENT_TOKEN_SYMBOL = "ADC";
+export const DEPLOYMENT_TOKEN_RECEIVERS = [account.address];
+export const DEPLOYMENT_TOKEN_AMOUNTS = [parseEther("1000")];
 
 // DUAL GOVERNANCE
 export const DUAL_GOVERNANCE_ENS_SUBDOMAIN =
-  "dual-test-" + Math.random().toString().slice(2);
+  "dual-governance-test-" + Math.random().toString().slice(2);
 
 // OTHER
 export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";

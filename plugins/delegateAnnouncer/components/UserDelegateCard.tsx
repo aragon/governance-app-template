@@ -98,11 +98,9 @@ export const SelfDelegationProfileCard = ({ address, tokenAddress, message, dele
                     <Button variant="secondary" size="sm" onClick={() => delegateTo()}>Delegate</Button>
                 </div>
             </If>
-            <If condition={inputDescription === ''}>
                 <div className="mt-1">
-                    <Button variant="primary" size="sm" onClick={() => announceDelegate()}>Announce yourself!</Button>
+                    <Button variant="primary" size="sm" state={inputDescription === '<p></p>' || !inputDescription ? 'disabled' : ''} onClick={() => announceDelegate()}>Announce yourself!</Button>
                 </div>
-            </If>
             </div>
         </Card>
     )

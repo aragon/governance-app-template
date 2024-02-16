@@ -9,6 +9,7 @@ import { goerli } from "viem/chains";
 import { OptimisticTokenVotingPluginAbi } from "../../artifacts/OptimisticTokenVotingPlugin.sol";
 import { Address } from "viem";
 import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
+import { useProposalVariantStatus } from "../../hooks/useProposalVariantStatus";
 
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS || "") as Address;
@@ -29,10 +30,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
 }) => {
   const { writeContract: executeWrite, data: executeResponse } = useWriteContract()
   const { addAlert } = useAlertContext() as AlertContextProps;
-  const [proposalVariant, setProposalVariant] = useState({
-    variant: "",
-    label: "",
-  });
+  const proposalVariant = useProposalVariantStatus(proposal);
 
   const executeButtonPressed = () => {
     executeWrite({
@@ -48,20 +46,6 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
     if (executeResponse) addAlert('Your execution has been registered', executeResponse)
   }, [executeResponse])
 
-  useEffect(() => {
-    setProposalVariant(getProposalVariantStatus());
-  }, [proposal]);
-
-  const getProposalVariantStatus = () => {
-  return proposal?.vetoTally >= proposal.parameters.minVetoVotingPower 
-    ? { variant: 'critical', label: 'Defeated' }
-    : proposal.active
-      ? { variant: 'primary', label: 'Active' }
-      : proposal.executed 
-        ? { variant: 'success', label: 'Executed' }
-        : { variant: 'success', label: 'Executable' }
-  
-}
   return (
     <div className="w-full">
       <div className="flex flex-row pb-2 h-16 items-center">
@@ -95,7 +79,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
               </Button>
             </Then>
             <Else>
-              <If condition={getProposalVariantStatus().label === 'Executable'}>
+              <If condition={proposalVariant.label === 'Executable'}>
                 <Button
                 className="flex h-5 items-center"
                 size="lg"

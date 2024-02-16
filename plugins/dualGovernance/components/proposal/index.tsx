@@ -7,6 +7,7 @@ import { Card, Tag, TagVariant } from "@aragon/ods";
 import * as DOMPurify from 'dompurify';
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { goerli } from "viem/chains";
+import { useProposalVariantStatus } from "../../hooks/useProposalVariantStatus";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY =
@@ -18,17 +19,6 @@ type ProposalInputs = {
   proposalId: bigint;
 };
 
-const getProposalVariantStatus = (proposal: Proposal) => {
-  return proposal?.vetoTally >= proposal.parameters.minVetoVotingPower 
-    ? { variant: 'critical', label: 'Defeated' }
-    : proposal.active
-      ? { variant: 'primary', label: 'Active' }
-      : proposal.executed 
-        ? { variant: 'success', label: 'Executed' }
-        : { variant: 'success', label: 'Executable' }
-  
-}
-
 export default function ProposalCard(props: ProposalInputs) {
   const publicClient = usePublicClient({chainId: goerli.id});
   const { proposal, status } = useProposal(
@@ -36,6 +26,7 @@ export default function ProposalCard(props: ProposalInputs) {
     PLUGIN_ADDRESS,
     props.proposalId.toString()
   );
+  const proposalVariant = useProposalVariantStatus(proposal!);
 
   const showLoading = getShowProposalLoading(proposal, status);
 
@@ -78,8 +69,8 @@ export default function ProposalCard(props: ProposalInputs) {
       <Card className="p-4">
           <div className="flex mb-2">
             <Tag
-              variant={getProposalVariantStatus(proposal as Proposal).variant as TagVariant}
-              label={getProposalVariantStatus(proposal as Proposal).label}
+              variant={proposalVariant.variant as TagVariant}
+              label={proposalVariant.label}
             />
           </div>
         <div className="text-ellipsis overflow-hidden">

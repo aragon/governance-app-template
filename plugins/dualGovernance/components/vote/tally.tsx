@@ -14,7 +14,7 @@ const VetoTally: FC<VoteTallyProps> = ({ voteCount, votePercentage }) => (
       <p className="text-xl font-semibold">{formatLargeNumber(formatUnits(voteCount+BigInt(1) || BigInt(0), 18))}</p>
     </div>
     <div className={`h-4 w-full bg-critical-100 rounded`}>
-      <div className={`h-4 bg-critical-700 rounded`} style={{ width: `${votePercentage}%` }}/>
+      <div className={`h-4 bg-critical-700 rounded`} style={{ width: `${Math.min(votePercentage, 100)}%` }}/>
     </div>
   </Card>
 );

@@ -17,7 +17,6 @@ export function useDelegateAnnouncements(
 
     useEffect(() => {
         setIsLoading(true)
-        console.log('DAO', daoAddress)
             
         publicClient.getLogs({
             address: delegationContract,

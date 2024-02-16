@@ -20,7 +20,7 @@ type ProposalInputs = {
 };
 
 export default function ProposalCard(props: ProposalInputs) {
-  const publicClient = usePublicClient({chainId: goerli.id});
+  const publicClient = usePublicClient();
   const { proposal, status } = useProposal(
     publicClient,
     PLUGIN_ADDRESS,

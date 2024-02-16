@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@aragon/osx-commons-configs": "^0.2.0",
+    "@types/dompurify": "^3.0.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-blockies": "^1.4.4",

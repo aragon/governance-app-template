@@ -19,7 +19,7 @@ export const plugins: PluginItem[] = [
     id: "tokenVoting",
     title: "Community proposals",
     icon: IconType.APP_GOVERNANCE,
-    pluginAddress: process.env.NEXT_PUBLIC_PLUGIN_ADDRESS ?? "",
+    pluginAddress: process.env.NEXT_PUBLIC_TOKEN_VOTING_PLUGIN_ADDRESS ?? "",
   },
   {
     id: "delegateAnnouncer",

@@ -25,7 +25,7 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setActions }) => {
     const [to, setTo] = useState<Address>()
     const [data, setCallData] = useState<Address>(`0x`)
 
-    const handleInputChange = (setter: Function) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (setter: (value: any) => void) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setter(event?.target?.value);
     }
 

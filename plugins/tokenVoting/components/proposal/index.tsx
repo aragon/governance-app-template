@@ -12,7 +12,7 @@ import { If } from "@/components/if";
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY =
   "(The metadata of the proposal is not available)";
-const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS ||
+const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_TOKEN_VOTING_PLUGIN_ADDRESS ||
   "") as Address;
 
 type TagVariant = ITagProps["variant"];

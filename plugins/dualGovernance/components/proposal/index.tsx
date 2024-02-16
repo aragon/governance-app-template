@@ -77,13 +77,14 @@ export default function ProposalCard(props: ProposalInputs) {
           <h4 className=" mb-1 text-lg font-semibold text-dark line-clamp-1">
             {Number(props.proposalId) + 1} - {proposal.title}
           </h4>
-          {<div className="text-ellipsis overflow-hidden box line-clamp-2"
+          <div
+            className="text-ellipsis overflow-hidden box line-clamp-2"
             dangerouslySetInnerHTML={{
               __html: proposal.summary
                 ? DOMPurify.sanitize(proposal.summary)
-                : DEFAULT_PROPOSAL_METADATA_SUMMARY
-            }} />
-          }
+                : DEFAULT_PROPOSAL_METADATA_SUMMARY,
+            }}
+          />
         </div>
       </Card>
     </Link>

@@ -18,7 +18,7 @@ interface ProposalHeaderProps {
   proposalNumber: number;
   proposal: Proposal;
   userCanVeto: boolean;
-  onVetoPressed: Function;
+  onVetoPressed: () => void;
 }
 type AlertVariant = IAlertCardProps["variant"];
 

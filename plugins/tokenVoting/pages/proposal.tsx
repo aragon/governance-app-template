@@ -21,7 +21,7 @@ import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 
 type BottomSection = "description" | "votes";
 
-const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS ||
+const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_TOKEN_VOTING_PLUGIN_ADDRESS ||
   "") as Address;
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {

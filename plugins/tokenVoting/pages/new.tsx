@@ -13,7 +13,7 @@ import { getPlainText } from '@/utils/html';
 
 const IPFS_ENDPOINT = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
 const IPFS_KEY = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
-const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address
+const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_TOKEN_VOTING_PLUGIN_ADDRESS || "") as Address
 
 enum ActionType {
     Signaling,

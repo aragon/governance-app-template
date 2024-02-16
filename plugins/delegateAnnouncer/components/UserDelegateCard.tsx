@@ -78,7 +78,7 @@ export const SelfDelegationProfileCard = ({ address, tokenAddress, message, dele
             <div className="text-md text-neutral-500 m-1 grow">
                 <If condition={message}>
                     <div dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(message)
+                        __html: DOMPurify.sanitize(message ?? "")
                     }}/>
                 </If>
                 <If condition={!message}>

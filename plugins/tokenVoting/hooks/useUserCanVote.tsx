@@ -4,7 +4,7 @@ import { TokenVotingAbi } from '@/plugins/tokenVoting/artifacts/TokenVoting.sol'
 import { useEffect } from 'react';
 
 
-const pluginAddress = ((process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address)
+const pluginAddress = ((process.env.NEXT_PUBLIC_TOKEN_VOTING_PLUGIN_ADDRESS || "") as Address)
 
 export function useUserCanVote(proposalId: bigint) {
     const { address } = useAccount()

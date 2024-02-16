@@ -8,7 +8,7 @@ import { config } from "@/context/Web3Modal";
 import { createWeb3Modal } from '@web3modal/wagmi/react'
 import { State, WagmiProvider } from 'wagmi'
 
-const projectId: string = process.env.NEXT_PUBLIC_WC_PROJECT_ID || "";
+const projectId: string = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "";
 
 const queryClient = new QueryClient();
 

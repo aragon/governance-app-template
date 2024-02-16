@@ -3,7 +3,7 @@ import { useReadContract } from "wagmi";
 
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 
-const pluginAddress = (process.env.NEXT_PUBLIC_PLUGIN_ADDRESS || "") as Address;
+const pluginAddress = (process.env.NEXT_PUBLIC_TOKEN_VOTING_PLUGIN_ADDRESS || "") as Address;
 
 export function useVotingToken() {
   const {

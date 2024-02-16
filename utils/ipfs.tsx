@@ -15,7 +15,7 @@ export function uploadToIPFS(client: IPFSHTTPClient, blob: Blob) {
 }
 
 async function fetchFromIPFS(hexIpfsUri: string): Promise<Response> {
-  if (!hexIpfsUri || hexIpfsUri === '0x') throw new Error("Invalid IPFS URI");
+  if (!hexIpfsUri || hexIpfsUri === "0x") throw new Error("Invalid IPFS URI");
 
   const path = getPath(hexIpfsUri);
   const response = await fetch(`${IPFS_ENDPOINT}/cat?arg=${path}`, {

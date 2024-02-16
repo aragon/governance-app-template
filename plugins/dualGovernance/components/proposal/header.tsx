@@ -43,7 +43,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   }
 
   useEffect(() => {
-    if (executeResponse) addAlert('Your execution has been registered', executeResponse)
+    if (executeResponse) addAlert('Your execution has been submitted', executeResponse)
   }, [executeResponse])
 
   return (

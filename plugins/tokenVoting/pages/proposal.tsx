@@ -87,7 +87,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   };
 
   useEffect(() => {
-    if (voteResponse) addAlert("Your vote has been registered", voteResponse);
+    if (voteResponse) addAlert("Your vote has been submitted", voteResponse);
   }, [voteResponse]);
 
   useEffect(() => {

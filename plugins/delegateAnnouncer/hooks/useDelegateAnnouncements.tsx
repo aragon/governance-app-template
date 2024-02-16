@@ -17,7 +17,6 @@ export function useDelegateAnnouncements(
 
     useEffect(() => {
         setIsLoading(true)
-            
         publicClient.getLogs({
             address: delegationContract,
             event: AnnounceDelegationEvent,
@@ -27,7 +26,6 @@ export function useDelegateAnnouncements(
             fromBlock: BigInt(10541166),
             toBlock: 'latest'
         }).then((logs: any) => {
-            console.log('Logs: ', logs)
             setDelegateAnnouncements(
                 logs.map((log) => ({
                     logIndex: log.logIndex,

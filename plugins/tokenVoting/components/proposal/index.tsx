@@ -81,30 +81,32 @@ export default function ProposalCard(props: ProposalInputs) {
   }
 
   return (
-    <ActionItem className="w-full mb-4 p-5" href={`#/proposals/${props.proposalId}`} >
-      <div className="">
-        <If condition={proposal.tally}>
-          <div className="flex mb-2">
-            <Tag
-              variant={getProposalVariantStatus(proposal as Proposal).variant}
-              label={getProposalVariantStatus(proposal as Proposal).label}
-            />
-          </div>
-        </If>
+    <Link href={`#/proposals/${props.proposalId}`}>
+      <Card className="w-full mb-4 p-5">
+        <div className="">
+          <If condition={proposal.tally}>
+            <div className="flex mb-2">
+              <Tag
+                variant={getProposalVariantStatus(proposal as Proposal).variant}
+                label={getProposalVariantStatus(proposal as Proposal).label}
+              />
+            </div>
+          </If>
 
-        <div className="text-ellipsis overflow-hidden">
-          <h4 className=" mb-1 text-lg font-semibold text-dark line-clamp-1">
-            {Number(props.proposalId) + 1} - {proposal.title}
-          </h4>
-          <div className="text-ellipsis overflow-hidden box line-clamp-2"
-            dangerouslySetInnerHTML={{
-              __html: proposal.summary
-                ? DOMPurify.sanitize(proposal.summary)
-                : DEFAULT_PROPOSAL_METADATA_SUMMARY
-            }} />
+          <div className="text-ellipsis overflow-hidden">
+            <h4 className=" mb-1 text-lg font-semibold text-dark line-clamp-1">
+              {Number(props.proposalId) + 1} - {proposal.title}
+            </h4>
+            <div className="text-ellipsis overflow-hidden box line-clamp-2"
+              dangerouslySetInnerHTML={{
+                __html: proposal.summary
+                  ? DOMPurify.sanitize(proposal.summary)
+                  : DEFAULT_PROPOSAL_METADATA_SUMMARY
+              }} />
+          </div>
         </div>
-      </div>
-    </ActionItem>
+      </Card>
+    </Link>
   );
 }
 

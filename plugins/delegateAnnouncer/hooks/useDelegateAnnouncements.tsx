@@ -17,14 +17,13 @@ export function useDelegateAnnouncements(
 
     useEffect(() => {
         setIsLoading(true)
-            
         publicClient.getLogs({
             address: delegationContract,
             event: AnnounceDelegationEvent,
             args: {
                 dao: daoAddress
             } as any,
-            fromBlock: BigInt(53386422),
+            fromBlock: BigInt(10541166),
             toBlock: 'latest'
         }).then((logs: any) => {
             setDelegateAnnouncements(

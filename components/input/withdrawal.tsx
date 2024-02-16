@@ -16,7 +16,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
         if (!isAddress(to)) return;
         else if (!isNumeric(value)) return;
 
-        setActions([{ to, value: BigInt(value), data: '0x' } as unknown as Action])
+        setActions([{ to, value: BigInt(value), data: '' } as unknown as Action])
     }, [to, value])
 
     const handleTo = (event: React.ChangeEvent<HTMLInputElement>) => {

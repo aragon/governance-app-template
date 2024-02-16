@@ -10,6 +10,12 @@ type PluginItem = {
 
 export const plugins: PluginItem[] = [
   {
+    id: "dualGovernance",
+    title: "Core Proposals",
+    icon: IconType.BLOCKCHAIN,
+    pluginAddress: process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS ?? "",
+  },
+  {
     id: "tokenVoting",
     title: "Community proposals",
     icon: IconType.APP_GOVERNANCE,

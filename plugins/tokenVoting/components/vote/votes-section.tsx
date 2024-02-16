@@ -5,6 +5,7 @@ import { formatUnits } from "viem";
 import { ReactNode } from "react";
 import { AddressText } from "@/components/text/address";
 import { Card, Tag } from '@aragon/ods'
+import { formatLargeNumber } from "@/utils/formatNumber";
 
 export default function VotesSection({
   votes,
@@ -69,7 +70,7 @@ const VoteCard = function({
           <div className="px-2">
             <AddressText>{vote.voter}</AddressText>
             <p className="text-neutral-600 text-sm">
-              {formatUnits(vote.votingPower, 18)} votes
+              {formatLargeNumber(formatUnits(vote.votingPower, 18))} votes
             </p>
           </div>
         </div>

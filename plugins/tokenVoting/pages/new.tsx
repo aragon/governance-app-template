@@ -27,7 +27,6 @@ const ipfsClient = create({
 });
 
 export default function Create() {
-    const [ipfsPin, setIpfsPin] = useState<string>('');
     const [title, setTitle] = useState<string>('');
     const [summary, setSummary] = useState<string>('');
     const [actions, setActions] = useState<Action[]>([]);
@@ -44,17 +43,6 @@ export default function Create() {
        if(proposalCreated) addAlert("The proposal has been created", proposalCreated)
     }, [proposalCreated])
 
-    useEffect(() => {
-        if (!ipfsPin) return;
-
-        createProposalWrite({
-            abi: TokenVotingAbi,
-            address: PLUGIN_ADDRESS,
-            functionName: 'createProposal',
-            args: [toHex(ipfsPin), actions, 0, 0, 0, 0, 0],
-        })
-    }, [ipfsPin])
-
     const submitProposal = async () => {
         // Check metadata
         if (!title.trim()) return alert("Please, enter a title");
@@ -69,6 +57,7 @@ export default function Create() {
                 if (!actions.length) {
                     return alert("Please ensure that the withdrawal address and the amount to transfer are valid");
                 }
+                break
             default:
                 if (!actions.length || !actions[0].data || actions[0].data === "0x") {
                     return alert("Please ensure that the values of the action to execute are correct");
@@ -79,7 +68,12 @@ export default function Create() {
         const blob = new Blob([JSON.stringify(proposalMetadataJsonObject)], { type: 'application/json' });
 
         const ipfsPin = await uploadToIPFS(ipfsClient, blob);
-        setIpfsPin(ipfsPin!)
+        createProposalWrite({
+            abi: TokenVotingAbi,
+            address: PLUGIN_ADDRESS,
+            functionName: 'createProposal',
+            args: [toHex(ipfsPin), actions, 0, 0, 0, 0, 0],
+        })
     }
 
     const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {

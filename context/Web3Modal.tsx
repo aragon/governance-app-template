@@ -16,12 +16,12 @@ const metadata = {
 };
 
 export const config = createConfig({
-  chains: [polygon, mainnet],
+  chains: [goerli, mainnet],
   transports: {
-    [polygon.id]: http('https://polygon-mainnet.g.alchemy.com/v2/' + ALCHEMY_KEY, {batch: true}),
+    [goerli.id]: http('https://eth-goerli.g.alchemy.com/v2/' + ALCHEMY_KEY, {batch: true}),
+    // [polygon.id]: http('https://polygon-mainnet.g.alchemy.com/v2/' + ALCHEMY_KEY, {batch: true}),
     [mainnet.id]: http('https://eth-mainnet.g.alchemy.com/v2/' + ALCHEMY_KEY, {batch: true}),
     // [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/' + ALCHEMY_KEY, {batch: true})
-    // [goerli.id]: http('https://eth-goerli.g.alchemy.com/v2/' + ALCHEMY_KEY, {batch: true})
   },
   connectors: [
     walletConnect({ projectId: WALLET_CONNECT_PROJECT_ID, metadata, showQrModal: false }),

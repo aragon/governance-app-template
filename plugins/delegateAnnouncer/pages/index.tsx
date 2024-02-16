@@ -37,7 +37,6 @@ export default function DelegateAnnouncements() {
     <MainSection>
       <If condition={account?.address}>
         <SectionView>
-          <If condition={delegateAnnouncements.length}>
             <h2 className="text-xl font-semibold text-neutral-700 pb-3">
               Your profile
             </h2>
@@ -51,11 +50,10 @@ export default function DelegateAnnouncements() {
                 )?.message
               }
             />
-          </If>
         </SectionView>
       </If>
 
-      <h2 className="text-3xl font-semibold text-neutral-700 pt-1">
+      <h2 className="text-3xl font-semibold text-neutral-700">
         Delegates
       </h2>
       <IfNot condition={delegateAnnouncements.length}>
@@ -91,7 +89,7 @@ export default function DelegateAnnouncements() {
 
 function MainSection({ children }: { children: ReactNode }) {
   return (
-    <main className="flex flex-col mt-6 w-screen max-w-full">{children}</main>
+    <main className="flex flex-col w-screen max-w-full">{children}</main>
   );
 }
 

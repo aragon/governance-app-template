@@ -25,6 +25,6 @@ export const plugins: PluginItem[] = [
     id: "delegateAnnouncer",
     title: "Delegation",
     icon: IconType.APP_COMMUNITY,
-    pluginAddress: process.env.NEXT_PUBLIC_DELEGATION_CONTRACT ?? "",
+    pluginAddress: process.env.NEXT_PUBLIC_DELEGATION_CONTRACT_ADDRESS ?? "",
   },
 ];

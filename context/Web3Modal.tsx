@@ -5,7 +5,7 @@ import { walletConnect } from 'wagmi/connectors'
 
 // 1. Get projectId
 const WALLET_CONNECT_PROJECT_ID: string = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "";
-const ALCHEMY_KEY: string = process.env.NEXT_PUBLIC_ALCHEMY || "";
+const ALCHEMY_KEY: string = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || "";
 
 // 2. Create wagmiConfig
 const metadata = {

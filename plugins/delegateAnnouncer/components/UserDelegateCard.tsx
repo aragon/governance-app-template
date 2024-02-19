@@ -12,7 +12,7 @@ import { formatHexString } from "@/utils/evm";
 import { DelegateAnnouncerAbi } from "@/plugins/delegateAnnouncer/artifacts/DelegateAnnouncer.sol";
 import * as DOMPurify from 'dompurify'
 
-const DELEGATION_CONTRACT = (process.env.NEXT_PUBLIC_DELEGATION_CONTRACT || "") as Address;
+const DELEGATION_CONTRACT = (process.env.NEXT_PUBLIC_DELEGATION_CONTRACT_ADDRESS || "") as Address;
 const DAO_ADDRESS = (process.env.NEXT_PUBLIC_DAO_ADDRESS || "") as Address;
 
 type SelfDelegationProfileCardProps = {

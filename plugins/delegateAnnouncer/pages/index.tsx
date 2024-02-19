@@ -10,7 +10,7 @@ import { DelegateCard } from "@/plugins/delegateAnnouncer/components/DelegateCar
 import { SelfDelegationProfileCard } from "../components/UserDelegateCard";
 
 const TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_TOKEN_ADDRESS || "") as Address;
-const DELEGATION_CONTRACT = (process.env.NEXT_PUBLIC_DELEGATION_CONTRACT ||
+const DELEGATION_CONTRACT = (process.env.NEXT_PUBLIC_DELEGATION_CONTRACT_ADDRESS ||
   "") as Address;
 const DAO_ADDRESS = (process.env.NEXT_PUBLIC_DAO_ADDRESS || "") as Address;
 

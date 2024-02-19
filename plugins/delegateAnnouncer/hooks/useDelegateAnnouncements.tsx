@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { DelegateAnnouncerAbi } from "@/plugins/delegateAnnouncer/artifacts/DelegateAnnouncer.sol";
 import { Address, PublicClient, getAbiItem, fromHex } from "viem";
-// import { useBlockNumber } from "wagmi";
 import { DelegateAnnounce } from "../utils/types";
+import { PUB_DELEGATION_ANNOUNCEMENTS_START_BLOCK } from "@/constants";
 
-const DELEGATION_ANNOUNCEMENTS_START = BigInt(process.env.NEXT_PUBLIC_DELEGATION_ANNOUNCEMENTS_START || "0");
 const AnnounceDelegationEvent = getAbiItem({abi: DelegateAnnouncerAbi, name: "AnnounceDelegation"})
 
 export function useDelegateAnnouncements(
@@ -12,7 +11,6 @@ export function useDelegateAnnouncements(
     delegationContract: Address,
     daoAddress: Address
 ) {
-    // const { data: blockNumber } = useBlockNumber({watch: true})
     const [delegateAnnouncements, setDelegateAnnouncements] = useState<DelegateAnnounce[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -24,7 +22,7 @@ export function useDelegateAnnouncements(
             args: {
                 dao: daoAddress
             } as any,
-            fromBlock: DELEGATION_ANNOUNCEMENTS_START,
+            fromBlock: PUB_DELEGATION_ANNOUNCEMENTS_START_BLOCK,
             toBlock: 'latest'
         }).then((logs: any) => {
             setDelegateAnnouncements(

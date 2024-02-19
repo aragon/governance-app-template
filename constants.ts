@@ -3,6 +3,9 @@ import { Address } from "viem";
 // General
 export const PUB_APP_PAGE_TITLE = "Aragonette";
 export const PUB_DISCORD_URL = "https://discord.com/";
+export const PUB_DELEGATION_ANNOUNCEMENTS_START_BLOCK = BigInt(
+  process.env.NEXT_PUBLIC_DELEGATION_ANNOUNCEMENTS_START_BLOCK || "0"
+);
 
 // Contract Addresses
 export const PUB_DAO_ADDRESS = (process.env.NEXT_PUBLIC_DAO_ADDRESS ??

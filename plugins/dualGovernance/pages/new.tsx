@@ -10,11 +10,11 @@ import WithdrawalInput from '@/components/input/withdrawal'
 import CustomActionInput from '@/components/input/custom-action'
 import { Action } from '@/utils/types'
 import { getPlainText } from '@/utils/html';
-import { goerli } from 'viem/chains';
 import {
     PUB_IPFS_ENDPOINT,
     PUB_IPFS_API_KEY,
-    PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS
+    PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+    PUB_CHAIN
 } from '@/constants';
 
 enum ActionType {
@@ -71,7 +71,7 @@ export default function Create() {
 
         const ipfsPin = await uploadToIPFS(ipfsClient, blob);
         createProposalWrite({
-            chainId: goerli.id,
+            chainId: PUB_CHAIN.id,
             abi: OptimisticTokenVotingPluginAbi,
             address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
             functionName: 'createProposal',

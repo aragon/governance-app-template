@@ -1,35 +1,28 @@
 import { http, createConfig } from "wagmi";
-import { polygon, mainnet, sepolia, goerli } from "@wagmi/core/chains";
 import { injected } from "wagmi/connectors";
 import { walletConnect } from "wagmi/connectors";
 import {
-  PUB_ALCHEMY_API_KEY,
+  PUB_APP_DESCRIPTION,
+  PUB_APP_NAME,
+  PUB_CHAIN,
+  PUB_PROJECT_URL,
   PUB_WALLET_CONNECT_PROJECT_ID,
+  PUB_WALLET_ICON,
+  PUB_WEB3_ENDPOINT,
 } from "@/constants";
 
-// 1. Get projectId
-
-// 2. Create wagmiConfig
+// wagmi config
 const metadata = {
-  name: "Aragonette",
-  description: "Simplified UI for Aragon",
-  url: "https://aragon.org",
-  icons: ["https://avatars.githubusercontent.com/u/37784886"],
+  name: PUB_APP_NAME,
+  description: PUB_APP_DESCRIPTION,
+  url: PUB_PROJECT_URL,
+  icons: [PUB_WALLET_ICON],
 };
 
 export const config = createConfig({
-  chains: [goerli, mainnet],
+  chains: [PUB_CHAIN],
   transports: {
-    [goerli.id]: http(
-      "https://eth-goerli.g.alchemy.com/v2/" + PUB_ALCHEMY_API_KEY,
-      { batch: true }
-    ),
-    // [polygon.id]: http('https://polygon-mainnet.g.alchemy.com/v2/' + PUB_ALCHEMY_API_KEY, {batch: true}),
-    [mainnet.id]: http(
-      "https://eth-mainnet.g.alchemy.com/v2/" + PUB_ALCHEMY_API_KEY,
-      { batch: true }
-    ),
-    // [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/' + PUB_ALCHEMY_API_KEY, {batch: true})
+    [PUB_CHAIN.id]: http(PUB_WEB3_ENDPOINT, { batch: true }),
   },
   connectors: [
     walletConnect({

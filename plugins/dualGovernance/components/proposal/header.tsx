@@ -5,11 +5,10 @@ import { IAlertCardProps } from "@aragon/ods";
 import { Else, If, IfCase, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
 import { useWriteContract } from "wagmi";
-import { goerli } from "viem/chains";
 import { OptimisticTokenVotingPluginAbi } from "../../artifacts/OptimisticTokenVotingPlugin.sol";
 import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
 import { useProposalVariantStatus } from "../../hooks/useProposalVariantStatus";
-import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 
@@ -33,7 +32,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
 
   const executeButtonPressed = () => {
     executeWrite({
-      chainId: goerli.id,
+      chainId: PUB_CHAIN.id,
       abi: OptimisticTokenVotingPluginAbi,
       address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
       functionName: 'execute',

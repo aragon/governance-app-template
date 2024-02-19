@@ -11,7 +11,7 @@ import {
   ProposalParameters,
 } from "@/plugins/dualGovernance/utils/types";
 import { useQuery } from "@tanstack/react-query";
-import { goerli } from "viem/chains";
+import { PUB_CHAIN } from "@/constants";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -52,7 +52,7 @@ export function useProposal(
     abi: OptimisticTokenVotingPluginAbi,
     functionName: "getProposal",
     args: [proposalId],
-    chainId: goerli.id,
+    chainId: PUB_CHAIN.id,
   });
   const proposalData = decodeProposalResultData(proposalResult);
 

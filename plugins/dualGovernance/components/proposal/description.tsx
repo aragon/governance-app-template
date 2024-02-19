@@ -9,8 +9,7 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import { AddressText } from "@/components/text/address";
 import { isAddress } from "@/utils/evm";
 import * as DOMPurify from "dompurify";
-import { goerli } from "viem/chains";
-import { PUB_ETHERSCAN_API_KEY } from "@/constants";
+import { PUB_CHAIN, PUB_ETHERSCAN_API_KEY } from "@/constants";
 
 const DEFAULT_PROPOSAL_SUMMARY = "(No description available)";
 
@@ -21,7 +20,7 @@ type FunctionData = {
 };
 
 export default function ProposalDescription(proposal: Proposal) {
-  const publicClient = usePublicClient({ chainId: goerli.id });
+  const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
   const [decodedActions, setDecodedActions] = useState<FunctionData[]>([]);
   const proposalActions = proposal?.actions || [];
 

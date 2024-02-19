@@ -14,14 +14,13 @@ import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
 import { Else, IfCase, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
-import { goerli } from "viem/chains";
-import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 
 type BottomSection = "description" | "vetoes";
 
 export default function ProposalDetail({ id: proposalId}: {id: string}) {
   const skipRender = useSkipFirstRender();
-  const publicClient = usePublicClient({chainId: goerli.id});
+  const publicClient = usePublicClient({chainId: PUB_CHAIN.id});
 
   const { proposal, status: proposalFetchStatus } = useProposal(
     publicClient,

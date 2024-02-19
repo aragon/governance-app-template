@@ -8,8 +8,7 @@ import Link from "next/link";
 import { If, IfNot } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
-import { goerli } from "viem/chains";
-import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 
 const PROPOSALS_PER_PAGE = 10;
 
@@ -32,7 +31,7 @@ export default function Proposals() {
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     abi: OptimisticTokenVotingPluginAbi,
     functionName: "proposalCount",
-    chainId: goerli.id,
+    chainId: PUB_CHAIN.id,
   });
 
   useEffect(() => {

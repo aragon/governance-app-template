@@ -1,3 +1,8 @@
+import {
+  PUB_DELEGATION_CONTRACT_ADDRESS,
+  PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+  PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+} from "@/constants";
 import { IconType } from "@aragon/ods";
 
 type PluginItem = {
@@ -13,18 +18,18 @@ export const plugins: PluginItem[] = [
     id: "dualGovernance",
     title: "Core Proposals",
     icon: IconType.BLOCKCHAIN,
-    pluginAddress: process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS ?? "",
+    pluginAddress: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   },
   {
     id: "tokenVoting",
     title: "Community proposals",
     icon: IconType.APP_GOVERNANCE,
-    pluginAddress: process.env.NEXT_PUBLIC_TOKEN_VOTING_PLUGIN_ADDRESS ?? "",
+    pluginAddress: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
   },
   {
     id: "delegateAnnouncer",
     title: "Delegation",
     icon: IconType.APP_COMMUNITY,
-    pluginAddress: process.env.NEXT_PUBLIC_DELEGATION_CONTRACT_ADDRESS ?? "",
+    pluginAddress: PUB_DELEGATION_CONTRACT_ADDRESS,
   },
 ];

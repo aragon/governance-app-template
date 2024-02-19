@@ -1,37 +1,24 @@
-import { Address, erc20Abi } from "viem";
+import { erc20Abi } from "viem";
 import { useReadContract } from "wagmi";
-
-import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
-
-const pluginAddress = (process.env.NEXT_PUBLIC_TOKEN_VOTING_PLUGIN_ADDRESS || "") as Address;
+import { PUB_TOKEN_ADDRESS } from "@/constants";
 
 export function useVotingToken() {
   const {
-    data: tokenAddress,
-    isError: error1,
-    isLoading: loading1,
-  } = useReadContract({
-    address: pluginAddress,
-    abi: OptimisticTokenVotingPluginAbi,
-    functionName: "getVotingToken",
-  });
-
-  const {
     data: tokenSupply,
-    isError: error2,
-    isLoading: loading2,
-  } = useReadContract({ 
-    address: tokenAddress as Address,
+    isError,
+    isLoading,
+  } = useReadContract({
+    address: PUB_TOKEN_ADDRESS,
     abi: erc20Abi,
-    functionName: 'totalSupply'
+    functionName: "totalSupply",
   });
 
   return {
-    address: tokenAddress,
+    address: PUB_TOKEN_ADDRESS,
     tokenSupply,
     status: {
-      isLoading: loading1 || loading2,
-      isError: error1 || error2,
+      isLoading,
+      isError,
     },
   };
 }

@@ -1,7 +1,6 @@
 import { useBlockNumber, useReadContract } from "wagmi";
 import { ReactNode, useEffect, useState } from "react";
 import ProposalCard from "@/plugins/dualGovernance/components/proposal";
-import { Address } from "viem";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { Button, IconType } from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/dualGovernance/hooks/useCanCreateProposal";
@@ -10,10 +9,9 @@ import { If, IfNot } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { goerli } from "viem/chains";
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
 const PROPOSALS_PER_PAGE = 10;
-const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS ||
-  "") as Address;
 
 export default function Proposals() {
   const [proposalCount, setProposalCount] = useState(0);
@@ -31,7 +29,7 @@ export default function Proposals() {
   }, [proposalCount, currentPage]);
   
   const { data: proposalCountResponse, isLoading, refetch } = useReadContract({
-    address: PLUGIN_ADDRESS,
+    address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     abi: OptimisticTokenVotingPluginAbi,
     functionName: "proposalCount",
     chainId: goerli.id,

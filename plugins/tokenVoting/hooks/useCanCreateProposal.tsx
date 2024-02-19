@@ -2,9 +2,7 @@ import { Address } from 'viem'
 import { useState, useEffect } from 'react'
 import { useBalance, useAccount, useReadContracts } from 'wagmi';
 import { TokenVotingAbi } from '@/plugins/tokenVoting/artifacts/TokenVoting.sol';
-
-
-const pluginAddress = ((process.env.NEXT_PUBLIC_TOKEN_VOTING_PLUGIN_ADDRESS || "") as Address)
+import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from '@/constants';
 
 export function useCanCreateProposal() {
     const [isCreator, setIsCreator] = useState<boolean>(false);
@@ -16,12 +14,12 @@ export function useCanCreateProposal() {
     const { data: contractReads } = useReadContracts({
         contracts: [
             {
-                address: pluginAddress,
+                address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
                 abi: TokenVotingAbi,
                 functionName: 'minProposerVotingPower',
             },
             {
-                address: pluginAddress,
+                address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
                 abi: TokenVotingAbi,
                 functionName: 'getVotingToken',
             }

@@ -1,25 +1,22 @@
-import { Address } from 'viem'
-import { useAccount, useBlockNumber, useReadContract } from 'wagmi';
-import { TokenVotingAbi } from '@/plugins/tokenVoting/artifacts/TokenVoting.sol';
-import { useEffect } from 'react';
-
-
-const pluginAddress = ((process.env.NEXT_PUBLIC_TOKEN_VOTING_PLUGIN_ADDRESS || "") as Address)
+import { useAccount, useBlockNumber, useReadContract } from "wagmi";
+import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
+import { useEffect } from "react";
+import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 export function useUserCanVote(proposalId: bigint) {
-    const { address } = useAccount()
-    const { data: blockNumber } = useBlockNumber({watch: true})
+  const { address } = useAccount();
+  const { data: blockNumber } = useBlockNumber({ watch: true });
 
-    const { data: canVote, refetch: canVoteRefetch } = useReadContract({
-                address: pluginAddress,
-                abi: TokenVotingAbi,
-                functionName: 'canVote',
-                args: [proposalId, address, 1]
-    })
+  const { data: canVote, refetch: refreshCanVote } = useReadContract({
+    address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+    abi: TokenVotingAbi,
+    functionName: "canVote",
+    args: [proposalId, address, 1],
+  });
 
-    useEffect(() => {
-        canVoteRefetch()
-    }, [blockNumber])
+  useEffect(() => {
+    refreshCanVote();
+  }, [blockNumber]);
 
-    return canVote
+  return canVote;
 }

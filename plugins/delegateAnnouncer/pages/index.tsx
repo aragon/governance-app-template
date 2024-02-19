@@ -1,6 +1,6 @@
 import { usePublicClient, useReadContract } from "wagmi";
 import { useAccount } from "wagmi";
-import { Address, PublicClient, parseAbi } from "viem";
+import { PublicClient, parseAbi } from "viem";
 import { ReactNode } from "react";
 import { If, IfNot } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
@@ -8,26 +8,26 @@ import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useDelegateAnnouncements } from "../hooks/useDelegateAnnouncements";
 import { DelegateCard } from "@/plugins/delegateAnnouncer/components/DelegateCard";
 import { SelfDelegationProfileCard } from "../components/UserDelegateCard";
-
-const TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_TOKEN_ADDRESS || "") as Address;
-const DELEGATION_CONTRACT = (process.env.NEXT_PUBLIC_DELEGATION_CONTRACT_ADDRESS ||
-  "") as Address;
-const DAO_ADDRESS = (process.env.NEXT_PUBLIC_DAO_ADDRESS || "") as Address;
+import {
+  PUB_DAO_ADDRESS,
+  PUB_DELEGATION_CONTRACT_ADDRESS,
+  PUB_TOKEN_ADDRESS,
+} from "@/constants";
 
 export default function DelegateAnnouncements() {
   const publicClient = usePublicClient();
   const account = useAccount();
   const { data: delegates } = useReadContract({
     abi: iVotesAbi,
-    address: TOKEN_ADDRESS,
+    address: PUB_TOKEN_ADDRESS,
     functionName: "delegates",
     args: [account.address!],
   });
   const { delegateAnnouncements, isLoading: delegateAnnouncementsIsLoading } =
     useDelegateAnnouncements(
       publicClient as PublicClient,
-      DELEGATION_CONTRACT,
-      DAO_ADDRESS
+      PUB_DELEGATION_CONTRACT_ADDRESS,
+      PUB_DAO_ADDRESS
     );
 
   const skipRender = useSkipFirstRender();
@@ -37,25 +37,23 @@ export default function DelegateAnnouncements() {
     <MainSection>
       <If condition={account?.address}>
         <SectionView>
-            <h2 className="text-xl font-semibold text-neutral-700 pb-3">
-              Your profile
-            </h2>
-            <SelfDelegationProfileCard
-              address={account.address!}
-              tokenAddress={TOKEN_ADDRESS}
-              delegates={delegates!}
-              message={
-                delegateAnnouncements.findLast(
-                  (an) => an.delegate === account.address
-                )?.message
-              }
-            />
+          <h2 className="text-xl font-semibold text-neutral-700 pb-3">
+            Your profile
+          </h2>
+          <SelfDelegationProfileCard
+            address={account.address!}
+            tokenAddress={PUB_TOKEN_ADDRESS}
+            delegates={delegates!}
+            message={
+              delegateAnnouncements.findLast(
+                (an) => an.delegate === account.address
+              )?.message
+            }
+          />
         </SectionView>
       </If>
 
-      <h2 className="text-3xl font-semibold text-neutral-700">
-        Delegates
-      </h2>
+      <h2 className="text-3xl font-semibold text-neutral-700">Delegates</h2>
       <IfNot condition={delegateAnnouncements.length}>
         <If condition={delegateAnnouncementsIsLoading}>
           <SectionView>
@@ -78,7 +76,7 @@ export default function DelegateAnnouncements() {
               delegates={delegates!}
               delegate={announcement.delegate}
               message={announcement.message}
-              tokenAddress={TOKEN_ADDRESS}
+              tokenAddress={PUB_TOKEN_ADDRESS}
             />
           ))}
         </div>
@@ -88,9 +86,7 @@ export default function DelegateAnnouncements() {
 }
 
 function MainSection({ children }: { children: ReactNode }) {
-  return (
-    <main className="flex flex-col w-screen max-w-full">{children}</main>
-  );
+  return <main className="flex flex-col w-screen max-w-full">{children}</main>;
 }
 
 function SectionView({ children }: { children: ReactNode }) {

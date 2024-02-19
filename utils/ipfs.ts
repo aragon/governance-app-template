@@ -1,8 +1,6 @@
+import { PUB_IPFS_ENDPOINT, PUB_IPFS_API_KEY } from "@/constants";
 import { CID, IPFSHTTPClient } from "ipfs-http-client";
 import { fromHex } from "viem";
-
-const IPFS_ENDPOINT = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
-const IPFS_API_KEY = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
 
 export function fetchJsonFromIpfs(hexIpfsUri: string) {
   return fetchFromIPFS(hexIpfsUri).then((res) => res.json());
@@ -18,10 +16,10 @@ async function fetchFromIPFS(hexIpfsUri: string): Promise<Response> {
   if (!hexIpfsUri || hexIpfsUri === "0x") throw new Error("Invalid IPFS URI");
 
   const path = getPath(hexIpfsUri);
-  const response = await fetch(`${IPFS_ENDPOINT}/cat?arg=${path}`, {
+  const response = await fetch(`${PUB_IPFS_ENDPOINT}/cat?arg=${path}`, {
     method: "POST",
     headers: {
-      "X-API-KEY": IPFS_API_KEY,
+      "X-API-KEY": PUB_IPFS_API_KEY,
       Accept: "application/json",
     },
   });

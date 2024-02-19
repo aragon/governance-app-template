@@ -1,7 +1,7 @@
 export function formatLargeNumber(input: number | string, decimalPlaces: number = 2): string {
     const num = typeof input === 'string' ? parseFloat(input) : input;
   
-    if (isNaN(num)) return "Invalid number";
+    if (isNaN(num)) return "-";
   
     if (num >= 1.0e+9) {
       return (num / 1.0e+9).toFixed(decimalPlaces) + 'B';

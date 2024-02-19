@@ -3,7 +3,7 @@ import { Address, decodeEventLog } from "viem";
 import {
   DEPLOYMENT_TARGET_CHAIN_ID,
   DUAL_GOVERNANCE_ENS_SUBDOMAIN,
-} from "./constants";
+} from "./priv-constants";
 import { publicClient, walletClient } from "../util/client";
 import { ABI as PluginRepoFactoryABI } from "../artifacts/plugin-repo-factory";
 import { ABI as PluginRepoRegistryABI } from "../artifacts/plugin-repo-registry";

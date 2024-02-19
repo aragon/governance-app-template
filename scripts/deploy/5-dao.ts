@@ -6,7 +6,7 @@ import {
   DEPLOYMENT_ENS_SUBDOMAIN,
   DEPLOYMENT_TARGET_CHAIN_ID,
   DEPLOYMENT_TOKEN_RECEIVERS,
-} from "./constants";
+} from "./priv-constants";
 import { Address, Hex, Log, decodeEventLog, toHex } from "viem";
 import { publicClient, walletClient } from "../util/client";
 import { account } from "../util/account";

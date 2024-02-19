@@ -15,7 +15,7 @@ import {
   DEPLOYMENT_TOKEN_NAME,
   DEPLOYMENT_TOKEN_RECEIVERS,
   DEPLOYMENT_TOKEN_SYMBOL,
-} from "./constants";
+} from "./priv-constants";
 
 export async function deployTokenContracts() {
   const daoToken = await deployGovernanceErc20Token();

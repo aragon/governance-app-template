@@ -1,5 +1,5 @@
 import { contracts } from "@aragon/osx-commons-configs";
-import { DEPLOYMENT_TARGET_CHAIN_ID } from "./constants";
+import { DEPLOYMENT_TARGET_CHAIN_ID } from "./priv-constants";
 import { Address } from "viem";
 
 export async function ensurePluginRepo(): Promise<Address> {

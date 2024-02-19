@@ -4,14 +4,17 @@ import {
   DEPLOYMENT_TARGET_CHAIN_ID,
   DUAL_GOVERNANCE_ENS_SUBDOMAIN,
 } from "./priv-constants";
-import { publicClient, walletClient } from "../util/client";
-import { ABI as PluginRepoFactoryABI } from "../artifacts/plugin-repo-factory";
-import { ABI as PluginRepoRegistryABI } from "../artifacts/plugin-repo-registry";
+import {
+  deploymentPublicClient as publicClient,
+  deploymentWalletClient as walletClient,
+} from "../lib/util/client";
+import { deploymentAccount as account } from "../lib/util/account";
+import { ABI as PluginRepoFactoryABI } from "../lib/artifacts/plugin-repo-factory";
+import { ABI as PluginRepoRegistryABI } from "../lib/artifacts/plugin-repo-registry";
 import {
   ABI as DualGovernancePluginSetupABI,
   BYTECODE as DualGovernancePluginSetupBytecode,
-} from "../artifacts/dual-governance-plugin-setup";
-import { account } from "../util/account";
+} from "../lib/artifacts/dual-governance-plugin-setup";
 
 export async function deployPlugin(
   governanceErc20Base: Address,

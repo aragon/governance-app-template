@@ -1,6 +1,9 @@
 import { toHex } from "viem";
-import { publicClient, walletClient } from "./util/client";
-import { account } from "./util/account";
+import {
+  deploymentPublicClient as publicClient,
+  deploymentWalletClient as walletClient,
+} from "./lib/util/client";
+import { deploymentAccount as account } from "./lib/util/account";
 import { DelegateAnnouncerAbi } from "../plugins/delegateAnnouncer/artifacts/DelegateAnnouncer.sol";
 
 async function main() {

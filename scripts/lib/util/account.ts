@@ -3,4 +3,4 @@ import { getEnv } from "./env";
 
 const PRIVATE_KEY = getEnv("DEPLOYMENT_WALLET_PRIVATE_KEY", true) as Address;
 
-export const account = privateKeyToAccount(PRIVATE_KEY);
+export const deploymentAccount = privateKeyToAccount(PRIVATE_KEY);

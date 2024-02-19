@@ -1,6 +1,9 @@
-import { publicClient, walletClient } from "../util/client";
-import { ABI, BYTECODE } from "../artifacts/delegate-announcer";
-import { account } from "../util/account";
+import {
+  deploymentPublicClient as publicClient,
+  deploymentWalletClient as walletClient,
+} from "../lib/util/client";
+import { deploymentAccount as account } from "../lib/util/account";
+import { ABI, BYTECODE } from "../lib/artifacts/delegate-announcer";
 import { Address } from "viem";
 
 export async function deployContract(): Promise<Address> {

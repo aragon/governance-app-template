@@ -4,6 +4,7 @@ import { Address, PublicClient, getAbiItem, fromHex } from "viem";
 // import { useBlockNumber } from "wagmi";
 import { DelegateAnnounce } from "../utils/types";
 
+const DELEGATION_ANNOUNCEMENTS_START = BigInt(process.env.NEXT_PUBLIC_DELEGATION_ANNOUNCEMENTS_START || "0");
 const AnnounceDelegationEvent = getAbiItem({abi: DelegateAnnouncerAbi, name: "AnnounceDelegation"})
 
 export function useDelegateAnnouncements(
@@ -23,7 +24,7 @@ export function useDelegateAnnouncements(
             args: {
                 dao: daoAddress
             } as any,
-            fromBlock: BigInt(10541166),
+            fromBlock: DELEGATION_ANNOUNCEMENTS_START,
             toBlock: 'latest'
         }).then((logs: any) => {
             setDelegateAnnouncements(

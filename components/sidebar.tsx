@@ -6,7 +6,7 @@ import { useState } from "react";
 import { plugins } from "@/plugins";
 import { ParsedUrlQuery } from "querystring";
 import { resolveQueryParam } from "@/utils/query";
-import { DISCORD_URL } from "@/constants";
+import { PUB_DISCORD_URL } from "@/constants";
 
 const Sidebar = () => {
   const { pathname, query } = useRouter();
@@ -124,7 +124,7 @@ const Sidebar = () => {
             <li
               className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 rounded-lg shadow-lg hover:bg-neutral-200`}
             >
-              <Link href={DISCORD_URL} className="flex items-center w-full p-3">
+              <Link href={PUB_DISCORD_URL} className="flex items-center w-full p-3">
                 <Icon
                   className="mr-2"
                   icon={IconType.QUESTION}

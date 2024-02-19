@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import Blockies from "react-blockies";
 import { VoteCastEvent } from "@/plugins/tokenVoting/utils/types";
 import { formatUnits } from "viem";
-import { ReactNode } from "react";
 import { AddressText } from "@/components/text/address";
 import { Card, Tag } from '@aragon/ods'
 import { formatLargeNumber } from "@/utils/formatNumber";

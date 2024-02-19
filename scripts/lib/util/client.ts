@@ -3,7 +3,7 @@ import { deploymentAccount as account } from "./account";
 import { getEnv } from "./env";
 import { goerli } from "viem/chains";
 
-const ALCHEMY_KEY = getEnv("DEPLOYMENT_ALCHEMY_KEY", true);
+const ALCHEMY_KEY = getEnv("DEPLOYMENT_ALCHEMY_API_KEY", true);
 
 export const deploymentPublicClient = createPublicClient({
   chain: goerli,

@@ -6,17 +6,20 @@ import {
   DEPLOYMENT_ENS_SUBDOMAIN,
   DEPLOYMENT_TARGET_CHAIN_ID,
   DEPLOYMENT_TOKEN_RECEIVERS,
-} from "./constants";
+} from "./priv-constants";
 import { Address, Hex, Log, decodeEventLog, toHex } from "viem";
-import { publicClient, walletClient } from "../util/client";
-import { account } from "../util/account";
+import {
+  deploymentPublicClient as publicClient,
+  deploymentWalletClient as walletClient,
+} from "../lib/util/client";
+import { deploymentAccount as account } from "../lib/util/account";
 import { uploadToIPFS } from "@/utils/ipfs";
-import { ipfsClient } from "../util/ipfs";
-import { ABI as DaoFactoryABI } from "../artifacts/dao-factory";
-import { ABI as DaoRegistryABI } from "../artifacts/dao-registry";
-import { ABI as PluginSetupProcessorABI } from "../artifacts/plugin-setup-processor";
-import { PREPARE_INSTALLATION_ABI as TokenVotingPrepareInstallationAbi } from "../artifacts/token-voting-plugin-setup";
-import { PREPARE_INSTALLATION_ABI as DualGovernancePrepareInstallationAbi } from "../artifacts/dual-governance-plugin-setup";
+import { deploymentIpfsClient as ipfsClient } from "../lib/util/ipfs";
+import { ABI as DaoFactoryABI } from "../lib/artifacts/dao-factory";
+import { ABI as DaoRegistryABI } from "../lib/artifacts/dao-registry";
+import { ABI as PluginSetupProcessorABI } from "../lib/artifacts/plugin-setup-processor";
+import { PREPARE_INSTALLATION_ABI as TokenVotingPrepareInstallationAbi } from "../lib/artifacts/token-voting-plugin-setup";
+import { PREPARE_INSTALLATION_ABI as DualGovernancePrepareInstallationAbi } from "../lib/artifacts/dual-governance-plugin-setup";
 import { encodeAbiParameters } from "viem";
 
 const EXPECTED_PLUGIN_COUNT = 2;

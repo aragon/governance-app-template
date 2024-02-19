@@ -1,6 +1,5 @@
 import { usePublicClient, useWriteContract } from "wagmi";
 import { useState, useEffect } from "react";
-import { Address } from "viem";
 import { useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
 import { useProposalVetoes } from "@/plugins/dualGovernance/hooks/useProposalVetoes";
 import { ToggleGroup, Toggle } from "@aragon/ods";
@@ -16,10 +15,9 @@ import { Else, IfCase, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { goerli } from "viem/chains";
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
 type BottomSection = "description" | "vetoes";
-
-const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS || "") as Address;
 
 export default function ProposalDetail({ id: proposalId}: {id: string}) {
   const skipRender = useSkipFirstRender();
@@ -27,13 +25,13 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
 
   const { proposal, status: proposalFetchStatus } = useProposal(
     publicClient,
-    PLUGIN_ADDRESS,
+    PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     proposalId,
     true
   );
   const vetoes = useProposalVetoes(
     publicClient,
-    PLUGIN_ADDRESS,
+    PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     proposalId,
     proposal
   );
@@ -51,7 +49,7 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
   const vetoProposal = () => {
     vetoWrite({
       abi: OptimisticTokenVotingPluginAbi,
-      address: PLUGIN_ADDRESS,
+      address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
       functionName: "veto",
       args: [proposalId],
     });

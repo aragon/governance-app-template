@@ -1,6 +1,6 @@
 import { SupportedNetworks } from "@aragon/osx-commons-configs";
-import { account } from "../util/account";
-import { getEnv } from "../util/env";
+import { deploymentAccount as account } from "../lib/util/account";
+import { getEnv } from "../lib/util/env";
 import { parseEther } from "viem";
 
 // NETWORK

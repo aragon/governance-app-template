@@ -8,8 +8,9 @@ import { Else, If, IfCase, IfNot, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { AddressText } from "@/components/text/address";
 import { isAddress } from "@/utils/evm";
+import * as DOMPurify from "dompurify";
 import { goerli } from "viem/chains";
-import * as DOMPurify from 'dompurify';
+import { PUB_ETHERSCAN_API_KEY } from "@/constants";
 
 const DEFAULT_PROPOSAL_SUMMARY = "(No description available)";
 
@@ -19,16 +20,14 @@ type FunctionData = {
   to: Address;
 };
 
-const etherscanKey: string = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY || "";
-
 export default function ProposalDescription(proposal: Proposal) {
-  const publicClient = usePublicClient({chainId: goerli.id});
+  const publicClient = usePublicClient({ chainId: goerli.id });
   const [decodedActions, setDecodedActions] = useState<FunctionData[]>([]);
   const proposalActions = proposal?.actions || [];
 
   const getFunctionData = async (action: Action) => {
     const abiLoader = new whatsabi.loaders.EtherscanABILoader({
-      apiKey: etherscanKey,
+      apiKey: PUB_ETHERSCAN_API_KEY,
     });
 
     const { abi } = await whatsabi.autoload(action.to, {
@@ -64,12 +63,13 @@ export default function ProposalDescription(proposal: Proposal) {
 
   return (
     <div className="pt-2">
-      <div className="pb-6"
+      <div
+        className="pb-6"
         dangerouslySetInnerHTML={{
-              __html: proposal.summary
-                ? DOMPurify.sanitize(proposal.summary)
-                : DEFAULT_PROPOSAL_SUMMARY
-            }}
+          __html: proposal.summary
+            ? DOMPurify.sanitize(proposal.summary)
+            : DEFAULT_PROPOSAL_SUMMARY,
+        }}
       />
       <h2 className="flex-grow text-2xl text-neutral-900 font-semibold pt-10 pb-3">
         Actions

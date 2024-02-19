@@ -3,10 +3,7 @@ import { useState, useEffect } from 'react'
 import { useBalance, useAccount, useReadContracts } from 'wagmi';
 import { OptimisticTokenVotingPluginAbi } from '@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol';
 import { goerli } from 'viem/chains';
-
-
-const pluginAddress = ((process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS || "") as Address)
-// const daoAddress = ((process.env.NEXT_PUBLIC_DAO_ADDRESS || "") as Address)
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from '@/constants';
 
 export function useCanCreateProposal() {
     const [isCreator, setIsCreator] = useState<boolean>(false);
@@ -19,13 +16,13 @@ export function useCanCreateProposal() {
         contracts: [
             {
                 chainId: goerli.id,
-                address: pluginAddress,
+                address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
                 abi: OptimisticTokenVotingPluginAbi,
                 functionName: 'minProposerVotingPower',
             },
             {
                 chainId: goerli.id,
-                address: pluginAddress,
+                address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
                 abi: OptimisticTokenVotingPluginAbi,
                 functionName: 'getVotingToken',
             }

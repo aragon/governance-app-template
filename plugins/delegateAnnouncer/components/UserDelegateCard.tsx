@@ -11,9 +11,7 @@ import { iVotesAbi } from "../artifacts/iVotes.sol";
 import { formatHexString } from "@/utils/evm";
 import { DelegateAnnouncerAbi } from "@/plugins/delegateAnnouncer/artifacts/DelegateAnnouncer.sol";
 import * as DOMPurify from 'dompurify'
-
-const DELEGATION_CONTRACT = (process.env.NEXT_PUBLIC_DELEGATION_CONTRACT || "") as Address;
-const DAO_ADDRESS = (process.env.NEXT_PUBLIC_DAO_ADDRESS || "") as Address;
+import { PUB_DAO_ADDRESS, PUB_DELEGATION_CONTRACT_ADDRESS } from "@/constants";
 
 type SelfDelegationProfileCardProps = {
     address: Address;
@@ -54,9 +52,9 @@ export const SelfDelegationProfileCard = ({ address, tokenAddress, message, dele
     const announceDelegate = () => {
         delegateAnnouncementWrite({
             abi: DelegateAnnouncerAbi,
-            address: DELEGATION_CONTRACT,
+            address: PUB_DELEGATION_CONTRACT_ADDRESS,
             functionName: 'announceDelegation',
-            args: [DAO_ADDRESS, toHex(inputDescription!)]
+            args: [PUB_DAO_ADDRESS, toHex(inputDescription!)]
         })
     }
 
@@ -78,7 +76,7 @@ export const SelfDelegationProfileCard = ({ address, tokenAddress, message, dele
             <div className="text-md text-neutral-500 m-1 grow">
                 <If condition={message}>
                     <div dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(message)
+                        __html: DOMPurify.sanitize(message ?? "")
                     }}/>
                 </If>
                 <If condition={!message}>

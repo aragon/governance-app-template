@@ -8,12 +8,11 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import { isAddress } from "@/utils/evm";
 import { Action } from "@/utils/types";
 import { If, IfNot } from "@/components/if";
+import { PUB_ETHERSCAN_API_KEY } from "@/constants";
 
 interface CustomActionInputProps {
     setActions: (actions: Action[]) => any;
 }
-
-const etherscanKey: string = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY || "";
 
 const CustomActionInput: FC<CustomActionInputProps> = ({ setActions }) => {
     const publicClient = usePublicClient()
@@ -25,7 +24,7 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setActions }) => {
     const [to, setTo] = useState<Address>()
     const [data, setCallData] = useState<Address>(`0x`)
 
-    const handleInputChange = (setter: Function) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (setter: (value: any) => void) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setter(event?.target?.value);
     }
 
@@ -34,7 +33,9 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setActions }) => {
         else if (!isAddress(to)) return
 
         setLoadingAbi(true)
-        const abiLoader = new whatsabi.loaders.EtherscanABILoader({ apiKey: etherscanKey });
+        const abiLoader = new whatsabi.loaders.EtherscanABILoader({
+            apiKey: PUB_ETHERSCAN_API_KEY
+        });
         const { abi } = await whatsabi.autoload(to!, {
             provider: publicClient,
             abiLoader,

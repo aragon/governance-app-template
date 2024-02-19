@@ -9,6 +9,7 @@ import { Else, If, IfCase, IfNot, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { AddressText } from "@/components/text/address";
 import { isAddress } from "@/utils/evm";
+import { PUB_ETHERSCAN_API_KEY } from "@/constants";
 
 const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(No description available)";
 
@@ -17,8 +18,6 @@ type FunctionData = {
   functionName: string;
   to: Address;
 };
-
-const etherscanKey: string = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY || "";
 
 export default function ProposalDescription(proposal: Proposal) {
   const publicClient = usePublicClient();
@@ -30,7 +29,7 @@ export default function ProposalDescription(proposal: Proposal) {
 
   const getFunctionData = async (action: Action) => {
     const abiLoader = new whatsabi.loaders.EtherscanABILoader({
-      apiKey: etherscanKey,
+      apiKey: PUB_ETHERSCAN_API_KEY,
     });
 
     const { abi } = await whatsabi.autoload(action.to, {

@@ -1,21 +1,24 @@
-import { publicClient, walletClient } from "../util/client";
+import {
+  deploymentPublicClient as publicClient,
+  deploymentWalletClient as walletClient,
+} from "../lib/util/client";
+import { deploymentAccount as account } from "../lib/util/account";
 import {
   ABI as GovernanceErc20ABI,
   BYTECODE as GovernanceErc20Bytecode,
-} from "../artifacts/governance-erc20";
+} from "../lib/artifacts/governance-erc20";
 import {
   ABI as GovernanceWrappedErc20ABI,
   BYTECODE as GovernanceWrappedErc20Bytecode,
-} from "../artifacts/governance-wrapped-erc20";
+} from "../lib/artifacts/governance-wrapped-erc20";
 import { Address } from "viem";
-import { account } from "../util/account";
 import {
   ADDRESS_ZERO,
   DEPLOYMENT_TOKEN_AMOUNTS,
   DEPLOYMENT_TOKEN_NAME,
   DEPLOYMENT_TOKEN_RECEIVERS,
   DEPLOYMENT_TOKEN_SYMBOL,
-} from "./constants";
+} from "./priv-constants";
 
 export async function deployTokenContracts() {
   const daoToken = await deployGovernanceErc20Token();

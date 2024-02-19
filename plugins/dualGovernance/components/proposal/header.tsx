@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { AlertInline, Button, Tag } from "@aragon/ods";
+import { useEffect } from "react";
+import { Button, Tag } from "@aragon/ods";
 import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { IAlertCardProps } from "@aragon/ods";
 import { Else, If, IfCase, Then } from "@/components/if";
@@ -7,18 +7,17 @@ import { AddressText } from "@/components/text/address";
 import { useWriteContract } from "wagmi";
 import { goerli } from "viem/chains";
 import { OptimisticTokenVotingPluginAbi } from "../../artifacts/OptimisticTokenVotingPlugin.sol";
-import { Address } from "viem";
 import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
 import { useProposalVariantStatus } from "../../hooks/useProposalVariantStatus";
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
-const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS || "") as Address;
 
 interface ProposalHeaderProps {
   proposalNumber: number;
   proposal: Proposal;
   userCanVeto: boolean;
-  onVetoPressed: Function;
+  onVetoPressed: () => void;
 }
 type AlertVariant = IAlertCardProps["variant"];
 
@@ -36,7 +35,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
     executeWrite({
       chainId: goerli.id,
       abi: OptimisticTokenVotingPluginAbi,
-      address: PLUGIN_ADDRESS,
+      address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
       functionName: 'execute',
       args: [proposalNumber]
     })

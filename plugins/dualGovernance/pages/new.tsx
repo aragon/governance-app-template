@@ -3,7 +3,7 @@ import { Button, IconType, Icon, InputText, TextAreaRichText } from '@aragon/ods
 import React, { useEffect, useState } from 'react'
 import { uploadToIPFS } from '@/utils/ipfs'
 import { useWriteContract } from 'wagmi';
-import { Address, toHex } from 'viem'
+import { toHex } from 'viem'
 import { OptimisticTokenVotingPluginAbi } from '@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol';
 import { useAlertContext } from '@/context/AlertContext';
 import WithdrawalInput from '@/components/input/withdrawal'
@@ -11,10 +11,11 @@ import CustomActionInput from '@/components/input/custom-action'
 import { Action } from '@/utils/types'
 import { getPlainText } from '@/utils/html';
 import { goerli } from 'viem/chains';
-
-const IPFS_ENDPOINT = process.env.NEXT_PUBLIC_IPFS_ENDPOINT || "";
-const IPFS_KEY = process.env.NEXT_PUBLIC_IPFS_API_KEY || "";
-const PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS || "") as Address
+import {
+    PUB_IPFS_ENDPOINT,
+    PUB_IPFS_API_KEY,
+    PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS
+} from '@/constants';
 
 enum ActionType {
     Signaling,
@@ -23,8 +24,8 @@ enum ActionType {
 }
 
 const ipfsClient = create({
-    url: IPFS_ENDPOINT,
-    headers: { 'X-API-KEY': IPFS_KEY, 'Accept': 'application/json' }
+    url: PUB_IPFS_ENDPOINT,
+    headers: { 'X-API-KEY': PUB_IPFS_API_KEY, 'Accept': 'application/json' }
 });
 
 export default function Create() {
@@ -72,7 +73,7 @@ export default function Create() {
         createProposalWrite({
             chainId: goerli.id,
             abi: OptimisticTokenVotingPluginAbi,
-            address: PLUGIN_ADDRESS,
+            address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
             functionName: 'createProposal',
             args: [toHex(ipfsPin), actions, 0, 0, 0],
         })

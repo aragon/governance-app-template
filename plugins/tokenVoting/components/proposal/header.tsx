@@ -12,7 +12,7 @@ interface ProposalHeaderProps {
   proposal: Proposal;
   userVote: number | undefined;
   userCanVote: boolean;
-  onShowVotingModal: Function;
+  onShowVotingModal: () => void;
 }
 type AlertVariant = IAlertCardProps["variant"];
 

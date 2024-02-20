@@ -15,7 +15,7 @@ const Header = () => {
   if (skipRender) return <></>;
 
   return (
-    <div className="flex flex-row-reverse w-full mt-5 h-24">
+    <div className="flex flex-row-reverse w-full mt-5 h-14 md:h-24">
       <IfCase condition={isConnected}>
         <Then>
           <div><WalletContainer /> </div>

@@ -38,7 +38,10 @@ const WalletContainer = () => {
   if (skipRender) return <></>;
 
   return (
-    <Card className="px-1 py-1 flex items-center border border-neutral-200 !rounded-full hover:drop-shadow cursor-pointer" onClick={() => open()} >
+    <Card className="
+        px-1 py-1 flex items-center border border-neutral-200 !rounded-full hover:drop-shadow cursor-pointer
+        absolute top-0 right-0 m-2 md:relative md:top-auto md:right-auto md:m-0 
+    " onClick={() => open()} >
       <Link className="mx-3 !text-sm" variant="neutral">{result.data ? result.data : formatHexString(address as Address)}</Link>
       <Avatar
         src={avatarResult.data ? avatarResult.data : '/profile.jpg'}

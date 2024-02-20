@@ -2,7 +2,7 @@ import { create } from 'ipfs-http-client';
 import { Button, IconType, Icon, InputText, TextAreaRichText } from '@aragon/ods'
 import React, { useEffect, useState } from 'react'
 import { uploadToIPFS } from '@/utils/ipfs'
-import { useWriteContract } from 'wagmi';
+import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { toHex } from 'viem'
 import { TokenVotingAbi } from '@/plugins/tokenVoting/artifacts/TokenVoting.sol';
 import { useAlertContext } from '@/context/AlertContext';
@@ -10,6 +10,9 @@ import WithdrawalInput from '@/components/input/withdrawal'
 import CustomActionInput from '@/components/input/custom-action'
 import { Action } from '@/utils/types'
 import { getPlainText } from '@/utils/html';
+import { useRouter } from 'next/router';
+import { Else, IfCase, Then } from '@/components/if';
+import { PleaseWaitSpinner } from '@/components/please-wait';
 import {
     PUB_IPFS_API_KEY,
     PUB_IPFS_ENDPOINT,
@@ -28,11 +31,19 @@ const ipfsClient = create({
 });
 
 export default function Create() {
+    const { push } = useRouter()
     const [title, setTitle] = useState<string>('');
     const [summary, setSummary] = useState<string>('');
     const [actions, setActions] = useState<Action[]>([]);
     const { addAlert } = useAlertContext()
-    const { writeContract: createProposalWrite, data: proposalCreated } = useWriteContract();
+    const {
+        writeContract: createProposalWrite,
+        data: createTxHash,
+        status,
+        error
+    } = useWriteContract();
+    const { isLoading: isConfirming, isSuccess: isConfirmed } =
+        useWaitForTransactionReceipt({ hash: createTxHash });
     const [actionType, setActionType] = useState<ActionType>(ActionType.Signaling)
 
     const changeActionType = (actionType: ActionType) => {
@@ -41,9 +52,26 @@ export default function Create() {
     }
 
     useEffect(() => {
-       if(proposalCreated) addAlert("The proposal has been created", proposalCreated)
-    }, [proposalCreated])
-
+        if (status === "idle" || status === "pending") return;
+        else if (status === "error") {
+            if (error?.message?.startsWith("User rejected the request")) return;
+            alert("Could not create the proposal");
+            return;
+        }
+    
+        // success
+        if (!createTxHash) return;
+        else if (isConfirming) {
+            addAlert("The proposal has been submitted", createTxHash);
+            return;
+        } else if (!isConfirmed) return;
+    
+        addAlert("The proposal has been confirmed", createTxHash);
+        setTimeout(() => {
+            push("#/");
+        }, 1000 * 2);
+      }, [status, createTxHash, isConfirming, isConfirmed]);
+    
     const submitProposal = async () => {
         // Check metadata
         if (!title.trim()) return alert("Please, enter a title");
@@ -80,6 +108,8 @@ export default function Create() {
     const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTitle(event?.target?.value);
     };
+
+    const showLoading = status === "pending" || isConfirming;
 
     return (
         <section className="flex flex-col items-center w-screen max-w-full min-w-full">
@@ -145,14 +175,23 @@ export default function Create() {
                     </div>
                 </div>
 
-                <Button
-                    className='mt-14 mb-6'
-                    size="lg"
-                    variant='primary'
-                    onClick={() => submitProposal()}
-                >
-                    Submit
-                </Button>
+                <IfCase condition={showLoading}>
+                    <Then>
+                        <div className="mt-14 mb-6">
+                        <PleaseWaitSpinner fullMessage="Confirming transaction..." />
+                        </div>
+                    </Then>
+                    <Else>
+                        <Button
+                        className="mt-14 mb-6"
+                        size="lg"
+                        variant="primary"
+                        onClick={() => submitProposal()}
+                        >
+                        Submit
+                        </Button>
+                    </Else>
+                </IfCase>
             </div>
         </section>
     )

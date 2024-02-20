@@ -92,7 +92,7 @@ export function useProposal(
     isSuccess: metadataReady,
     error: metadataError,
   } = useQuery<ProposalMetadata, Error>({
-    queryKey: [`tokenVotingProposal-${address}-${proposalId}`],
+    queryKey: [`tokenVotingProposal-${address}-${proposalId}`, metadataUri!],
     queryFn: () =>
       metadataUri ? fetchJsonFromIpfs(metadataUri) : Promise.resolve(null),
     enabled: !!metadataUri,

@@ -78,9 +78,9 @@ export default function ProposalCard(props: ProposalInputs) {
   }
 
   return (
-    <Link href={`#/proposals/${props.proposalId}`}>
+    <Link href={`#/proposals/${props.proposalId}`} className="w-full">
       <Card className="w-full mb-4 p-5">
-        <div className="">
+        <div className="w-full">
           <If condition={proposal.tally}>
             <div className="flex mb-2">
               <Tag

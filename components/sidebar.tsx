@@ -7,6 +7,8 @@ import { plugins } from "@/plugins";
 import { ParsedUrlQuery } from "querystring";
 import { resolveQueryParam } from "@/utils/query";
 import { PUB_DISCORD_URL } from "@/constants";
+import { Else, IfCase, Then } from "./if";
+import { CloseIcon, MenuIcon } from "./icons";
 
 const Sidebar = () => {
   const { pathname, query } = useRouter();
@@ -22,21 +24,14 @@ const Sidebar = () => {
       className="md:hidden block absolute mt-2 ml-2 z-50"
       onClick={() => setIsOpen(!isOpen)}
     >
-      <svg className="h-6 w-6 fill-current" viewBox="0 0 24 24">
-        {isOpen ? (
-          <path
-            fillRule="evenodd"
-            d="M18.278 16.864a1 1 0 01-1.414 1.414l-8-8a1 1 0 011.414-1.414l8 8zm0-6a1 1 0 01-1.414 1.414l-8-8a1 1 0 011.414-1.414l8 8z"
-            clipRule="evenodd"
-          />
-        ) : (
-          <path
-            fillRule="evenodd"
-            d="M4 5h16a1 1 0 010 2H4a1 1 0 110-2zm0 6h16a1 1 0 010 2H4a1 1 0 010-2zm0 6h16a1 1 0 010 2H4a1 1 0 010-2z"
-            clipRule="evenodd"
-          />
-        )}
-      </svg>
+      <IfCase condition={isOpen}>
+        <Then>
+          <CloseIcon className="h-6 w-6 fill-current" />
+        </Then>
+        <Else>
+          <MenuIcon className="h-6 w-6 fill-current" />
+        </Else>
+      </IfCase>
     </Button>
   );
 
@@ -44,12 +39,12 @@ const Sidebar = () => {
     <header className="h-screen">
       <SidebarSwitchButton />
       <div
-        className={`md:w-72 bg-neutral-100 h-full flex flex-col justify-between ${
+        className={`md:w-72 bg-neutral-50 md:bg-neutral-100 h-full flex flex-col justify-between z-40 ${
           isOpen ? "absolute md:relative w-full" : "hidden md:block"
         }`}
       >
         <div className="flex-1 grow">
-          <div className="w-full flex items-center pt-14 py-3 px-3 md:pt-3">
+          <div className="w-full flex items-center pt-14 py-3 px-3 md:pt-6">
             <Image
               src="/logo-bw-lg.png"
               width="60"
@@ -65,13 +60,13 @@ const Sidebar = () => {
               Aragonette
             </Link>
           </div>
-          <ul className="mt-12 px-6">
+          <ul className="mt-6 px-6">
             {/* Home page */}
             <li
               onClick={() => setIsOpen(false)}
               className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 ${
-                isHome ? "bg-neutral-200 font-semibold" : ""
-              } rounded-lg shadow-lg hover:bg-neutral-200`}
+                isHome ? "bg-neutral-100 md:bg-neutral-200 font-semibold" : ""
+              } rounded-lg shadow-lg hover:bg-neutral-100 md:hover:bg-neutral-200`}
             >
               <Link href="/" className="flex items-center w-full p-3">
                 <Icon
@@ -99,9 +94,9 @@ const Sidebar = () => {
                 onClick={() => setIsOpen(false)}
                 className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 ${
                   plugin.id === pluginId
-                    ? "bg-neutral-200 rounded-lg shadow-lg"
+                    ? "bg-neutral-100 md:bg-neutral-200 font-semibold rounded-lg shadow-lg"
                     : ""
-                } rounded-lg shadow-lg hover:bg-neutral-200`}
+                } rounded-lg shadow-lg hover:bg-neutral-100 md:hover:bg-neutral-200`}
               >
                 <Link
                   href={"/plugins/" + plugin.id + "/#/"}
@@ -122,9 +117,12 @@ const Sidebar = () => {
 
             {/* Other links */}
             <li
-              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 rounded-lg shadow-lg hover:bg-neutral-200`}
+              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 rounded-lg shadow-lg hover:bg-neutral-100 md:hover:bg-neutral-200`}
             >
-              <Link href={PUB_DISCORD_URL} className="flex items-center w-full p-3">
+              <Link
+                href={PUB_DISCORD_URL}
+                className="flex items-center w-full p-3"
+              >
                 <Icon
                   className="mr-2"
                   icon={IconType.QUESTION}

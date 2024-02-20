@@ -90,14 +90,22 @@ export const SelfDelegationProfileCard = ({ address, tokenAddress, message, dele
                 </If>
             </div>
             <div className="flex flex-row gap-2">
-            <If condition={delegates !== address}>
-                <div className="mt-1">
-                    <Button variant="secondary" size="sm" onClick={() => delegateTo()}>Delegate</Button>
-                </div>
-            </If>
-                <div className="mt-1">
-                    <Button variant="primary" size="sm" state={inputDescription === '<p></p>' || !inputDescription ? 'disabled' : ''} onClick={() => announceDelegate()}>Announce yourself!</Button>
-                </div>
+                <If condition={delegates !== address}>
+                    <div className="mt-1">
+                        <Button variant="secondary" size="sm" onClick={() => delegateTo()}>Delegate</Button>
+                    </div>
+                </If>
+                <If condition={!message}>
+                    <div className="mt-1">
+                        <Button 
+                            variant="primary" 
+                            size="sm" 
+                            state={inputDescription === '<p></p>' || !inputDescription ? 'disabled' : undefined} 
+                            onClick={() => announceDelegate()}>
+                                Announce yourself
+                        </Button>
+                    </div>
+                </If>
             </div>
         </Card>
     )

@@ -25,13 +25,13 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const publicClient = usePublicClient();
 
   const { proposal, status: proposalFetchStatus } = useProposal(
-    publicClient,
+    publicClient!,
     PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
     proposalId,
     true
   );
   const votes = useProposalVotes(
-    publicClient,
+    publicClient!,
     PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
     proposalId,
     proposal

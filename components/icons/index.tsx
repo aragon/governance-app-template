@@ -1,5 +1,6 @@
 export const CloseIcon = ({ className }: { className?: string }) => (
   <svg
+    className={className ?? ""}
     height="24"
     viewBox="0 0 48 48"
     width="24"

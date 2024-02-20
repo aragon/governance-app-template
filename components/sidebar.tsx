@@ -115,12 +115,13 @@ const Sidebar = () => {
               </li>
             ))}
 
-            {/* Other links */}
+            {/* External links */}
             <li
               className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 rounded-lg shadow-lg hover:bg-neutral-100 md:hover:bg-neutral-200`}
             >
               <Link
                 href={PUB_DISCORD_URL}
+                target="_blank"
                 className="flex items-center w-full p-3"
               >
                 <Icon

@@ -28,6 +28,8 @@ export default function ProposalDescription(proposal: Proposal) {
     : DEFAULT_PROPOSAL_METADATA_SUMMARY;
 
   const getFunctionData = async (action: Action) => {
+    if (!publicClient) return;
+
     const abiLoader = new whatsabi.loaders.EtherscanABILoader({
       apiKey: PUB_ETHERSCAN_API_KEY,
     });

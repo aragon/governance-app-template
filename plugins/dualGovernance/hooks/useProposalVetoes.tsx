@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Address, getAbiItem } from "viem";
-import { PublicClient } from "wagmi";
+import { PublicClient } from "viem";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import {
   Proposal,
@@ -8,7 +8,10 @@ import {
   VoteCastResponse,
 } from "@/plugins/dualGovernance/utils/types";
 
-const event = getAbiItem({ abi: OptimisticTokenVotingPluginAbi, name: "VetoCast" });
+const event = getAbiItem({
+  abi: OptimisticTokenVotingPluginAbi,
+  name: "VetoCast",
+});
 
 export function useProposalVetoes(
   publicClient: PublicClient,
@@ -21,15 +24,16 @@ export function useProposalVetoes(
   async function getLogs() {
     if (!proposal?.parameters?.snapshotBlock) return;
 
-    const logs: VoteCastResponse[] = await publicClient.getLogs({
+    const logs: VoteCastResponse[] = (await publicClient.getLogs({
       address,
-      event,
+      event: event as any,
       args: {
         proposalId,
       } as any,
       fromBlock: proposal.parameters.snapshotBlock,
       toBlock: "latest", // TODO: Make this variable between 'latest' and proposal last block
-    });
+    })) as any;
+
     const newLogs = logs.flatMap((log) => log.args);
     if (newLogs.length > proposalLogs.length) setLogs(newLogs);
   }

@@ -1,14 +1,12 @@
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Button } from "@aragon/ods";
 import { useAccount } from "wagmi";
-import { Address } from "viem"
 import { Else, IfCase, Then } from "@/components/if";
-import { formatHexString } from "@/utils/evm";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import WalletContainer from "./WalletContainer";
 
 const Header = () => {
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const { open } = useWeb3Modal();
 
   const skipRender = useSkipFirstRender();
@@ -18,7 +16,9 @@ const Header = () => {
     <div className="flex flex-row-reverse w-full mt-5 h-24">
       <IfCase condition={isConnected}>
         <Then>
-          <div><WalletContainer /> </div>
+          <div>
+            <WalletContainer />{" "}
+          </div>
         </Then>
         <Else>
           <Button size="md" variant="primary" onClick={() => open()}>

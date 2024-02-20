@@ -9,6 +9,7 @@ import { OptimisticTokenVotingPluginAbi } from "../../artifacts/OptimisticTokenV
 import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
 import { useProposalVariantStatus } from "../../hooks/useProposalVariantStatus";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { PleaseWaitSpinner } from "@/components/please-wait";
 
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 
@@ -16,6 +17,7 @@ interface ProposalHeaderProps {
   proposalNumber: number;
   proposal: Proposal;
   userCanVeto: boolean;
+  transactionLoading: boolean;
   onVetoPressed: () => void;
 }
 
@@ -23,6 +25,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposalNumber,
   proposal,
   userCanVeto,
+  transactionLoading,
   onVetoPressed,
 }) => {
   const { writeContract: executeWrite, data: executeResponse } = useWriteContract()
@@ -66,14 +69,23 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
         <div className="flex ">
           <IfCase condition={userCanVeto}>
             <Then>
-              <Button
-                className="flex h-5 items-center"
-                size="lg"
-                variant="primary"
-                onClick={() => onVetoPressed()}
-              >
-                Veto
-              </Button>
+              <IfCase condition={!transactionLoading}>
+                <Then>
+                  <Button
+                    className="flex h-5 items-center"
+                    size="lg"
+                    variant="primary"
+                    onClick={() => onVetoPressed()}
+                    >
+                      Veto
+                  </Button>
+                </Then>
+                <Else>
+                  <div>
+                    <PleaseWaitSpinner fullMessage="Confirming..." />
+                  </div>
+                </Else>
+              </IfCase>
             </Then>
             <Else>
               <If condition={proposalVariant.label === 'Executable'}>

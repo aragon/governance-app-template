@@ -1,4 +1,8 @@
-import { usePublicClient, useWriteContract } from "wagmi";
+import {
+  usePublicClient,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { useState, useEffect } from "react";
 import { useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
 import { useProposalVetoes } from "@/plugins/dualGovernance/hooks/useProposalVetoes";
@@ -14,13 +18,15 @@ import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
 import { Else, IfCase, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
+import { useRouter } from "next/router";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 
 type BottomSection = "description" | "vetoes";
 
-export default function ProposalDetail({ id: proposalId}: {id: string}) {
+export default function ProposalDetail({ id: proposalId }: { id: string }) {
+  const { reload } = useRouter();
   const skipRender = useSkipFirstRender();
-  const publicClient = usePublicClient({chainId: PUB_CHAIN.id});
+  const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
 
   const { proposal, status: proposalFetchStatus } = useProposal(
     publicClient!,
@@ -35,15 +41,37 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
     proposal
   );
   const userCanVeto = useUserCanVeto(BigInt(proposalId));
-  
+
   const [bottomSection, setBottomSection] =
     useState<BottomSection>("description");
   const { addAlert } = useAlertContext() as AlertContextProps;
-  const { writeContract: vetoWrite, data: vetoResponse } = useWriteContract();
+  const {
+    writeContract: vetoWrite,
+    data: vetoTxHash,
+    error,
+    status,
+  } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({ hash: vetoTxHash });
 
   useEffect(() => {
-      if(vetoResponse) addAlert("Your veto has been submitted", vetoResponse);
-  }, [vetoResponse])
+    if (status === "idle" || status === "pending") return;
+    else if (status === "error") {
+      if (error?.message?.startsWith("User rejected the request")) return;
+      alert("Could not create the proposal");
+      return;
+    }
+
+    // success
+    if (!vetoTxHash) return;
+    else if (isConfirming) {
+      addAlert("The veto has been submitted", vetoTxHash);
+      return;
+    } else if (!isConfirmed) return;
+
+    // addAlert("The veto has been registered", vetoTxHash);
+    reload();
+  }, [status, vetoTxHash, isConfirming, isConfirmed]);
 
   const vetoProposal = () => {
     vetoWrite({
@@ -54,9 +82,13 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
     });
   };
 
-  const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
+  const showProposalLoading = getShowProposalLoading(
+    proposal,
+    proposalFetchStatus
+  );
+  const showTransactionLoading = status === "pending" || isConfirming;
 
-  if (skipRender || !proposal || showLoading) {
+  if (skipRender || !proposal || showProposalLoading) {
     return (
       <section className="flex justify-left items-left w-screen max-w-full min-w-full">
         <PleaseWaitSpinner />
@@ -70,6 +102,7 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
         <ProposalHeader
           proposalNumber={Number(proposalId)}
           proposal={proposal}
+          transactionLoading={showTransactionLoading}
           userCanVeto={userCanVeto as boolean}
           onVetoPressed={() => vetoProposal()}
         />
@@ -78,7 +111,11 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
       <div className="grid xl:grid-cols-3 lg:grid-cols-2 my-10 gap-10 w-full">
         <VetoTally
           voteCount={proposal?.vetoTally}
-          votePercentage={Number(proposal?.vetoTally / proposal?.parameters?.minVetoVotingPower) * 100}
+          votePercentage={
+            Number(
+              proposal?.vetoTally / proposal?.parameters?.minVetoVotingPower
+            ) * 100
+          }
         />
         <ProposalDetails
           minVetoVotingPower={proposal?.parameters?.minVetoVotingPower}
@@ -115,7 +152,6 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
     </section>
   );
 }
-
 
 function getShowProposalLoading(
   proposal: ReturnType<typeof useProposal>["proposal"],

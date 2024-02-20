@@ -17,7 +17,7 @@ import {
 export default function DelegateAnnouncements() {
   const publicClient = usePublicClient();
   const account = useAccount();
-  const { data: delegates } = useReadContract({
+  const { data: delegates, status } = useReadContract({
     abi: iVotesAbi,
     address: PUB_TOKEN_ADDRESS,
     functionName: "delegates",
@@ -44,6 +44,7 @@ export default function DelegateAnnouncements() {
             address={account.address!}
             tokenAddress={PUB_TOKEN_ADDRESS}
             delegates={delegates!}
+            loading={status === "pending"}
             message={
               delegateAnnouncements.findLast(
                 (an) => an.delegate === account.address

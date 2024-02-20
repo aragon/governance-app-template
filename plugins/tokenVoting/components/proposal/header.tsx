@@ -4,6 +4,7 @@ import { Proposal } from "@/plugins/tokenVoting/utils/types";
 import { AlertVariant } from "@aragon/ods";
 import { Else, If, IfCase, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
+import { PleaseWaitSpinner } from "@/components/please-wait";
 
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 
@@ -12,6 +13,7 @@ interface ProposalHeaderProps {
   proposal: Proposal;
   userVote: number | undefined;
   userCanVote: boolean;
+  transactionLoading: boolean;
   onShowVotingModal: () => void;
 }
 
@@ -20,6 +22,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposal,
   userVote,
   userCanVote,
+  transactionLoading,
   onShowVotingModal,
 }) => {
   const [proposalVariant, setProposalVariant] = useState({
@@ -92,14 +95,23 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
         <div className="flex ">
           <IfCase condition={userCanVote}>
             <Then>
-              <Button
-                className="flex h-5 items-center"
-                size="lg"
-                variant="primary"
-                onClick={() => onShowVotingModal()}
-              >
-                Vote
-              </Button>
+              <IfCase condition={!transactionLoading}>
+                <Then>
+                  <Button
+                    className="flex h-5 items-center"
+                    size="lg"
+                    variant="primary"
+                    onClick={() => onShowVotingModal()}
+                  >
+                    Vote
+                  </Button>
+                </Then>
+                <Else>
+                  <div>
+                    <PleaseWaitSpinner fullMessage="Confirming..." />
+                  </div>
+                </Else>
+              </IfCase>
             </Then>
             <Else>
               <If condition={userVote}>

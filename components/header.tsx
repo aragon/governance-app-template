@@ -5,6 +5,7 @@ import { Address } from "viem"
 import { Else, IfCase, Then } from "@/components/if";
 import { formatHexString } from "@/utils/evm";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
+import WalletContainer from "./WalletContainer";
 
 const Header = () => {
   const { address, isConnected } = useAccount();
@@ -17,12 +18,7 @@ const Header = () => {
     <div className="flex flex-row-reverse w-full mt-5 h-24">
       <IfCase condition={isConnected}>
         <Then>
-          <span
-            onClick={() => open()}
-            className="text-primary-500 underline cursor-pointer"
-          >
-            {formatHexString(address as Address)}
-          </span>
+          <div><WalletContainer /> </div>
         </Then>
         <Else>
           <Button size="md" variant="primary" onClick={() => open()}>

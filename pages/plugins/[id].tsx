@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { resolveQueryParam } from "@/utils/query";
 import { NotFound } from "@/components/not-found";
+import { plugins } from "@/plugins";
 
 const PluginLoader: FC = () => {
   const { query, push } = useRouter();
@@ -12,12 +13,16 @@ const PluginLoader: FC = () => {
 
   useEffect(() => {
     if (!pluginId || typeof pluginId !== "string") {
-      // Redirect to the home page
+      push("/");
+      return;
+    }
+    const plugin = plugins.find((p) => p.id === pluginId);
+    if (!plugin) {
       push("/");
       return;
     }
 
-    import(`@/plugins/${pluginId}`)
+    import(`@/plugins/${plugin.folderName}`)
       .then((mod) => {
         setShowNotFoundError(false);
         setPageComponent(() => mod.default);

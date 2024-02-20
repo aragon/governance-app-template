@@ -3,7 +3,7 @@ import Blockies from "react-blockies";
 import { VoteCastEvent } from "@/plugins/tokenVoting/utils/types";
 import { formatUnits } from "viem";
 import { AddressText } from "@/components/text/address";
-import { Card, Tag } from '@aragon/ods'
+import { Card, Tag, TagVariant } from "@aragon/ods";
 import { formatLargeNumber } from "@/utils/formatNumber";
 
 export default function VotesSection({
@@ -11,17 +11,17 @@ export default function VotesSection({
 }: {
   votes: Array<VoteCastEvent>;
 }) {
-  const [abstainVotes, setAbstainVotes] = useState<VoteCastEvent[]>([])
-  const [yesVotes, setYesVotes] = useState<VoteCastEvent[]>([])
-  const [noVotes, setNoVotes] = useState<VoteCastEvent[]>([])
+  const [abstainVotes, setAbstainVotes] = useState<VoteCastEvent[]>([]);
+  const [yesVotes, setYesVotes] = useState<VoteCastEvent[]>([]);
+  const [noVotes, setNoVotes] = useState<VoteCastEvent[]>([]);
 
   useEffect(() => {
     if (votes) {
-      setAbstainVotes(votes.filter((vote) => vote.voteOption === 1))
-      setYesVotes(votes.filter((vote) => vote.voteOption === 2))
-      setNoVotes(votes.filter((vote) => vote.voteOption === 3))
+      setAbstainVotes(votes.filter((vote) => vote.voteOption === 1));
+      setYesVotes(votes.filter((vote) => vote.voteOption === 2));
+      setNoVotes(votes.filter((vote) => vote.voteOption === 3));
     }
-  }, [votes])
+  }, [votes]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 mt-4 mb-14 gap-4">
@@ -50,14 +50,14 @@ export default function VotesSection({
   );
 }
 
-const VoteCard = function({
+const VoteCard = function ({
   vote,
   type = "Abstain",
 }: {
   vote: VoteCastEvent;
   type?: "Yes" | "No" | "Abstain";
 }) {
-  let colorType = "neutral";
+  let colorType: TagVariant = "neutral";
   if (type === "No") colorType = "critical";
   else if (type === "Yes") colorType = "success";
 
@@ -73,11 +73,7 @@ const VoteCard = function({
             </p>
           </div>
         </div>
-        <Tag
-          className="!text-sm"
-          variant={colorType}
-          label={type}
-        />
+        <Tag className="!text-sm" variant={colorType} label={type} />
       </div>
     </Card>
   );

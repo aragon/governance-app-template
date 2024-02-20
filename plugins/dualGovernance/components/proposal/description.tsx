@@ -25,6 +25,8 @@ export default function ProposalDescription(proposal: Proposal) {
   const proposalActions = proposal?.actions || [];
 
   const getFunctionData = async (action: Action) => {
+    if (!publicClient) return;
+
     const abiLoader = new whatsabi.loaders.EtherscanABILoader({
       apiKey: PUB_ETHERSCAN_API_KEY,
     });

@@ -12,7 +12,7 @@ export function useDelegateAnnouncements(
     daoAddress: Address
 ) {
     const [delegateAnnouncements, setDelegateAnnouncements] = useState<DelegateAnnounce[]>([])
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         setIsLoading(true)
@@ -24,17 +24,16 @@ export function useDelegateAnnouncements(
             } as any,
             fromBlock: PUB_DELEGATION_ANNOUNCEMENTS_START_BLOCK,
             toBlock: 'latest'
-        }).then((logs: any) => {
-            setDelegateAnnouncements(
-                logs.map((log) => ({
-                    logIndex: log.logIndex,
-                    dao: log.args.dao,
-                    delegate: log.args.delegate,
-                    message: fromHex(log.args.message, 'string'),
-                }))
-            )
+        }).then((logs) => {
+            const announcements = logs.map((log) => ({
+                logIndex: log.logIndex,
+                dao: log.args.dao ?? "0x",
+                delegate: log.args.delegate ?? "0x",
+                message: fromHex(log.args.message ?? "0x", 'string'),
+            }))
+            setDelegateAnnouncements(announcements)
         }).catch((err) => {
-            console.error("Could not fetch the proposal defailt", err);
+            console.error("Could not fetch the delegates list", err);
             return null;
         }).finally(() => {
             setIsLoading(false)

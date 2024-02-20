@@ -46,7 +46,7 @@ const WalletContainer = () => {
       <Avatar
         src={avatarResult.data ? avatarResult.data : '/profile.jpg'}
         size="md"
-        alt="profile pic"
+        alt="Profile picture"
       />
     </Card>
   );

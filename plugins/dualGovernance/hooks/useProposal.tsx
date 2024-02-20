@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Address } from "viem";
-import { PublicClient, useBlockNumber, useReadContract } from "wagmi";
+import { useBlockNumber, useReadContract } from "wagmi";
 import { fetchJsonFromIpfs } from "@/utils/ipfs";
-import { getAbiItem } from "viem";
+import { PublicClient, getAbiItem } from "viem";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { Action } from "@/utils/types";
 import {
@@ -54,7 +54,7 @@ export function useProposal(
     args: [proposalId],
     chainId: PUB_CHAIN.id,
   });
-  const proposalData = decodeProposalResultData(proposalResult);
+  const proposalData = decodeProposalResultData(proposalResult as any);
 
   useEffect(() => {
     if (autoRefresh) proposalRefetch()
@@ -66,16 +66,19 @@ export function useProposal(
     publicClient
       .getLogs({
         address,
-        event: ProposalCreatedEvent,
+        event: ProposalCreatedEvent as any,
         args: {
           proposalId,
         } as any,
         fromBlock: proposalData.parameters.snapshotBlock,
         toBlock: proposalData.parameters.startDate,
       })
-      .then((logs: ProposalCreatedLogResponse[]) => {
-        setProposalCreationEvent(logs[0].args);
-        setMetadata(logs[0].args.metadata);
+      .then((logs) => {
+        if (!logs || !logs.length) throw new Error("No creation logs");
+
+        const log: ProposalCreatedLogResponse = logs[0] as any;
+        setProposalCreationEvent(log.args);
+        setMetadata(log.args.metadata);
       })
       .catch((err) => {
         console.error("Could not fetch the proposal defailt", err);

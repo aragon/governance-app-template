@@ -18,7 +18,7 @@ type ProposalInputs = {
 export default function ProposalCard(props: ProposalInputs) {
   const publicClient = usePublicClient();
   const { proposal, status } = useProposal(
-    publicClient,
+    publicClient!,
     PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     props.proposalId.toString()
   );

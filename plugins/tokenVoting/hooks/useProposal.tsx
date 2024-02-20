@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Address } from "viem";
-import { PublicClient, useBlockNumber, useReadContract } from "wagmi";
+import { useBlockNumber, useReadContract } from "wagmi";
 import { fetchJsonFromIpfs } from "@/utils/ipfs";
-import { getAbiItem } from "viem";
+import { PublicClient, getAbiItem } from "viem";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import { Action } from "@/utils/types";
 import {
@@ -39,25 +39,25 @@ export function useProposal(
   const [proposalCreationEvent, setProposalCreationEvent] =
     useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();
-  const { data: blockNumber} = useBlockNumber();
+  const { data: blockNumber } = useBlockNumber();
 
   // Proposal on-chain data
   const {
     data: proposalResult,
     error: proposalError,
     fetchStatus: proposalFetchStatus,
-    refetch: proposalRefetch
+    refetch: proposalRefetch,
   } = useReadContract<typeof TokenVotingAbi, "getProposal", any[]>({
     address,
     abi: TokenVotingAbi,
     functionName: "getProposal",
     args: [proposalId],
   });
-  const proposalData = decodeProposalResultData(proposalResult);
+  const proposalData = decodeProposalResultData(proposalResult as any);
 
   useEffect(() => {
-    if (autoRefresh) proposalRefetch()
-  }, [blockNumber])
+    if (autoRefresh) proposalRefetch();
+  }, [blockNumber]);
 
   // Creation event
   useEffect(() => {
@@ -66,20 +66,22 @@ export function useProposal(
     publicClient
       .getLogs({
         address,
-        event: ProposalCreatedEvent,
+        event: ProposalCreatedEvent as any,
         args: {
           proposalId: proposalId,
         } as any,
         fromBlock: proposalData.parameters.snapshotBlock,
         toBlock: proposalData.parameters.startDate,
       })
-      .then((logs: ProposalCreatedLogResponse[]) => {
-        setProposalCreationEvent(logs[0].args);
-        setMetadata(logs[0].args.metadata);
+      .then((logs) => {
+        if (!logs || !logs.length) throw new Error("No creation logs");
+
+        const log: ProposalCreatedLogResponse = logs[0] as any;
+        setProposalCreationEvent(log.args);
+        setMetadata(log.args.metadata);
       })
       .catch((err) => {
         console.error("Could not fetch the proposal defailt", err);
-        return null;
       });
   }, [proposalData?.tally]);
 
@@ -91,9 +93,10 @@ export function useProposal(
     error: metadataError,
   } = useQuery<ProposalMetadata, Error>({
     queryKey: [`ipfsData:${proposalId}`],
-    queryFn: () => metadataUri ? fetchJsonFromIpfs(metadataUri) : Promise.resolve(null),
-    enabled: !!metadataUri
-});
+    queryFn: () =>
+      metadataUri ? fetchJsonFromIpfs(metadataUri) : Promise.resolve(null),
+    enabled: !!metadataUri,
+  });
 
   const proposal = arrangeProposalData(
     proposalData,

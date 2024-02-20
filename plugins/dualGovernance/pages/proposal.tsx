@@ -23,13 +23,13 @@ export default function ProposalDetail({ id: proposalId}: {id: string}) {
   const publicClient = usePublicClient({chainId: PUB_CHAIN.id});
 
   const { proposal, status: proposalFetchStatus } = useProposal(
-    publicClient,
+    publicClient!,
     PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     proposalId,
     true
   );
   const vetoes = useProposalVetoes(
-    publicClient,
+    publicClient!,
     PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     proposalId,
     proposal

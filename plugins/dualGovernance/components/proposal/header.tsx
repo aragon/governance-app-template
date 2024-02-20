@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Button, Tag } from "@aragon/ods";
 import { Proposal } from "@/plugins/dualGovernance/utils/types";
-import { IAlertCardProps } from "@aragon/ods";
+import { AlertVariant } from "@aragon/ods";
 import { Else, If, IfCase, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
 import { useWriteContract } from "wagmi";
@@ -18,7 +18,6 @@ interface ProposalHeaderProps {
   userCanVeto: boolean;
   onVetoPressed: () => void;
 }
-type AlertVariant = IAlertCardProps["variant"];
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposalNumber,

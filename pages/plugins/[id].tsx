@@ -6,7 +6,7 @@ import { NotFound } from "@/components/not-found";
 import { plugins } from "@/plugins";
 
 const PluginLoader: FC = () => {
-  const { query, push } = useRouter();
+  const { query } = useRouter();
   const pluginId = resolveQueryParam(query.id);
   const [PageComponent, setPageComponent] = useState<FC | null>(null);
   const [componentLoading, setComponentLoading] = useState(true);

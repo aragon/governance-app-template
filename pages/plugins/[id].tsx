@@ -9,39 +9,35 @@ const PluginLoader: FC = () => {
   const { query, push } = useRouter();
   const pluginId = resolveQueryParam(query.id);
   const [PageComponent, setPageComponent] = useState<FC | null>(null);
-  const [showNotFoundError, setShowNotFoundError] = useState(false);
+  const [componentLoading, setComponentLoading] = useState(true);
 
   useEffect(() => {
-    if (!pluginId || typeof pluginId !== "string") {
-      push("/");
-      return;
-    }
+    if (!pluginId) return;
+
     const plugin = plugins.find((p) => p.id === pluginId);
-    if (!plugin) {
-      push("/");
-      return;
-    }
+    if (!plugin) return;
 
     import(`@/plugins/${plugin.folderName}`)
       .then((mod) => {
-        setShowNotFoundError(false);
+        setComponentLoading(true);
         setPageComponent(() => mod.default);
       })
       .catch((err) => {
         console.error("Failed to load the page component", err);
 
-        setShowNotFoundError(true);
+        setComponentLoading(false);
       });
   }, [pluginId]);
 
-  if (showNotFoundError) {
+  if (!PageComponent) {
+    if (componentLoading) {
+      return (
+        <div>
+          <PleaseWaitSpinner />
+        </div>
+      );
+    }
     return <NotFound />;
-  } else if (!PageComponent) {
-    return (
-      <div>
-        <PleaseWaitSpinner />
-      </div>
-    );
   }
 
   return <PageComponent />;

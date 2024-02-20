@@ -17,7 +17,7 @@ const Header = () => {
       <IfCase condition={isConnected}>
         <Then>
           <div>
-            <WalletContainer />{" "}
+            <WalletContainer />
           </div>
         </Then>
         <Else>

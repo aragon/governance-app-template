@@ -5,6 +5,7 @@ import { formatUnits } from "viem";
 import { AddressText } from "@/components/text/address";
 import { Card, Tag, TagVariant } from "@aragon/ods";
 import { formatLargeNumber } from "@/utils/formatNumber";
+import { If } from "@/components/if";
 
 export default function VotesSection({
   votes,
@@ -25,32 +26,38 @@ export default function VotesSection({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 mt-4 mb-14 gap-4">
-      <div>
-        <div className="grid gap-3">
-          {yesVotes.map((vote, i) => (
-            <VoteCard key={i} vote={vote} type="Yes" />
-          ))}
+      <If condition={yesVotes.length > 0}>
+        <div>
+          <div className="grid gap-3">
+            {yesVotes.map((vote, i) => (
+              <VoteCard key={i} vote={vote} type="Yes" />
+            ))}
+          </div>
         </div>
-      </div>
-      <div>
-        <div className="grid gap-3">
-          {noVotes.map((vote, i) => (
-            <VoteCard key={i} vote={vote} type="No" />
-          ))}
+      </If>
+      <If condition={noVotes.length > 0}>
+        <div>
+          <div className="grid gap-3">
+            {noVotes.map((vote, i) => (
+              <VoteCard key={i} vote={vote} type="No" />
+            ))}
+          </div>
         </div>
-      </div>
-      <div>
-        <div className="grid gap-3">
-          {abstainVotes.map((vote, i) => (
-            <VoteCard key={i} vote={vote} />
-          ))}
+      </If>
+      <If condition={abstainVotes.length > 0}>
+        <div>
+          <div className="grid gap-3">
+            {abstainVotes.map((vote, i) => (
+              <VoteCard key={i} vote={vote} />
+            ))}
+          </div>
         </div>
-      </div>
+      </If>
     </div>
   );
 }
 
-const VoteCard = function ({
+const VoteCard = function({
   vote,
   type = "Abstain",
 }: {

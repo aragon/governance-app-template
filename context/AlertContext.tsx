@@ -15,6 +15,9 @@ export type NewAlert = {
 export interface AlertContextProps {
   alerts: IAlert[];
   addAlert: (newAlert: NewAlert) => void;
+  addSuccessAlert: (message: string) => void;
+  addInfoAlert: (message: string) => void;
+  addErrorAlert: (message: string) => void;
 }
 
 export const AlertContext = createContext<AlertContextProps | undefined>(
@@ -29,6 +32,12 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Add a new alert to the list
   const addAlert = (alert: NewAlert) => {
+    // Clean duplicates
+    const idx = alerts.findIndex(
+      (a) => a.message === alert.message && a.description === alert.description
+    );
+    if (idx >= 0) removeAlert(idx);
+
     const newAlert: IAlert = {
       id: Date.now(),
       message: alert.message,
@@ -48,13 +57,26 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
     }, timeout);
   };
 
+  // Convenience aliases
+  const addSuccessAlert = (message: string) => {
+    addAlert({ message, type: "success" });
+  };
+  const addInfoAlert = (message: string) => {
+    addAlert({ message, type: "info" });
+  };
+  const addErrorAlert = (message: string) => {
+    addAlert({ message, type: "error" });
+  };
+
   // Function to remove an alert
   const removeAlert = (id: number) => {
     setAlerts(alerts.filter((alert) => alert.id !== id));
   };
 
   return (
-    <AlertContext.Provider value={{ alerts, addAlert }}>
+    <AlertContext.Provider
+      value={{ alerts, addAlert, addSuccessAlert, addInfoAlert, addErrorAlert }}
+    >
       {children}
     </AlertContext.Provider>
   );

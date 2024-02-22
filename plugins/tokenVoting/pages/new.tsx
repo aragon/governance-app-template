@@ -35,7 +35,7 @@ export default function Create() {
     const [title, setTitle] = useState<string>('');
     const [summary, setSummary] = useState<string>('');
     const [actions, setActions] = useState<Action[]>([]);
-    const { addAlert } = useAlertContext()
+    const { addAlert, addErrorAlert } = useAlertContext()
     const {
         writeContract: createProposalWrite,
         data: createTxHash,
@@ -54,19 +54,37 @@ export default function Create() {
     useEffect(() => {
         if (status === "idle" || status === "pending") return;
         else if (status === "error") {
-            if (error?.message?.startsWith("User rejected the request")) return;
-            alert("Could not create the proposal");
+            if (error?.message?.startsWith("User rejected the request")) {
+                addAlert({
+                    message: "Transaction rejected by the user",
+                    type: "error",
+                    timeout: 4 * 1000,
+                });
+            } else {
+                addErrorAlert("Could not create the proposal");
+            }
             return;
         }
     
         // success
         if (!createTxHash) return;
         else if (isConfirming) {
-            addAlert("The proposal has been submitted", createTxHash);
+            addAlert({
+                message: "Proposal submitted",
+                description: "Waiting for the transaction to be validated",
+                type: "info",
+                txHash: createTxHash,
+            });
             return;
         } else if (!isConfirmed) return;
     
-        addAlert("The proposal has been confirmed", createTxHash);
+        addAlert({
+            message: "Proposal created",
+            description: "The transaction has been validated",
+            type: "success",
+            txHash: createTxHash,
+        });
+        
         setTimeout(() => {
             push("#/");
         }, 1000 * 2);
@@ -74,22 +92,22 @@ export default function Create() {
     
     const submitProposal = async () => {
         // Check metadata
-        if (!title.trim()) return alert("Please, enter a title");
+        if (!title.trim()) return addErrorAlert("Please, enter a title");
         
         const plainSummary = getPlainText(summary).trim()
-        if (!plainSummary.trim()) return alert("Please, enter a summary of what the proposal is about");
+        if (!plainSummary.trim()) return addErrorAlert("Please, enter a summary of what the proposal is about");
 
         // Check the action
         switch (actionType) {
             case ActionType.Signaling: break;
             case ActionType.Withdrawal: 
                 if (!actions.length) {
-                    return alert("Please ensure that the withdrawal address and the amount to transfer are valid");
+                    return addErrorAlert("Please ensure that the withdrawal address and the amount to transfer are valid");
                 }
                 break
             default:
                 if (!actions.length || !actions[0].data || actions[0].data === "0x") {
-                    return alert("Please ensure that the values of the action to execute are correct");
+                    return addErrorAlert("Please ensure that the values of the action to execute are correct");
                 }
         }
           

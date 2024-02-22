@@ -54,7 +54,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const [votedOption, setVotedOption] = useState<number | undefined>(undefined);
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [selectedVoteOption, setSelectedVoteOption] = useState<number>();
-  const { addAlert } = useAlertContext() as AlertContextProps;
+  const { addAlert, addErrorAlert } = useAlertContext() as AlertContextProps;
   const { address } = useAccount();
   const {
     writeContract: voteWrite,
@@ -99,19 +99,37 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   useEffect(() => {
     if (status === "idle" || status === "pending") return;
     else if (status === "error") {
-      if (error?.message?.startsWith("User rejected the request")) return;
-      alert("Could not create the proposal");
+      if (error?.message?.startsWith("User rejected the request")) {
+        addAlert({
+          message: "Transaction rejected by the user",
+          type: "error",
+          timeout: 4 * 1000,
+        });
+      } else {
+        addErrorAlert("Could not create the proposal");
+      }
       return;
     }
 
     // success
     if (!votingTxHash) return;
     else if (isConfirming) {
-      addAlert("The vote has been submitted", votingTxHash);
+      addAlert({
+        message: "Vote submitted",
+        description: "Waiting for the transaction to be validated",
+        type: "info",
+        txHash: votingTxHash,
+      });
       return;
     } else if (!isConfirmed) return;
 
-    // addAlert("The vote has been registered", votingTxHash);
+    addAlert({
+      message: "Vote registered",
+      description: "The transaction has been validated",
+      type: "success",
+      txHash: votingTxHash,
+    });
+
     reload();
   }, [status, votingTxHash, isConfirming, isConfirmed]);
 

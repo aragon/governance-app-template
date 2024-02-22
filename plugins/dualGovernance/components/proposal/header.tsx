@@ -4,12 +4,13 @@ import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { AlertVariant } from "@aragon/ods";
 import { Else, If, IfCase, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
-import { useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { OptimisticTokenVotingPluginAbi } from "../../artifacts/OptimisticTokenVotingPlugin.sol";
 import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
 import { useProposalVariantStatus } from "../../hooks/useProposalVariantStatus";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { PleaseWaitSpinner } from "@/components/please-wait";
+import { useRouter } from "next/router";
 
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 
@@ -28,23 +29,65 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   transactionLoading,
   onVetoPressed,
 }) => {
-  const { writeContract: executeWrite, data: executeResponse } = useWriteContract()
-  const { addAlert } = useAlertContext() as AlertContextProps;
+  const { reload } = useRouter();
+  const { addAlert, addErrorAlert } = useAlertContext() as AlertContextProps;
   const proposalVariant = useProposalVariantStatus(proposal);
+
+  const {
+    writeContract: executeWrite,
+    data: executeTxHash,
+    error,
+    status,
+  } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({ hash: executeTxHash });
 
   const executeButtonPressed = () => {
     executeWrite({
       chainId: PUB_CHAIN.id,
       abi: OptimisticTokenVotingPluginAbi,
       address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-      functionName: 'execute',
-      args: [proposalNumber]
-    })
-  }
+      functionName: "execute",
+      args: [proposalNumber],
+    });
+  };
 
   useEffect(() => {
-    if (executeResponse) addAlert('Your execution has been submitted', executeResponse)
-  }, [executeResponse])
+    if (status === "idle" || status === "pending") return;
+    else if (status === "error") {
+      if (error?.message?.startsWith("User rejected the request")) {
+        addAlert({
+          message: "Transaction rejected by the user",
+          type: "error",
+          timeout: 4 * 1000,
+        });
+      } else {
+        addErrorAlert("Could not create the proposal");
+      }
+      return;
+    }
+
+    // success
+    if (!executeTxHash) return;
+    else if (isConfirming) {
+      addAlert({
+        message: "Proposal submitted",
+        description: "Waiting for the transaction to be validated",
+        type: "info",
+        txHash: executeTxHash,
+      });
+      return;
+    } else if (!isConfirmed) return;
+
+    addAlert({
+      message: "Proposal created",
+      description: "The transaction has been validated",
+      type: "success",
+      txHash: executeTxHash,
+    });
+
+    setTimeout(() => reload(), 1000 * 2);
+  }, [status, executeTxHash, isConfirming, isConfirmed]);
 
   return (
     <div className="w-full">
@@ -54,13 +97,13 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
             {/** bg-info-200 bg-success-200 bg-critical-200
              * text-info-800 text-success-800 text-critical-800
              */}
-              <div className="flex">
-                <Tag
-                  className="text-center text-critical-800"
-                  label={proposalVariant.label}
-                  variant={proposalVariant.variant as AlertVariant}
-                />
-              </div>
+            <div className="flex">
+              <Tag
+                className="text-center text-critical-800"
+                label={proposalVariant.label}
+                variant={proposalVariant.variant as AlertVariant}
+              />
+            </div>
             <span className="text-xl font-semibold text-neutral-700 pt-1">
               Proposal {proposalNumber + 1}
             </span>
@@ -76,8 +119,8 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                     size="lg"
                     variant="primary"
                     onClick={() => onVetoPressed()}
-                    >
-                      Veto
+                  >
+                    Veto
                   </Button>
                 </Then>
                 <Else>
@@ -88,15 +131,15 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
               </IfCase>
             </Then>
             <Else>
-              <If condition={proposalVariant.label === 'Executable'}>
+              <If condition={proposalVariant.label === "Executable"}>
                 <Button
-                className="flex h-5 items-center"
-                size="lg"
-                variant="success"
-                onClick={() => executeButtonPressed()}
-              >
-                Execute
-              </Button>
+                  className="flex h-5 items-center"
+                  size="lg"
+                  variant="success"
+                  onClick={() => executeButtonPressed()}
+                >
+                  Execute
+                </Button>
               </If>
             </Else>
           </IfCase>

@@ -62,7 +62,8 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
           timeout: 4 * 1000,
         });
       } else {
-        addErrorAlert("Could not create the proposal");
+        console.error(error);
+        addErrorAlert("Could not execute the proposal");
       }
       return;
     }
@@ -80,7 +81,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
     } else if (!isConfirmed) return;
 
     addAlert({
-      message: "Proposal created",
+      message: "Proposal executed",
       description: "The transaction has been validated",
       type: "success",
       txHash: executeTxHash,

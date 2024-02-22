@@ -1,29 +1,60 @@
-import React, { createContext, useState, useContext } from 'react';
-import { IAlert } from '@/utils/types'
+import React, { createContext, useState, useContext } from "react";
+import { IAlert } from "@/utils/types";
+import { usePublicClient } from "wagmi";
+
+const DEFAULT_ALERT_TIMEOUT = 7 * 1000;
+
+export type NewAlert = {
+  type: "success" | "info" | "error";
+  message: string;
+  description?: string;
+  txHash?: string;
+  timeout?: number;
+};
 
 export interface AlertContextProps {
   alerts: IAlert[];
-  addAlert: (message: string, txHash: string) => void;
-  removeAlert: (id: number) => void;
+  addAlert: (newAlert: NewAlert) => void;
 }
 
-export const AlertContext = createContext<AlertContextProps | undefined>(undefined);
+export const AlertContext = createContext<AlertContextProps | undefined>(
+  undefined
+);
 
-export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [alerts, setAlerts] = useState<IAlert[]>([]);
+  const client = usePublicClient();
 
-  // Function to add a new alert
-  const addAlert = (message: string, txHash: string) => {
-    setAlerts([...alerts, { message, txHash, id: Date.now() }]);
+  // Add a new alert to the list
+  const addAlert = (alert: NewAlert) => {
+    const newAlert: IAlert = {
+      id: Date.now(),
+      message: alert.message,
+      description: alert.description,
+      type: alert.type,
+    };
+    if (alert.txHash && client) {
+      newAlert.explorerLink =
+        client.chain.blockExplorers?.default.url + "/tx/" + alert.txHash;
+    }
+    setAlerts(alerts.concat(newAlert));
+
+    // Schedule the clean-up
+    const timeout = alert.timeout ?? DEFAULT_ALERT_TIMEOUT;
+    setTimeout(() => {
+      removeAlert(newAlert.id);
+    }, timeout);
   };
 
   // Function to remove an alert
   const removeAlert = (id: number) => {
-    setAlerts(alerts?.filter((alert) => alert.id !== id));
+    setAlerts(alerts.filter((alert) => alert.id !== id));
   };
 
   return (
-    <AlertContext.Provider value={{ alerts, addAlert, removeAlert }}>
+    <AlertContext.Provider value={{ alerts, addAlert }}>
       {children}
     </AlertContext.Provider>
   );
@@ -33,7 +64,7 @@ export const useAlertContext = () => {
   const context = useContext(AlertContext);
 
   if (!context) {
-    throw new Error('useThemeContext must be used inside the AlertProvider');
+    throw new Error("useContext must be used inside the AlertProvider");
   }
 
   return context;

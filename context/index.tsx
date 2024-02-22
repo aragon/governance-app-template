@@ -1,5 +1,4 @@
 import { AlertProvider } from "./AlertContext";
-import Alerts from "@/components/alert/alerts";
 import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query' 
 import { config } from "@/context/Web3Modal";
@@ -22,7 +21,6 @@ export function RootContextProvider({ children, initialState }: { children: Reac
       <QueryClientProvider client={queryClient}>
         <AlertProvider>
           {children}
-          <Alerts />
         </AlertProvider>
       </QueryClientProvider>
     </WagmiProvider>

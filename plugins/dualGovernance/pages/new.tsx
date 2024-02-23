@@ -42,7 +42,7 @@ export default function Create() {
   const [title, setTitle] = useState<string>("");
   const [summary, setSummary] = useState<string>("");
   const [actions, setActions] = useState<Action[]>([]);
-  const { addAlert, addErrorAlert } = useAlertContext();
+  const { addAlert } = useAlertContext();
   const {
     writeContract: createProposalWrite,
     data: createTxHash,
@@ -64,13 +64,11 @@ export default function Create() {
     if (status === "idle" || status === "pending") return;
     else if (status === "error") {
       if (error?.message?.startsWith("User rejected the request")) {
-        addAlert({
-          message: "Transaction rejected by the user",
-          type: "error",
+        addAlert("Transaction rejected by the user", {
           timeout: 4 * 1000,
         });
       } else {
-        addErrorAlert("Could not create the proposal");
+        addAlert("Could not create the proposal", { type: "error" });
       }
       return;
     }
@@ -78,17 +76,14 @@ export default function Create() {
     // success
     if (!createTxHash) return;
     else if (isConfirming) {
-      addAlert({
-        message: "Proposal submitted",
+      addAlert("Proposal submitted", {
         description: "Waiting for the transaction to be validated",
-        type: "info",
         txHash: createTxHash,
       });
       return;
     } else if (!isConfirmed) return;
 
-    addAlert({
-      message: "Proposal created",
+    addAlert("Proposal created", {
       description: "The transaction has been validated",
       type: "success",
       txHash: createTxHash,
@@ -100,13 +95,14 @@ export default function Create() {
 
   const submitProposal = async () => {
     // Check metadata
-    if (!title.trim()) return addErrorAlert("Please, enter a title");
+    if (!title.trim())
+      return addAlert("Please, enter a title", { type: "error" });
 
     const plainSummary = getPlainText(summary).trim();
     if (!plainSummary.trim())
-      return addErrorAlert(
-        "Please, enter a summary of what the proposal is about"
-      );
+      return addAlert("Please, enter a summary of what the proposal is about", {
+        type: "error",
+      });
 
     // Check the action
     switch (actionType) {
@@ -114,15 +110,17 @@ export default function Create() {
         break;
       case ActionType.Withdrawal:
         if (!actions.length) {
-          return addErrorAlert(
-            "Please ensure that the withdrawal address and the amount to transfer are valid"
+          return addAlert(
+            "Please ensure that the withdrawal address and the amount to transfer are valid",
+            { type: "error" }
           );
         }
         break;
       default:
         if (!actions.length || !actions[0].data || actions[0].data === "0x") {
-          return addErrorAlert(
-            "Please ensure that the values of the action to execute are correct"
+          return addAlert(
+            "Please ensure that the values of the action to execute are correct",
+            { type: "error" }
           );
         }
     }

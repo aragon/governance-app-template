@@ -4,9 +4,8 @@ import { usePublicClient } from "wagmi";
 
 const DEFAULT_ALERT_TIMEOUT = 7 * 1000;
 
-export type NewAlert = {
-  type: "success" | "info" | "error";
-  message: string;
+export type AlertOptions = {
+  type?: "success" | "info" | "error";
   description?: string;
   txHash?: string;
   timeout?: number;
@@ -14,10 +13,7 @@ export type NewAlert = {
 
 export interface AlertContextProps {
   alerts: IAlert[];
-  addAlert: (newAlert: NewAlert) => void;
-  addSuccessAlert: (message: string) => void;
-  addInfoAlert: (message: string) => void;
-  addErrorAlert: (message: string) => void;
+  addAlert: (message: string, alertOptions?: AlertOptions) => void;
 }
 
 export const AlertContext = createContext<AlertContextProps | undefined>(
@@ -31,41 +27,34 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
   const client = usePublicClient();
 
   // Add a new alert to the list
-  const addAlert = (alert: NewAlert) => {
+  const addAlert = (message: string, alertOptions?: AlertOptions) => {
     // Clean duplicates
-    const idx = alerts.findIndex(
-      (a) => a.message === alert.message && a.description === alert.description
-    );
+    const idx = alerts.findIndex((a) => {
+      if (a.message !== message) return false;
+      else if (a.description !== alertOptions?.description) return false;
+      else if (a.type !== alertOptions?.type) return false;
+
+      return true;
+    });
     if (idx >= 0) removeAlert(idx);
 
     const newAlert: IAlert = {
       id: Date.now(),
-      message: alert.message,
-      description: alert.description,
-      type: alert.type,
+      message,
+      description: alertOptions?.description,
+      type: alertOptions?.type ?? "info",
     };
-    if (alert.txHash && client) {
+    if (alertOptions?.txHash && client) {
       newAlert.explorerLink =
-        client.chain.blockExplorers?.default.url + "/tx/" + alert.txHash;
+        client.chain.blockExplorers?.default.url + "/tx/" + alertOptions.txHash;
     }
     setAlerts(alerts.concat(newAlert));
 
     // Schedule the clean-up
-    const timeout = alert.timeout ?? DEFAULT_ALERT_TIMEOUT;
+    const timeout = alertOptions?.timeout ?? DEFAULT_ALERT_TIMEOUT;
     setTimeout(() => {
       removeAlert(newAlert.id);
     }, timeout);
-  };
-
-  // Convenience aliases
-  const addSuccessAlert = (message: string) => {
-    addAlert({ message, type: "success" });
-  };
-  const addInfoAlert = (message: string) => {
-    addAlert({ message, type: "info" });
-  };
-  const addErrorAlert = (message: string) => {
-    addAlert({ message, type: "error" });
   };
 
   // Function to remove an alert
@@ -74,9 +63,7 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AlertContext.Provider
-      value={{ alerts, addAlert, addSuccessAlert, addInfoAlert, addErrorAlert }}
-    >
+    <AlertContext.Provider value={{ alerts, addAlert }}>
       {children}
     </AlertContext.Provider>
   );

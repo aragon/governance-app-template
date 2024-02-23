@@ -30,7 +30,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   onVetoPressed,
 }) => {
   const { reload } = useRouter();
-  const { addAlert, addErrorAlert } = useAlertContext() as AlertContextProps;
+  const { addAlert } = useAlertContext() as AlertContextProps;
   const proposalVariant = useProposalVariantStatus(proposal);
 
   const {
@@ -56,14 +56,12 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
     if (status === "idle" || status === "pending") return;
     else if (status === "error") {
       if (error?.message?.startsWith("User rejected the request")) {
-        addAlert({
-          message: "Transaction rejected by the user",
-          type: "error",
+        addAlert("Transaction rejected by the user", {
           timeout: 4 * 1000,
         });
       } else {
         console.error(error);
-        addErrorAlert("Could not execute the proposal");
+        addAlert("Could not execute the proposal", { type: "error" });
       }
       return;
     }
@@ -71,8 +69,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
     // success
     if (!executeTxHash) return;
     else if (isConfirming) {
-      addAlert({
-        message: "Proposal submitted",
+      addAlert("Proposal submitted", {
         description: "Waiting for the transaction to be validated",
         type: "info",
         txHash: executeTxHash,
@@ -80,8 +77,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
       return;
     } else if (!isConfirmed) return;
 
-    addAlert({
-      message: "Proposal executed",
+    addAlert("Proposal executed", {
       description: "The transaction has been validated",
       type: "success",
       txHash: executeTxHash,

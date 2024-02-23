@@ -44,7 +44,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
 
   const [bottomSection, setBottomSection] =
     useState<BottomSection>("description");
-  const { addAlert, addErrorAlert } = useAlertContext() as AlertContextProps;
+  const { addAlert } = useAlertContext() as AlertContextProps;
   const {
     writeContract: vetoWrite,
     data: vetoTxHash,
@@ -58,13 +58,11 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     if (status === "idle" || status === "pending") return;
     else if (status === "error") {
       if (error?.message?.startsWith("User rejected the request")) {
-        addAlert({
-          message: "Transaction rejected by the user",
-          type: "error",
+        addAlert("Transaction rejected by the user", {
           timeout: 4 * 1000,
         });
       } else {
-        addErrorAlert("Could not create the proposal");
+        addAlert("Could not create the proposal", { type: "error" });
       }
       return;
     }
@@ -72,17 +70,14 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     // success
     if (!vetoTxHash) return;
     else if (isConfirming) {
-      addAlert({
-        message: "Veto submitted",
+      addAlert("Veto submitted", {
         description: "Waiting for the transaction to be validated",
-        type: "info",
         txHash: vetoTxHash,
       });
       return;
     } else if (!isConfirmed) return;
 
-    addAlert({
-      message: "Veto registered",
+    addAlert("Veto registered", {
       description: "The transaction has been validated",
       type: "success",
       txHash: vetoTxHash,

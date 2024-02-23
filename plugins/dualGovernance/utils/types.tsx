@@ -1,6 +1,8 @@
 import { Address } from "viem";
 import { Action } from "@/utils/types";
 
+export type ProposalStatus = "Active" | "Defeated" | "Executable" | "Executed";
+
 export type ProposalInputs = {
   proposalId: bigint;
 };

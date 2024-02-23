@@ -1,16 +1,10 @@
-import { useEffect } from "react";
 import { Button, Tag } from "@aragon/ods";
 import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { AlertVariant } from "@aragon/ods";
-import { Else, If, Then } from "@/components/if";
+import { Else, ElseIf, If, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { OptimisticTokenVotingPluginAbi } from "../../artifacts/OptimisticTokenVotingPlugin.sol";
-import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
-import { useProposalVariantStatus } from "../../hooks/useProposalVariantStatus";
-import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { useProposalVariantStatus } from "@/plugins/dualGovernance/hooks/useProposalVariantStatus";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useRouter } from "next/router";
 
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 
@@ -18,73 +12,22 @@ interface ProposalHeaderProps {
   proposalNumber: number;
   proposal: Proposal;
   userCanVeto: boolean;
-  transactionLoading: boolean;
+  userCanExecute: boolean;
+  transactionConfirming: boolean;
   onVetoPressed: () => void;
+  onExecutePressed: () => void;
 }
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposalNumber,
   proposal,
   userCanVeto,
-  transactionLoading,
+  userCanExecute,
+  transactionConfirming,
   onVetoPressed,
+  onExecutePressed,
 }) => {
-  const { reload } = useRouter();
-  const { addAlert } = useAlertContext() as AlertContextProps;
   const proposalVariant = useProposalVariantStatus(proposal);
-
-  const {
-    writeContract: executeWrite,
-    data: executeTxHash,
-    error,
-    status,
-  } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash: executeTxHash });
-
-  const executeButtonPressed = () => {
-    executeWrite({
-      chainId: PUB_CHAIN.id,
-      abi: OptimisticTokenVotingPluginAbi,
-      address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-      functionName: "execute",
-      args: [proposalNumber],
-    });
-  };
-
-  useEffect(() => {
-    if (status === "idle" || status === "pending") return;
-    else if (status === "error") {
-      if (error?.message?.startsWith("User rejected the request")) {
-        addAlert("Transaction rejected by the user", {
-          timeout: 4 * 1000,
-        });
-      } else {
-        console.error(error);
-        addAlert("Could not execute the proposal", { type: "error" });
-      }
-      return;
-    }
-
-    // success
-    if (!executeTxHash) return;
-    else if (isConfirming) {
-      addAlert("Proposal submitted", {
-        description: "Waiting for the transaction to be validated",
-        type: "info",
-        txHash: executeTxHash,
-      });
-      return;
-    } else if (!isConfirmed) return;
-
-    addAlert("Proposal executed", {
-      description: "The transaction has been validated",
-      type: "success",
-      txHash: executeTxHash,
-    });
-
-    setTimeout(() => reload(), 1000 * 2);
-  }, [status, executeTxHash, isConfirming, isConfirmed]);
 
   return (
     <div className="w-full">
@@ -102,43 +45,37 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
               />
             </div>
             <span className="text-xl font-semibold text-neutral-700 pt-1">
-              Proposal {proposalNumber + 1}
+              Proposal {proposalNumber}
             </span>
           </div>
         </div>
-        <div className="flex ">
-          <If condition={userCanVeto}>
+        <div className="flex">
+          <If condition={transactionConfirming}>
             <Then>
-              <If condition={!transactionLoading}>
-                <Then>
-                  <Button
-                    className="flex h-5 items-center"
-                    size="lg"
-                    variant="primary"
-                    onClick={() => onVetoPressed()}
-                  >
-                    Veto
-                  </Button>
-                </Then>
-                <Else>
-                  <div>
-                    <PleaseWaitSpinner fullMessage="Confirming..." />
-                  </div>
-                </Else>
-              </If>
+              <div>
+                <PleaseWaitSpinner fullMessage="Confirming..." />
+              </div>
             </Then>
-            <Else>
-              <If condition={proposalVariant.label === "Executable"}>
-                <Button
-                  className="flex h-5 items-center"
-                  size="lg"
-                  variant="success"
-                  onClick={() => executeButtonPressed()}
-                >
-                  Execute
-                </Button>
-              </If>
-            </Else>
+            <ElseIf condition={userCanVeto}>
+              <Button
+                className="flex h-5 items-center"
+                size="lg"
+                variant="primary"
+                onClick={() => onVetoPressed()}
+              >
+                Veto
+              </Button>
+            </ElseIf>
+            <ElseIf condition={userCanExecute}>
+              <Button
+                className="flex h-5 items-center"
+                size="lg"
+                variant="success"
+                onClick={() => onExecutePressed()}
+              >
+                Execute
+              </Button>
+            </ElseIf>
           </If>
         </div>
       </div>

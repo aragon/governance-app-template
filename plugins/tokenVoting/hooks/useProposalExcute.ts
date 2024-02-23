@@ -1,13 +1,17 @@
 import { useEffect } from "react";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { OptimisticTokenVotingPluginAbi } from "../artifacts/OptimisticTokenVotingPlugin.sol";
+import { TokenVotingAbi } from "../artifacts/TokenVoting.sol";
 import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
 import { useRouter } from "next/router";
-import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { Proposal } from "../utils/types";
+import { useProposal } from "./useProposal";
+import { ProposalStatus } from "@/plugins/dualGovernance/utils/types";
+import { PUB_CHAIN, PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 export function useProposalExecute(proposalId: string) {
   const { reload } = useRouter();
   const { addAlert } = useAlertContext() as AlertContextProps;
+  const { proposal } = useProposal(proposalId);
 
   const {
     writeContract: executeWrite,
@@ -21,8 +25,8 @@ export function useProposalExecute(proposalId: string) {
   const executeProposal = () => {
     executeWrite({
       chainId: PUB_CHAIN.id,
-      abi: OptimisticTokenVotingPluginAbi,
-      address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+      abi: TokenVotingAbi,
+      address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
       functionName: "execute",
       args: [proposalId],
     });
@@ -66,5 +70,21 @@ export function useProposalExecute(proposalId: string) {
     setTimeout(() => reload(), 1000 * 2);
   }, [executingStatus, executeTxHash, isConfirming, isConfirmed]);
 
-  return { executeProposal, isConfirming, isConfirmed };
+  return {
+    executeProposal,
+    canExecute: getProposalStatus(proposal) === "Executable",
+    isConfirming,
+    isConfirmed,
+  };
+}
+
+function getProposalStatus(proposal: Proposal | null): ProposalStatus {
+  // TODO: PENDING
+  if (!proposal) return "" as any;
+  else if (proposal.executed) return "Executed";
+  else if (proposal?.tally.no >= proposal?.parameters?.supportThreshold)
+    return "Defeated";
+  else if (proposal.active) return "Active";
+
+  return "Executable";
 }

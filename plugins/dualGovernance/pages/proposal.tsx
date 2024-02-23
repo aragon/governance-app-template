@@ -52,8 +52,8 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           proposalNumber={Number(proposalId) + 1}
           proposal={proposal}
           transactionConfirming={isConfirmingVeto || isConfirmingExecution}
-          userCanVeto={userCanVeto as boolean}
-          userCanExecute={proposalStatus === "Executable"}
+          canVeto={userCanVeto as boolean}
+          canExecute={proposalStatus === "Executable"}
           onVetoPressed={() => vetoProposal()}
           onExecutePressed={() => executeProposal()}
         />

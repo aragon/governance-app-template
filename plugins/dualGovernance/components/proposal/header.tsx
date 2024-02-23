@@ -11,8 +11,8 @@ const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 interface ProposalHeaderProps {
   proposalNumber: number;
   proposal: Proposal;
-  userCanVeto: boolean;
-  userCanExecute: boolean;
+  canVeto: boolean;
+  canExecute: boolean;
   transactionConfirming: boolean;
   onVetoPressed: () => void;
   onExecutePressed: () => void;
@@ -21,8 +21,8 @@ interface ProposalHeaderProps {
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposalNumber,
   proposal,
-  userCanVeto,
-  userCanExecute,
+  canVeto,
+  canExecute,
   transactionConfirming,
   onVetoPressed,
   onExecutePressed,
@@ -56,7 +56,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 <PleaseWaitSpinner fullMessage="Confirming..." />
               </div>
             </Then>
-            <ElseIf condition={userCanVeto}>
+            <ElseIf condition={canVeto}>
               <Button
                 className="flex h-5 items-center"
                 size="lg"
@@ -66,7 +66,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 Veto
               </Button>
             </ElseIf>
-            <ElseIf condition={userCanExecute}>
+            <ElseIf condition={canExecute}>
               <Button
                 className="flex h-5 items-center"
                 size="lg"

@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
 import { AlertInline, Button, Tag } from "@aragon/ods";
 import { Proposal } from "@/plugins/tokenVoting/utils/types";
 import { AlertVariant } from "@aragon/ods";
-import { Else, If, Then } from "@/components/if";
+import { Else, ElseIf, If, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 
@@ -12,34 +11,25 @@ interface ProposalHeaderProps {
   proposalNumber: number;
   proposal: Proposal;
   userVote: number | undefined;
-  userCanVote: boolean;
+  canVote: boolean;
+  canExecute: boolean;
   transactionConfirming: boolean;
   onShowVotingModal: () => void;
+  onExecute: () => void;
 }
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposalNumber,
   proposal,
   userVote,
-  userCanVote,
+  canVote,
+  canExecute,
   transactionConfirming,
   onShowVotingModal,
+  onExecute,
 }) => {
-  const [proposalVariant, setProposalVariant] = useState({
-    variant: "",
-    label: "",
-  });
-  const [userVoteData, setUserVoteData] = useState({ variant: "", label: "" });
-
-  useEffect(() => {
-    setProposalVariant(getProposalStatusVariant(proposal));
-  }, [proposal]);
-
-  useEffect(() => {
-    setUserVoteData(getUserVoteVariant(userVote));
-  }, [userVote]);
-
-  if (userVoteData.variant === "") return <></>;
+  const userVoteInfo = getUserVoteVariant(userVote);
+  const proposalVariant = getProposalStatusVariant(proposal);
 
   return (
     <div className="w-full">
@@ -63,41 +53,45 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
             </span>
           </div>
         </div>
-        <div className="flex ">
-          <If condition={userCanVote}>
+        <div className="flex">
+          <If condition={transactionConfirming}>
             <Then>
-              <If condition={!transactionConfirming}>
-                <Then>
-                  <Button
-                    className="flex h-5 items-center"
-                    size="lg"
-                    variant="primary"
-                    onClick={() => onShowVotingModal()}
-                  >
-                    Vote
-                  </Button>
-                </Then>
-                <Else>
-                  <div>
-                    <PleaseWaitSpinner fullMessage="Confirming..." />
-                  </div>
-                </Else>
-              </If>
+              <div>
+                <PleaseWaitSpinner fullMessage="Confirming..." />
+              </div>
             </Then>
-            <Else>
-              <If condition={userVote}>
-                <div className="flex items-center align-center">
-                  <span className="text-md text-neutral-800 font-semibold pr-4">
-                    Voted:{" "}
-                  </span>
-                  <AlertInline
-                    className="flex h-5 items-center"
-                    variant={userVoteData.variant as AlertVariant}
-                    message={userVoteData.label}
-                  />
-                </div>
-              </If>
-            </Else>
+            <ElseIf condition={canVote}>
+              <Button
+                className="flex h-5 items-center"
+                size="lg"
+                variant="primary"
+                onClick={() => onShowVotingModal()}
+              >
+                Vote
+              </Button>
+            </ElseIf>
+            <ElseIf condition={canExecute}>
+              <Button
+                className="flex h-5 items-center"
+                size="lg"
+                variant="success"
+                onClick={() => onExecute()}
+              >
+                Execute
+              </Button>
+            </ElseIf>
+            <ElseIf condition={userVote && userVoteInfo.label}>
+              <div className="flex items-center align-center">
+                <span className="text-md text-neutral-800 font-semibold pr-4">
+                  Voted:{" "}
+                </span>
+                <AlertInline
+                  className="flex h-5 items-center"
+                  variant={(userVoteInfo?.variant as AlertVariant) ?? ""}
+                  message={userVoteInfo?.label ?? ""}
+                />
+              </div>
+            </ElseIf>
           </If>
         </div>
       </div>

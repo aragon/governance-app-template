@@ -15,6 +15,7 @@ import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useProposalVoting } from "../hooks/useProposalVoting";
+import { useProposalExecute } from "../hooks/useProposalExcute";
 
 type BottomSection = "description" | "votes";
 
@@ -30,6 +31,8 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     votingStatus,
     isConfirming: isVoteConfirming,
   } = useProposalVoting(proposalId);
+  const { canExecute, executeProposal, isConfirming: isExecuteConfirming } =
+    useProposalExecute(proposalId);
   const votes = useProposalVoteList(proposalId, proposal);
   const userCanVote = useUserCanVote(BigInt(proposalId));
   const [votingPercentages, setVotingPercentages] = useState({
@@ -87,7 +90,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     proposalFetchStatus
   );
   const showTransactionConfirming =
-    votingStatus === "pending" || isVoteConfirming;
+    votingStatus === "pending" || isVoteConfirming || isExecuteConfirming;
 
   if (skipRender || !proposal || showProposalLoading) {
     return (
@@ -105,8 +108,10 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           proposal={proposal}
           userVote={votedOption}
           transactionConfirming={showTransactionConfirming}
-          userCanVote={userCanVote as boolean}
+          canVote={!!userCanVote}
+          canExecute={canExecute}
           onShowVotingModal={() => setShowVotingModal(true)}
+          onExecute={() => executeProposal()}
         />
       </div>
 

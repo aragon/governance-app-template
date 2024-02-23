@@ -1,5 +1,6 @@
 import { RootContextProvider } from "@/context";
 import { Layout } from "@/components/layout";
+import AlertContainer from "@/components/alert/alert-container";
 import { Manrope } from "next/font/google";
 import "@aragon/ods/index.css";
 import "@/pages/globals.css";
@@ -22,6 +23,7 @@ export default function AragonetteApp({ Component, pageProps }: any) {
         <Layout>
           <Component {...pageProps} />
         </Layout>
+        <AlertContainer />
       </RootContextProvider>
     </div>
   );

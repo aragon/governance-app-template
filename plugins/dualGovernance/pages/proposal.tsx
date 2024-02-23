@@ -57,19 +57,31 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   useEffect(() => {
     if (status === "idle" || status === "pending") return;
     else if (status === "error") {
-      if (error?.message?.startsWith("User rejected the request")) return;
-      alert("Could not create the proposal");
+      if (error?.message?.startsWith("User rejected the request")) {
+        addAlert("Transaction rejected by the user", {
+          timeout: 4 * 1000,
+        });
+      } else {
+        addAlert("Could not create the proposal", { type: "error" });
+      }
       return;
     }
 
     // success
     if (!vetoTxHash) return;
     else if (isConfirming) {
-      addAlert("The veto has been submitted", vetoTxHash);
+      addAlert("Veto submitted", {
+        description: "Waiting for the transaction to be validated",
+        txHash: vetoTxHash,
+      });
       return;
     } else if (!isConfirmed) return;
 
-    // addAlert("The veto has been registered", vetoTxHash);
+    addAlert("Veto registered", {
+      description: "The transaction has been validated",
+      type: "success",
+      txHash: vetoTxHash,
+    });
     reload();
   }, [status, vetoTxHash, isConfirming, isConfirmed]);
 

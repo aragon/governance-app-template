@@ -63,19 +63,31 @@ export default function Create() {
   useEffect(() => {
     if (status === "idle" || status === "pending") return;
     else if (status === "error") {
-      if (error?.message?.startsWith("User rejected the request")) return;
-      alert("Could not create the proposal");
+      if (error?.message?.startsWith("User rejected the request")) {
+        addAlert("Transaction rejected by the user", {
+          timeout: 4 * 1000,
+        });
+      } else {
+        addAlert("Could not create the proposal", { type: "error" });
+      }
       return;
     }
 
     // success
     if (!createTxHash) return;
     else if (isConfirming) {
-      addAlert("The proposal has been submitted", createTxHash);
+      addAlert("Proposal submitted", {
+        description: "Waiting for the transaction to be validated",
+        txHash: createTxHash,
+      });
       return;
     } else if (!isConfirmed) return;
 
-    addAlert("The proposal has been confirmed", createTxHash);
+    addAlert("Proposal created", {
+      description: "The transaction has been validated",
+      type: "success",
+      txHash: createTxHash,
+    });
     setTimeout(() => {
       push("#/");
     }, 1000 * 2);
@@ -83,11 +95,14 @@ export default function Create() {
 
   const submitProposal = async () => {
     // Check metadata
-    if (!title.trim()) return alert("Please, enter a title");
+    if (!title.trim())
+      return addAlert("Please, enter a title", { type: "error" });
 
     const plainSummary = getPlainText(summary).trim();
     if (!plainSummary.trim())
-      return alert("Please, enter a summary of what the proposal is about");
+      return addAlert("Please, enter a summary of what the proposal is about", {
+        type: "error",
+      });
 
     // Check the action
     switch (actionType) {
@@ -95,15 +110,17 @@ export default function Create() {
         break;
       case ActionType.Withdrawal:
         if (!actions.length) {
-          return alert(
-            "Please ensure that the withdrawal address and the amount to transfer are valid"
+          return addAlert(
+            "Please ensure that the withdrawal address and the amount to transfer are valid",
+            { type: "error" }
           );
         }
         break;
       default:
         if (!actions.length || !actions[0].data || actions[0].data === "0x") {
-          return alert(
-            "Please ensure that the values of the action to execute are correct"
+          return addAlert(
+            "Please ensure that the values of the action to execute are correct",
+            { type: "error" }
           );
         }
     }

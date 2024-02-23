@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { Address } from "viem";
-import { useBlockNumber, useReadContract } from "wagmi";
+import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { fetchJsonFromIpfs } from "@/utils/ipfs";
-import { PublicClient, getAbiItem } from "viem";
+import { getAbiItem } from "viem";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import { Action } from "@/utils/types";
 import {
@@ -12,6 +11,7 @@ import {
   Tally,
 } from "@/plugins/tokenVoting/utils/types";
 import { useQuery } from "@tanstack/react-query";
+import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -30,12 +30,8 @@ const ProposalCreatedEvent = getAbiItem({
   name: "ProposalCreated",
 });
 
-export function useProposal(
-  publicClient: PublicClient,
-  address: Address,
-  proposalId: string,
-  autoRefresh = false
-) {
+export function useProposal(proposalId: string, autoRefresh = false) {
+  const publicClient = usePublicClient();
   const [proposalCreationEvent, setProposalCreationEvent] =
     useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();
@@ -48,7 +44,7 @@ export function useProposal(
     fetchStatus: proposalFetchStatus,
     refetch: proposalRefetch,
   } = useReadContract<typeof TokenVotingAbi, "getProposal", any[]>({
-    address,
+    address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
     abi: TokenVotingAbi,
     functionName: "getProposal",
     args: [proposalId],
@@ -61,11 +57,11 @@ export function useProposal(
 
   // Creation event
   useEffect(() => {
-    if (!proposalData) return;
+    if (!proposalData || !publicClient) return;
 
     publicClient
       .getLogs({
-        address,
+        address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
         event: ProposalCreatedEvent as any,
         args: {
           proposalId: proposalId,
@@ -92,7 +88,10 @@ export function useProposal(
     isSuccess: metadataReady,
     error: metadataError,
   } = useQuery<ProposalMetadata, Error>({
-    queryKey: [`tokenVotingProposal-${address}-${proposalId}`, metadataUri!],
+    queryKey: [
+      `tokenVotingProposal-${PUB_TOKEN_VOTING_PLUGIN_ADDRESS}-${proposalId}`,
+      metadataUri!,
+    ],
     queryFn: () =>
       metadataUri ? fetchJsonFromIpfs(metadataUri) : Promise.resolve(null),
     enabled: !!metadataUri,

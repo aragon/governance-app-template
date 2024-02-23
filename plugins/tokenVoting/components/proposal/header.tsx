@@ -13,7 +13,7 @@ interface ProposalHeaderProps {
   proposal: Proposal;
   userVote: number | undefined;
   userCanVote: boolean;
-  transactionLoading: boolean;
+  transactionConfirming: boolean;
   onShowVotingModal: () => void;
 }
 
@@ -22,7 +22,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposal,
   userVote,
   userCanVote,
-  transactionLoading,
+  transactionConfirming,
   onShowVotingModal,
 }) => {
   const [proposalVariant, setProposalVariant] = useState({
@@ -32,41 +32,12 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   const [userVoteData, setUserVoteData] = useState({ variant: "", label: "" });
 
   useEffect(() => {
-    setProposalVariant(getProposalVariantStatus(proposal));
+    setProposalVariant(getProposalStatusVariant(proposal));
   }, [proposal]);
 
   useEffect(() => {
-    setUserVoteData(getUserVoteData());
+    setUserVoteData(getUserVoteVariant(userVote));
   }, [userVote]);
-
-  const getProposalVariantStatus = (proposal: Proposal) => {
-    return {
-      variant: proposal?.active
-        ? "info"
-        : proposal?.executed
-        ? "success"
-        : proposal?.tally?.no >= proposal?.tally?.yes
-        ? "critical"
-        : ("success" as AlertVariant),
-      label: proposal?.active
-        ? "Active"
-        : proposal?.executed
-        ? "Executed"
-        : proposal?.tally?.no >= proposal?.tally?.yes
-        ? "Defeated"
-        : "Executable",
-    };
-  };
-
-  const getUserVoteData = () => {
-    if (userVote === 3) {
-      return { variant: "critical" as AlertVariant, label: "Against" };
-    } else if (userVote === 1) {
-      return { variant: "info" as AlertVariant, label: "Abstain" };
-    } else {
-      return { variant: "success" as AlertVariant, label: "For" };
-    }
-  };
 
   if (userVoteData.variant === "") return <></>;
 
@@ -88,14 +59,14 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
               </div>
             </If>
             <span className="text-xl font-semibold text-neutral-700 pt-1">
-              Proposal {proposalNumber + 1}
+              Proposal {proposalNumber}
             </span>
           </div>
         </div>
         <div className="flex ">
           <If condition={userCanVote}>
             <Then>
-              <If condition={!transactionLoading}>
+              <If condition={!transactionConfirming}>
                 <Then>
                   <Button
                     className="flex h-5 items-center"
@@ -139,6 +110,38 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
       </p>
     </div>
   );
+};
+
+const getProposalStatusVariant = (proposal: Proposal) => {
+  return {
+    variant: proposal?.active
+      ? "info"
+      : proposal?.executed
+      ? "success"
+      : proposal?.tally?.no >= proposal?.tally?.yes
+      ? "critical"
+      : ("success" as AlertVariant),
+    label: proposal?.active
+      ? "Active"
+      : proposal?.executed
+      ? "Executed"
+      : proposal?.tally?.no >= proposal?.tally?.yes
+      ? "Defeated"
+      : "Executable",
+  };
+};
+
+const getUserVoteVariant = (userVote?: number) => {
+  switch (userVote) {
+    case 3:
+      return { variant: "critical" as AlertVariant, label: "Against" };
+    case 2:
+      return { variant: "success" as AlertVariant, label: "For" };
+    case 1:
+      return { variant: "info" as AlertVariant, label: "Abstain" };
+    default:
+      return { variant: "", label: "" };
+  }
 };
 
 export default ProposalHeader;

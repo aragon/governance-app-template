@@ -1,48 +1,36 @@
-import {
-  usePublicClient,
-  useAccount,
-  useWriteContract,
-  useWaitForTransactionReceipt,
-} from "wagmi";
+import { useAccount } from "wagmi";
 import { useState, useEffect } from "react";
 import { useProposal } from "@/plugins/tokenVoting/hooks/useProposal";
-import { useProposalVotes } from "@/plugins/tokenVoting/hooks/useProposalVotes";
+import { useProposalVoteList } from "@/plugins/tokenVoting/hooks/useProposalVoteList";
 import { ToggleGroup, Toggle } from "@aragon/ods";
 import ProposalDescription from "@/plugins/tokenVoting/components/proposal/description";
 import VotesSection from "@/plugins/tokenVoting/components/vote/votes-section";
 import ProposalHeader from "@/plugins/tokenVoting/components/proposal/header";
 import { formatUnits } from "viem";
 import { useUserCanVote } from "@/plugins/tokenVoting/hooks/useUserCanVote";
-import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import VoteTally from "@/plugins/tokenVoting/components/vote/tally";
 import VotingModal from "@/plugins/tokenVoting/components/vote/voting-modal";
 import ProposalDetails from "@/plugins/tokenVoting/components/proposal/details";
-import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
 import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
-import { useRouter } from "next/router";
-import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { useProposalVoting } from "../hooks/useProposalVoting";
 
 type BottomSection = "description" | "votes";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
-  const { reload } = useRouter();
   const skipRender = useSkipFirstRender();
-  const publicClient = usePublicClient();
 
   const { proposal, status: proposalFetchStatus } = useProposal(
-    publicClient!,
-    PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
     proposalId,
     true
   );
-  const votes = useProposalVotes(
-    publicClient!,
-    PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
-    proposalId,
-    proposal
-  );
+  const {
+    voteProposal,
+    votingStatus,
+    isConfirming: isVoteConfirming,
+  } = useProposalVoting(proposalId);
+  const votes = useProposalVoteList(proposalId, proposal);
   const userCanVote = useUserCanVote(BigInt(proposalId));
   const [votingPercentages, setVotingPercentages] = useState({
     yes: 0,
@@ -54,16 +42,14 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const [votedOption, setVotedOption] = useState<number | undefined>(undefined);
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [selectedVoteOption, setSelectedVoteOption] = useState<number>();
-  const { addAlert } = useAlertContext() as AlertContextProps;
   const { address } = useAccount();
-  const {
-    writeContract: voteWrite,
-    data: votingTxHash,
-    error,
-    status,
-  } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash: votingTxHash });
+
+  useEffect(() => {
+    if (showVotingModal) return;
+    else if (!selectedVoteOption) return;
+
+    voteProposal(selectedVoteOption, false);
+  }, [selectedVoteOption, showVotingModal]);
 
   useEffect(() => {
     if (!proposal?.tally) return;
@@ -96,55 +82,12 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     setShowVotingModal(false);
   };
 
-  useEffect(() => {
-    if (status === "idle" || status === "pending") return;
-    else if (status === "error") {
-      if (error?.message?.startsWith("User rejected the request")) {
-        addAlert("Transaction rejected by the user", {
-          timeout: 4 * 1000,
-        });
-      } else {
-        addAlert("Could not create the proposal", { type: "error" });
-      }
-      return;
-    }
-
-    // success
-    if (!votingTxHash) return;
-    else if (isConfirming) {
-      addAlert("Vote submitted", {
-        description: "Waiting for the transaction to be validated",
-        txHash: votingTxHash,
-      });
-      return;
-    } else if (!isConfirmed) return;
-
-    addAlert("Vote registered", {
-      description: "The transaction has been validated",
-      type: "success",
-      txHash: votingTxHash,
-    });
-
-    reload();
-  }, [status, votingTxHash, isConfirming, isConfirmed]);
-
-  useEffect(() => {
-    if (showVotingModal) return;
-    else if (!selectedVoteOption) return;
-
-    voteWrite({
-      abi: TokenVotingAbi,
-      address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
-      functionName: "vote",
-      args: [proposalId, selectedVoteOption, 1],
-    });
-  }, [selectedVoteOption, showVotingModal]);
-
   const showProposalLoading = getShowProposalLoading(
     proposal,
     proposalFetchStatus
   );
-  const showTransactionLoading = status === "pending" || isConfirming;
+  const showTransactionConfirming =
+    votingStatus === "pending" || isVoteConfirming;
 
   if (skipRender || !proposal || showProposalLoading) {
     return (
@@ -158,10 +101,10 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     <section className="flex flex-col items-center w-screen max-w-full min-w-full">
       <div className="flex justify-between py-5 w-full">
         <ProposalHeader
-          proposalNumber={Number(proposalId)}
+          proposalNumber={Number(proposalId) + 1}
           proposal={proposal}
           userVote={votedOption}
-          transactionLoading={showTransactionLoading}
+          transactionConfirming={showTransactionConfirming}
           userCanVote={userCanVote as boolean}
           onShowVotingModal={() => setShowVotingModal(true)}
         />

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { usePublicClient } from "wagmi";
 import { Proposal } from "@/plugins/tokenVoting/utils/types";
 import { useProposal } from "@/plugins/tokenVoting/hooks/useProposal";
 import { TagVariant } from "@aragon/ods";
@@ -7,7 +6,6 @@ import { Card, Tag } from "@aragon/ods";
 import * as DOMPurify from 'dompurify';
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { If } from "@/components/if";
-import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY =
@@ -37,10 +35,7 @@ const getProposalVariantStatus = (proposal: Proposal) => {
 };
 
 export default function ProposalCard(props: ProposalInputs) {
-  const publicClient = usePublicClient();
   const { proposal, status } = useProposal(
-    publicClient!,
-    PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
     props.proposalId.toString()
   );
 

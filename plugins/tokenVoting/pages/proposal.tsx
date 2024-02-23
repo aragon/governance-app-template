@@ -1,4 +1,9 @@
-import { usePublicClient, useAccount, useWriteContract } from "wagmi";
+import {
+  usePublicClient,
+  useAccount,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import { useState, useEffect } from "react";
 import { useProposal } from "@/plugins/tokenVoting/hooks/useProposal";
 import { useProposalVotes } from "@/plugins/tokenVoting/hooks/useProposalVotes";
@@ -16,11 +21,13 @@ import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
 import { Else, If, IfCase, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
-import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from '@/constants';
+import { useRouter } from "next/router";
+import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 type BottomSection = "description" | "votes";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
+  const { reload } = useRouter();
   const skipRender = useSkipFirstRender();
   const publicClient = usePublicClient();
 
@@ -48,8 +55,15 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [selectedVoteOption, setSelectedVoteOption] = useState<number>();
   const { addAlert } = useAlertContext() as AlertContextProps;
-  const { address, isConnected, isDisconnected } = useAccount();
-  const { writeContract: voteWrite, data: voteResponse } = useWriteContract();
+  const { address } = useAccount();
+  const {
+    writeContract: voteWrite,
+    data: votingTxHash,
+    error,
+    status,
+  } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({ hash: votingTxHash });
 
   useEffect(() => {
     if (!proposal?.tally) return;
@@ -83,8 +97,23 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   };
 
   useEffect(() => {
-    if (voteResponse) addAlert("Your vote has been submitted", voteResponse);
-  }, [voteResponse]);
+    if (status === "idle" || status === "pending") return;
+    else if (status === "error") {
+      if (error?.message?.startsWith("User rejected the request")) return;
+      alert("Could not create the proposal");
+      return;
+    }
+
+    // success
+    if (!votingTxHash) return;
+    else if (isConfirming) {
+      addAlert("The vote has been submitted", votingTxHash);
+      return;
+    } else if (!isConfirmed) return;
+
+    // addAlert("The vote has been registered", votingTxHash);
+    reload();
+  }, [status, votingTxHash, isConfirming, isConfirmed]);
 
   useEffect(() => {
     if (showVotingModal) return;
@@ -98,9 +127,13 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     });
   }, [selectedVoteOption, showVotingModal]);
 
-  const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
+  const showProposalLoading = getShowProposalLoading(
+    proposal,
+    proposalFetchStatus
+  );
+  const showTransactionLoading = status === "pending" || isConfirming;
 
-  if (skipRender || !proposal || showLoading) {
+  if (skipRender || !proposal || showProposalLoading) {
     return (
       <section className="flex justify-left items-left w-screen max-w-full min-w-full">
         <PleaseWaitSpinner />
@@ -115,6 +148,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           proposalNumber={Number(proposalId)}
           proposal={proposal}
           userVote={votedOption}
+          transactionLoading={showTransactionLoading}
           userCanVote={userCanVote as boolean}
           onShowVotingModal={() => setShowVotingModal(true)}
         />

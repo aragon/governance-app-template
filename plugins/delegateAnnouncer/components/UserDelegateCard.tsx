@@ -16,11 +16,12 @@ import { PUB_DAO_ADDRESS, PUB_DELEGATION_CONTRACT_ADDRESS } from "@/constants";
 type SelfDelegationProfileCardProps = {
     address: Address;
     tokenAddress: Address;
+    loading: boolean;
     message: string | undefined;
     delegates: Address;
 }
 
-export const SelfDelegationProfileCard = ({ address, tokenAddress, message, delegates }: SelfDelegationProfileCardProps) => {
+export const SelfDelegationProfileCard = ({ address, tokenAddress, message, loading, delegates }: SelfDelegationProfileCardProps) => {
     const [inputDescription, setInputDescription] = useState<string>();
     const result = useEnsName({
         chainId: mainnet.id,
@@ -79,7 +80,7 @@ export const SelfDelegationProfileCard = ({ address, tokenAddress, message, dele
                         __html: DOMPurify.sanitize(message ?? "")
                     }}/>
                 </If>
-                <If condition={!message}>
+                <If condition={!loading && !message}>
                     <TextAreaRichText
                         label="Summary"
                         className='pt-2'

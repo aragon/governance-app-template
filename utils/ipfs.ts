@@ -8,7 +8,7 @@ export function fetchJsonFromIpfs(hexIpfsUri: string) {
 
 export function uploadToIPFS(client: IPFSHTTPClient, blob: Blob) {
   return client.add(blob).then(({ cid }: { cid: CID }) => {
-    return cid.toString();
+    return "ipfs://" + cid.toString();
   });
 }
 

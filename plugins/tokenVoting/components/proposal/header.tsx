@@ -69,7 +69,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 variant="primary"
                 onClick={() => onShowVotingModal()}
               >
-                Vote
+                Submit vote
               </Button>
             </ElseIf>
             <ElseIf condition={canExecute}>
@@ -84,9 +84,6 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
             </ElseIf>
             <ElseIf condition={userVote && userVoteInfo.label}>
               <div className="flex items-center align-center">
-                <span className="text-md text-neutral-800 font-semibold pr-4">
-                  Voted:{" "}
-                </span>
                 {userVoteInfo?.variant && (
                   <AlertInline
                     className="flex h-5 items-center"
@@ -132,11 +129,11 @@ const getProposalStatusVariant = (proposal: Proposal) => {
 const getUserVoteVariant = (userVote?: number) => {
   switch (userVote) {
     case 3:
-      return { variant: "critical" as AlertVariant, label: "Against" };
+      return { variant: "critical" as AlertVariant, label: "You voted no" };
     case 2:
-      return { variant: "success" as AlertVariant, label: "For" };
+      return { variant: "success" as AlertVariant, label: "You voted yes" };
     case 1:
-      return { variant: "info" as AlertVariant, label: "Abstain" };
+      return { variant: "info" as AlertVariant, label: "You abstained" };
     default:
       return { variant: "", label: "" };
   }

@@ -1,18 +1,29 @@
 import { useEffect } from "react";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import {
+  useWaitForTransactionReceipt,
+  useWriteContract,
+  useReadContract,
+} from "wagmi";
 import { TokenVotingAbi } from "../artifacts/TokenVoting.sol";
 import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
 import { useRouter } from "next/router";
-import { Proposal } from "../utils/types";
-import { useProposal } from "./useProposal";
-import { ProposalStatus } from "@/plugins/dualGovernance/utils/types";
 import { PUB_CHAIN, PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 export function useProposalExecute(proposalId: string) {
   const { reload } = useRouter();
   const { addAlert } = useAlertContext() as AlertContextProps;
-  const { proposal } = useProposal(proposalId);
 
+  const {
+    data: canExecute,
+    isError: isCanVoteError,
+    isLoading: isCanVoteLoading,
+  } = useReadContract({
+    address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+    abi: TokenVotingAbi,
+    chainId: PUB_CHAIN.id,
+    functionName: "canExecute",
+    args: [proposalId],
+  });
   const {
     writeContract: executeWrite,
     data: executeTxHash,
@@ -23,6 +34,8 @@ export function useProposalExecute(proposalId: string) {
     useWaitForTransactionReceipt({ hash: executeTxHash });
 
   const executeProposal = () => {
+    if (!canExecute) return;
+
     executeWrite({
       chainId: PUB_CHAIN.id,
       abi: TokenVotingAbi,
@@ -72,19 +85,9 @@ export function useProposalExecute(proposalId: string) {
 
   return {
     executeProposal,
-    canExecute: getProposalStatus(proposal) === "Executable",
+    canExecute:
+      !isCanVoteError && !isCanVoteLoading && !isConfirmed && !!canExecute,
     isConfirming,
     isConfirmed,
   };
-}
-
-function getProposalStatus(proposal: Proposal | null): ProposalStatus {
-  // TODO: PENDING
-  if (!proposal) return "" as any;
-  else if (proposal.executed) return "Executed";
-  else if (proposal?.tally.no >= proposal?.parameters?.supportThreshold)
-    return "Defeated";
-  else if (proposal.active) return "Active";
-
-  return "Executable";
 }

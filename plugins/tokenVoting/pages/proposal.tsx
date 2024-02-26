@@ -15,7 +15,7 @@ import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useProposalVoting } from "../hooks/useProposalVoting";
-import { useProposalExecute } from "../hooks/useProposalExcute";
+import { useProposalExecute } from "../hooks/useProposalExecute";
 
 type BottomSection = "description" | "votes";
 
@@ -31,8 +31,11 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     votingStatus,
     isConfirming: isVoteConfirming,
   } = useProposalVoting(proposalId);
-  const { canExecute, executeProposal, isConfirming: isExecuteConfirming } =
-    useProposalExecute(proposalId);
+  const {
+    canExecute,
+    executeProposal,
+    isConfirming: isExecuteConfirming,
+  } = useProposalExecute(proposalId);
   const votes = useProposalVoteList(proposalId, proposal);
   const userCanVote = useUserCanVote(BigInt(proposalId));
   const [votingPercentages, setVotingPercentages] = useState({

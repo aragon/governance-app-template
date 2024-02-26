@@ -39,13 +39,15 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
             {/** bg-info-200 bg-success-200 bg-critical-200
              * text-info-800 text-success-800 text-critical-800
              */}
-            <If condition={proposal.tally}>
+            <If condition={proposal.tally && proposalVariant.variant}>
               <div className="flex">
-                <Tag
-                  className="text-center text-critical-800"
-                  label={proposalVariant.label}
-                  variant={proposalVariant.variant as AlertVariant}
-                />
+                {proposalVariant?.variant && (
+                  <Tag
+                    className="text-center text-critical-800"
+                    label={proposalVariant.label}
+                    variant={proposalVariant.variant as AlertVariant}
+                  />
+                )}
               </div>
             </If>
             <span className="text-xl font-semibold text-neutral-700 pt-1">
@@ -85,11 +87,13 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 <span className="text-md text-neutral-800 font-semibold pr-4">
                   Voted:{" "}
                 </span>
-                <AlertInline
-                  className="flex h-5 items-center"
-                  variant={(userVoteInfo?.variant as AlertVariant) ?? ""}
-                  message={userVoteInfo?.label ?? ""}
-                />
+                {userVoteInfo?.variant && (
+                  <AlertInline
+                    className="flex h-5 items-center"
+                    variant={(userVoteInfo.variant as AlertVariant) ?? "info"}
+                    message={userVoteInfo.label ?? " "}
+                  />
+                )}
               </div>
             </ElseIf>
           </If>
@@ -111,7 +115,7 @@ const getProposalStatusVariant = (proposal: Proposal) => {
     variant: proposal?.active
       ? "info"
       : proposal?.executed
-      ? "success"
+      ? "primary"
       : proposal?.tally?.no >= proposal?.tally?.yes
       ? "critical"
       : ("success" as AlertVariant),

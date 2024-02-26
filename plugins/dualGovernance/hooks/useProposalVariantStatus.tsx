@@ -10,9 +10,9 @@ export const useProposalVariantStatus = (proposal: Proposal) => {
       proposal?.vetoTally >= proposal?.parameters?.minVetoVotingPower 
         ? { variant: 'critical', label: 'Defeated' }
         : proposal?.active
-          ? { variant: 'primary', label: 'Active' }
+          ? { variant: 'info', label: 'Active' }
           : proposal?.executed 
-            ? { variant: 'success', label: 'Executed' }
+            ? { variant: 'primary', label: 'Executed' }
             : { variant: 'success', label: 'Executable' }
     );
   }, [proposal?.vetoTally, proposal?.active, proposal?.executed, proposal?.parameters?.minVetoVotingPower]);

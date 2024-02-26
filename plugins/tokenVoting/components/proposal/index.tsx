@@ -18,9 +18,9 @@ type ProposalInputs = {
 const getProposalVariantStatus = (proposal: Proposal) => {
   return {
     variant: (proposal?.active
-      ? "primary"
+      ? "info"
       : proposal?.executed
-        ? "success"
+        ? "primary"
         : proposal?.tally?.no >= proposal?.tally?.yes
           ? "critical"
           : "success") as TagVariant,

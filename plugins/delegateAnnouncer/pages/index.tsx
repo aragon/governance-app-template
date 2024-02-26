@@ -2,7 +2,7 @@ import { usePublicClient, useReadContract } from "wagmi";
 import { useAccount } from "wagmi";
 import { PublicClient, parseAbi } from "viem";
 import { ReactNode } from "react";
-import { If, IfNot } from "@/components/if";
+import { If } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useDelegateAnnouncements } from "../hooks/useDelegateAnnouncements";
@@ -55,7 +55,7 @@ export default function DelegateAnnouncements() {
       </If>
 
       <h2 className="text-3xl font-semibold text-neutral-700">Delegates</h2>
-      <IfNot condition={delegateAnnouncements.length}>
+      <If not={delegateAnnouncements.length}>
         <If condition={delegateAnnouncementsIsLoading}>
           <SectionView>
             <span className="my-3">
@@ -68,7 +68,7 @@ export default function DelegateAnnouncements() {
             No delegations have been registered on this DAO
           </span>
         </If>
-      </IfNot>
+      </If>
       <If condition={delegateAnnouncements.length}>
         <div className="grid grid-cols-1 lg:grid-cols-2 mt-4 mb-14 gap-4">
           {delegateAnnouncements.map((announcement) => (

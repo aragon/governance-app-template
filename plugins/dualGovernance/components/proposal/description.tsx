@@ -4,7 +4,7 @@ import { whatsabi } from "@shazow/whatsabi";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { usePublicClient } from "wagmi";
 import { Address, decodeFunctionData } from "viem";
-import { Else, If, IfCase, IfNot, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { AddressText } from "@/components/text/address";
 import { isAddress } from "@/utils/evm";
@@ -76,9 +76,9 @@ export default function ProposalDescription(proposal: Proposal) {
         Actions
       </h2>
       <div className="flex flex-row space-between">
-        <IfNot condition={proposalActions.length}>
+        <If not={proposalActions.length}>
           <p className="pt-2">The proposal has no actions</p>
-        </IfNot>
+        </If>
         <If condition={proposalActions.length && !decodedActions?.length}>
           <PleaseWaitSpinner />
         </If>
@@ -142,14 +142,14 @@ const ActionCard = function ({
           {action?.args?.length &&
             action?.args?.map((arg: any, j: number) => (
               <li key={`arg-${j}`}>
-                <IfCase condition={isAddress(arg)}>
+                <If condition={isAddress(arg)}>
                   <Then>
                     <AddressText>{arg.toString()}</AddressText>
                   </Then>
                   <Else>
                     <code>{arg.toString()}</code>
                   </Else>
-                </IfCase>
+                </If>
               </li>
             ))}
         </ul>

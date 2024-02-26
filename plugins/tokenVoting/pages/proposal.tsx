@@ -18,7 +18,7 @@ import VoteTally from "@/plugins/tokenVoting/components/vote/tally";
 import VotingModal from "@/plugins/tokenVoting/components/vote/voting-modal";
 import ProposalDetails from "@/plugins/tokenVoting/components/proposal/details";
 import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
-import { Else, If, IfCase, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useRouter } from "next/router";
@@ -209,14 +209,14 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           </ToggleGroup>
         </div>
 
-        <IfCase condition={bottomSection === "description"}>
+        <If condition={bottomSection === "description"}>
           <Then>
             <ProposalDescription {...proposal} />
           </Then>
           <Else>
             <VotesSection votes={votes} />
           </Else>
-        </IfCase>
+        </If>
       </div>
 
       <If condition={showVotingModal}>

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Button, Tag } from "@aragon/ods";
 import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { AlertVariant } from "@aragon/ods";
-import { Else, If, IfCase, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { OptimisticTokenVotingPluginAbi } from "../../artifacts/OptimisticTokenVotingPlugin.sol";
@@ -107,9 +107,9 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
           </div>
         </div>
         <div className="flex ">
-          <IfCase condition={userCanVeto}>
+          <If condition={userCanVeto}>
             <Then>
-              <IfCase condition={!transactionLoading}>
+              <If condition={!transactionLoading}>
                 <Then>
                   <Button
                     className="flex h-5 items-center"
@@ -125,7 +125,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                     <PleaseWaitSpinner fullMessage="Confirming..." />
                   </div>
                 </Else>
-              </IfCase>
+              </If>
             </Then>
             <Else>
               <If condition={proposalVariant.label === "Executable"}>
@@ -139,7 +139,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 </Button>
               </If>
             </Else>
-          </IfCase>
+          </If>
         </div>
       </div>
 

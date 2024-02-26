@@ -7,7 +7,7 @@ import { plugins } from "@/plugins";
 import { ParsedUrlQuery } from "querystring";
 import { resolveQueryParam } from "@/utils/query";
 import { PUB_DISCORD_URL } from "@/constants";
-import { Else, IfCase, Then } from "./if";
+import { Else, If, Then } from "./if";
 import { CloseIcon, MenuIcon } from "./icons";
 
 const Sidebar = () => {
@@ -24,14 +24,14 @@ const Sidebar = () => {
       className="md:hidden block absolute mt-2 ml-2 z-50"
       onClick={() => setIsOpen(!isOpen)}
     >
-      <IfCase condition={isOpen}>
+      <If condition={isOpen}>
         <Then>
           <CloseIcon className="h-6 w-6 fill-current" />
         </Then>
         <Else>
           <MenuIcon className="h-6 w-6 fill-current" />
         </Else>
-      </IfCase>
+      </If>
     </Button>
   );
 

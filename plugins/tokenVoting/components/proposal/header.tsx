@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { AlertInline, Button, Tag } from "@aragon/ods";
 import { Proposal } from "@/plugins/tokenVoting/utils/types";
 import { AlertVariant } from "@aragon/ods";
-import { Else, If, IfCase, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 
@@ -93,9 +93,9 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
           </div>
         </div>
         <div className="flex ">
-          <IfCase condition={userCanVote}>
+          <If condition={userCanVote}>
             <Then>
-              <IfCase condition={!transactionLoading}>
+              <If condition={!transactionLoading}>
                 <Then>
                   <Button
                     className="flex h-5 items-center"
@@ -111,7 +111,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                     <PleaseWaitSpinner fullMessage="Confirming..." />
                   </div>
                 </Else>
-              </IfCase>
+              </If>
             </Then>
             <Else>
               <If condition={userVote}>
@@ -127,7 +127,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 </div>
               </If>
             </Else>
-          </IfCase>
+          </If>
         </div>
       </div>
 

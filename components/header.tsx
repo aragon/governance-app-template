@@ -1,7 +1,7 @@
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Button } from "@aragon/ods";
 import { useAccount } from "wagmi";
-import { Else, IfCase, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import WalletContainer from "./WalletContainer";
 
@@ -14,7 +14,7 @@ const Header = () => {
 
   return (
     <div className="flex flex-row-reverse w-full mt-5 h-14 md:h-24">
-      <IfCase condition={isConnected}>
+      <If condition={isConnected}>
         <Then>
           <div>
             <WalletContainer />
@@ -25,7 +25,7 @@ const Header = () => {
             <span>Connect wallet</span>
           </Button>
         </Else>
-      </IfCase>
+      </If>
     </div>
   );
 };

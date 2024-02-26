@@ -15,7 +15,7 @@ import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifac
 import VetoTally from "@/plugins/dualGovernance/components/vote/tally";
 import ProposalDetails from "@/plugins/dualGovernance/components/proposal/details";
 import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
-import { Else, IfCase, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useRouter } from "next/router";
@@ -152,14 +152,14 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           </ToggleGroup>
         </div>
 
-        <IfCase condition={bottomSection === "description"}>
+        <If condition={bottomSection === "description"}>
           <Then>
             <ProposalDescription {...proposal} />
           </Then>
           <Else>
             <VetoesSection vetoes={vetoes} />
           </Else>
-        </IfCase>
+        </If>
       </div>
     </section>
   );

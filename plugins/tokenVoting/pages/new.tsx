@@ -17,7 +17,7 @@ import CustomActionInput from "@/components/input/custom-action";
 import { Action } from "@/utils/types";
 import { getPlainText } from "@/utils/html";
 import { useRouter } from "next/router";
-import { Else, IfCase, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import {
   PUB_IPFS_API_KEY,
@@ -240,7 +240,7 @@ export default function Create() {
           </div>
         </div>
 
-        <IfCase condition={showLoading}>
+        <If condition={showLoading}>
           <Then>
             <div className="mt-14 mb-6">
               <PleaseWaitSpinner fullMessage="Confirming transaction..." />
@@ -256,7 +256,7 @@ export default function Create() {
               Submit
             </Button>
           </Else>
-        </IfCase>
+        </If>
       </div>
     </section>
   );

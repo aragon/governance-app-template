@@ -5,7 +5,7 @@ import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifac
 import { Button, IconType } from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/dualGovernance/hooks/useCanCreateProposal";
 import Link from "next/link";
-import { If, IfNot } from "@/components/if";
+import { If } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
@@ -92,13 +92,13 @@ export default function Proposals() {
           </Button>
         </div>
       </If>
-      <IfNot condition={proposalCount}>
+      <If not={proposalCount}>
         <If condition={isLoading}>
           <SectionView>
             <PleaseWaitSpinner />
           </SectionView>
         </If>
-      </IfNot>
+      </If>
     </MainSection>
   );
 }

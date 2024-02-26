@@ -1,7 +1,7 @@
 import { Button, Tag } from "@aragon/ods";
 import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { AlertVariant } from "@aragon/ods";
-import { Else, ElseIf, If, Then } from "@/components/if";
+import { ElseIf, If, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
 import { useProposalVariantStatus } from "@/plugins/dualGovernance/hooks/useProposalVariantStatus";
 import { PleaseWaitSpinner } from "@/components/please-wait";

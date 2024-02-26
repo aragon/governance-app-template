@@ -1,7 +1,7 @@
 import { AlertInline, Button, Tag } from "@aragon/ods";
 import { Proposal } from "@/plugins/tokenVoting/utils/types";
 import { AlertVariant } from "@aragon/ods";
-import { Else, ElseIf, If, Then } from "@/components/if";
+import { ElseIf, If, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 

@@ -1,4 +1,4 @@
-import React, { ReactElement, ReactNode } from 'react';
+import React, { ReactElement, ReactNode } from "react";
 
 type Booleanish = any;
 type IfProps =
@@ -58,7 +58,7 @@ export const If = (props: IfProps) => {
   const mainCondition = resolveCondition(props);
 
   // Many children
-  if (Array.isArray(children)) {
+  if (Array.isArray(children) && hasConditionalChildren(children)) {
     for (const child of children) {
       // Match the Then/ElseIf/Else elements only
       if (child.type === Then) {
@@ -78,7 +78,7 @@ export const If = (props: IfProps) => {
     return <></>;
   }
   // One child
-  else if (typeof children !== 'object') {
+  else if (typeof children !== "object") {
     if (!mainCondition) return <></>;
 
     return children;
@@ -179,14 +179,28 @@ export const Else = ({ children }: { children: ReactNode }) => {
 
 function resolveCondition(props: IfProps): boolean {
   if (
-    typeof (props as any).condition !== 'undefined' &&
-    typeof (props as any).not !== 'undefined'
+    typeof (props as any).condition !== "undefined" &&
+    typeof (props as any).not !== "undefined"
   ) {
     throw new Error(
       "Either 'condition' or 'not' are required as an <If> prop, but not both"
     );
-  } else if (typeof (props as any).condition !== 'undefined') {
+  } else if (typeof (props as any).condition !== "undefined") {
     return (props as any).condition;
   }
   return !(props as any).not;
+}
+
+function hasConditionalChildren(children: ReactNode): boolean {
+  if (!Array.isArray(children)) {
+    return isConditionalChild(children as ReactElement);
+  }
+  for (const item of children) {
+    if (isConditionalChild(item)) return true;
+  }
+  return false;
+}
+
+function isConditionalChild(node: ReactElement) {
+  return node.type === Then || node.type === ElseIf || node.type === Else;
 }

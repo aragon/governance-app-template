@@ -65,7 +65,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 variant="primary"
                 onClick={() => onVetoPressed()}
               >
-                Veto
+                Submit veto
               </Button>
             </ElseIf>
             <ElseIf condition={canExecute}>

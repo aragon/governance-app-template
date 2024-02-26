@@ -21,10 +21,9 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
 
   const {
     proposal,
-    proposalStatus,
     proposalFetchStatus,
     vetoes,
-    userCanVeto,
+    canVeto,
     isConfirming: isConfirmingVeto,
     vetoProposal,
   } = useProposalVeto(proposalId);
@@ -34,8 +33,11 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     proposalFetchStatus
   );
 
-  const { executeProposal, isConfirming: isConfirmingExecution } =
-    useProposalExecute(proposalId);
+  const {
+    executeProposal,
+    canExecute,
+    isConfirming: isConfirmingExecution,
+  } = useProposalExecute(proposalId);
 
   if (skipRender || !proposal || showProposalLoading) {
     return (
@@ -52,8 +54,8 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           proposalNumber={Number(proposalId) + 1}
           proposal={proposal}
           transactionConfirming={isConfirmingVeto || isConfirmingExecution}
-          canVeto={userCanVeto as boolean}
-          canExecute={proposalStatus === "Executable"}
+          canVeto={canVeto}
+          canExecute={canExecute}
           onVetoPressed={() => vetoProposal()}
           onExecutePressed={() => executeProposal()}
         />

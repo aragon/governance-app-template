@@ -11,7 +11,6 @@ import { useUserCanVeto } from "@/plugins/dualGovernance/hooks/useUserCanVeto";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
-import { Proposal, ProposalStatus } from "../utils/types";
 
 export function useProposalVeto(proposalId: string) {
   const { reload } = useRouter();
@@ -29,7 +28,7 @@ export function useProposalVeto(proposalId: string) {
     proposalId,
     proposal
   );
-  const userCanVeto = useUserCanVeto(BigInt(proposalId));
+  const canVeto = useUserCanVeto(BigInt(proposalId)) as boolean;
 
   const { addAlert } = useAlertContext() as AlertContextProps;
   const {
@@ -84,21 +83,10 @@ export function useProposalVeto(proposalId: string) {
   return {
     proposal,
     proposalFetchStatus,
-    proposalStatus: getProposalStatus(proposal),
     vetoes,
-    userCanVeto,
+    canVeto,
     isConfirming: vetoingStatus === "pending" || isConfirming,
     isConfirmed,
     vetoProposal,
   };
-}
-
-function getProposalStatus(proposal: Proposal | null): ProposalStatus {
-  if (!proposal) return "" as any;
-  else if (proposal?.vetoTally >= proposal?.parameters?.minVetoVotingPower)
-    return "Defeated";
-  else if (proposal.active) return "Active";
-  else if (proposal.executed) return "Executed";
-
-  return "Executable";
 }

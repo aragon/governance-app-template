@@ -1,5 +1,9 @@
 import { useEffect } from "react";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import {
+  useReadContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { OptimisticTokenVotingPluginAbi } from "../artifacts/OptimisticTokenVotingPlugin.sol";
 import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
 import { useRouter } from "next/router";
@@ -10,6 +14,17 @@ export function useProposalExecute(proposalId: string) {
   const { addAlert } = useAlertContext() as AlertContextProps;
 
   const {
+    data: canExecute,
+    isError: isCanVoteError,
+    isLoading: isCanVoteLoading,
+  } = useReadContract({
+    address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+    abi: OptimisticTokenVotingPluginAbi,
+    chainId: PUB_CHAIN.id,
+    functionName: "canExecute",
+    args: [proposalId],
+  });
+  const {
     writeContract: executeWrite,
     data: executeTxHash,
     error: executingError,
@@ -19,6 +34,8 @@ export function useProposalExecute(proposalId: string) {
     useWaitForTransactionReceipt({ hash: executeTxHash });
 
   const executeProposal = () => {
+    if (!canExecute) return;
+
     executeWrite({
       chainId: PUB_CHAIN.id,
       abi: OptimisticTokenVotingPluginAbi,
@@ -66,5 +83,11 @@ export function useProposalExecute(proposalId: string) {
     setTimeout(() => reload(), 1000 * 2);
   }, [executingStatus, executeTxHash, isConfirming, isConfirmed]);
 
-  return { executeProposal, isConfirming, isConfirmed };
+  return {
+    executeProposal,
+    canExecute:
+      !isCanVoteError && !isCanVoteLoading && !isConfirmed && !!canExecute,
+    isConfirming,
+    isConfirmed,
+  };
 }

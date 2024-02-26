@@ -17,7 +17,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
     <>
       <Card>
         <h2 className="text-xl flex-grow font-semibold pr-6 text-neutral-600">
-          Minimum veto ratio
+          Minimum veto power
         </h2>
         <div className="items-right text-right flex-wrap">
           <span className="text-xl font-semibold">

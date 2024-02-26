@@ -1,10 +1,11 @@
 import { Button, Tag } from "@aragon/ods";
 import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { AlertVariant } from "@aragon/ods";
-import { ElseIf, If, Then } from "@/components/if";
+import { ElseIf, If, Then, Else } from "@/components/if";
 import { AddressText } from "@/components/text/address";
 import { useProposalVariantStatus } from "@/plugins/dualGovernance/hooks/useProposalVariantStatus";
 import { PleaseWaitSpinner } from "@/components/please-wait";
+import dayjs from "dayjs";
 
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 
@@ -28,6 +29,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   onExecutePressed,
 }) => {
   const proposalVariant = useProposalVariantStatus(proposal);
+  const ended = proposal.parameters.endDate <= Date.now() / 1000;
 
   return (
     <div className="w-full">
@@ -84,7 +86,23 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
         {proposal.title || DEFAULT_PROPOSAL_TITLE}
       </h4>
       <p className="text-base text-l text-body-color dark:text-dark-6">
-        Proposed by <AddressText>{proposal?.creator}</AddressText>
+        Proposed by <AddressText>{proposal?.creator}</AddressText>,{" "}
+        <If condition={ended}>
+          <Then>
+            ended on{" "}
+            {dayjs(Number(proposal.parameters.endDate) * 1000).format(
+              "D MMM YYYY HH:mm"
+            )}
+            h
+          </Then>
+          <Else>
+            ending on{" "}
+            {dayjs(Number(proposal.parameters.endDate) * 1000).format(
+              "D MMM YYYY HH:mm"
+            )}
+            h
+          </Else>
+        </If>
       </p>
     </div>
   );

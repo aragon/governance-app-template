@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { formatUnits } from "viem";
 import { Card } from '@aragon/ods'
-import { formatLargeNumber } from "@/utils/formatNumber";
+import { compactNumber } from "@/utils/numbers";
 
 interface VoteTallyProps {
   voteType: string;
@@ -14,7 +14,7 @@ const VoteTally: FC<VoteTallyProps> = ({ voteType, voteCount, votePercentage, co
   <Card className="p-4 xl:p-6 w-full flex flex-col space-y-6">
     <div className="flex flex-row space-between pb-2">
       <p className={`flex-grow text-xl text-${color}-700 font-semibold`}>{voteType}</p>
-      <p className="text-xl font-semibold">{formatLargeNumber(formatUnits(voteCount || BigInt(0), 18))}</p>
+      <p className="text-xl font-semibold">{compactNumber(formatUnits(voteCount || BigInt(0), 18))}</p>
     </div>
     <div className={`h-4 w-full bg-${color}-100 rounded`}>
       {/* Please don't delete or the bundler won't add these colors to the build */}

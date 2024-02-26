@@ -1,4 +1,4 @@
-export function formatLargeNumber(
+export function compactNumber(
   input: number | string,
   decimalPlaces: number = 2
 ): string {
@@ -6,7 +6,9 @@ export function formatLargeNumber(
 
   if (isNaN(num)) return "-";
 
-  if (num >= 1.0e9) {
+  if (num >= 1.0e12) {
+    return (num / 1.0e9).toFixed(decimalPlaces) + "T";
+  } else if (num >= 1.0e9) {
     return (num / 1.0e9).toFixed(decimalPlaces) + "B";
   } else if (num >= 1.0e6) {
     return (num / 1.0e6).toFixed(decimalPlaces) + "M";

@@ -139,7 +139,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         />
         <ProposalDetails
           supportThreshold={proposal?.parameters?.supportThreshold}
-          endDate={proposal?.parameters?.endDate}
+          minVotingPower={proposal?.parameters?.minVotingPower}
           snapshotBlock={proposal?.parameters?.snapshotBlock}
         />
       </div>

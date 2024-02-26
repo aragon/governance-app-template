@@ -5,20 +5,31 @@ import { PUB_TOKEN_ADDRESS } from "@/constants";
 export function useVotingToken() {
   const {
     data: tokenSupply,
-    isError,
-    isLoading,
+    isError: isError1,
+    isLoading: isLoading1,
   } = useReadContract({
     address: PUB_TOKEN_ADDRESS,
     abi: erc20Abi,
     functionName: "totalSupply",
   });
 
+  const {
+    data: tokenSymbol,
+    isError: isError2,
+    isLoading: isLoading2,
+  } = useReadContract({
+    address: PUB_TOKEN_ADDRESS,
+    abi: erc20Abi,
+    functionName: "symbol",
+  });
+
   return {
     address: PUB_TOKEN_ADDRESS,
     tokenSupply,
+    symbol: tokenSymbol,
     status: {
-      isLoading,
-      isError,
+      isLoading: isLoading1 || isLoading2,
+      isError: isError1 || isError2,
     },
   };
 }

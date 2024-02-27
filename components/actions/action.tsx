@@ -1,8 +1,7 @@
 import { ReactNode } from "react";
-import { Else, ElseIf, If, Then } from "@/components/if";
+import { ElseIf, If, Then } from "@/components/if";
 import { InputText, Tag } from "@aragon/ods";
 import { AddressText } from "@/components/text/address";
-import { isAddress } from "@/utils/evm";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { Action } from "@/utils/types";
 import { ABIFunction, useAction } from "@/hooks/useAction";
@@ -33,19 +32,14 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
         <div className="w-full flex flex-row space-x-10 justify-between">
           <div className="w-full flex flex-row space-x-10">
             <div>
-              <h3>Recipient</h3>
+              <h3 className="font-semibold">Recipient</h3>
               <p>
                 <AddressText>{action.to}</AddressText>
               </p>
             </div>
             <div>
-              <h3>Transfer amount</h3>
-              <p>
-                <span className="font-semibold">
-                  {compactNumber(formatEther(action.value))}
-                </span>{" "}
-                ETH{" "}
-              </p>
+              <h3 className="font-semibold">Transfer</h3>
+              <p>{compactNumber(formatEther(action.value))} ETH</p>
             </div>
           </div>
           <Tag label={(idx + 1).toString()} variant="primary"></Tag>
@@ -60,14 +54,14 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
         <div>
           <div className="w-full flex flex-row space-x-10">
             <div>
-              <h3>Contract call</h3>
+              <h3 className="font-semibold">Contract call</h3>
               <p>
                 <AddressText>{action.to}</AddressText>
               </p>
             </div>
             <If condition={!isLoading && functionName}>
               <div>
-                <h3>Action</h3>
+                <h3 className="font-semibold">Action</h3>
                 <p className="text-sm text-ellipsis">
                   <code>{functionSignature?.replace(/,/g, ", ")}</code>
                 </p>
@@ -75,7 +69,7 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
             </If>
             <If condition={action.value}>
               <div>
-                <h3>Transfer</h3>
+                <h3 className="font-semibold">Transfer</h3>
                 <p>
                   <span className="font-semibold">
                     {compactNumber(formatEther(action.value))}
@@ -97,7 +91,7 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
         <ElseIf condition={args.length}>
           <div className="mt-3">
             <div>
-              <h3>Action parameters</h3>
+              <h3 className="font-semibold">Action parameters</h3>
               <div className="grid gap-3 mt-3">
                 {args.map((arg, i) => (
                   <CallParameterField

@@ -84,7 +84,7 @@ export default function Proposals() {
           <Button
             variant="tertiary"
             size="sm"
-            disabled={(currentPage + 1) * PROPOSALS_PER_PAGE > proposalCount}
+            disabled={(currentPage + 1) * PROPOSALS_PER_PAGE >= proposalCount}
             onClick={() => setCurrentPage((page) => page + 1)}
             iconRight={IconType.CHEVRON_RIGHT}
           >

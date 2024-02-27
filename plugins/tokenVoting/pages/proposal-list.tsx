@@ -5,16 +5,16 @@ import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol"
 import { Button, IconType } from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/tokenVoting/hooks/useCanCreateProposal";
 import Link from "next/link";
-import { If, IfNot } from "@/components/if";
+import { If } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
-import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from '@/constants';
+import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 const PROPOSALS_PER_PAGE = 10;
 
 export default function Proposals() {
   const [proposalCount, setProposalCount] = useState(0);
-  const {data: blockNumber } = useBlockNumber({watch: true})
+  const { data: blockNumber } = useBlockNumber({ watch: true });
   const canCreate = useCanCreateProposal();
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -26,21 +26,25 @@ export default function Proposals() {
     const propIds = new Array(proposalCount).fill(0).map((_, i) => i);
     setPaginatedProposals(propIds.slice(start, end));
   }, [proposalCount, currentPage]);
-  
-  const { data: proposalCountResponse, isLoading, refetch } = useReadContract({
+
+  const {
+    data: proposalCountResponse,
+    isLoading,
+    refetch,
+  } = useReadContract({
     address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
     abi: TokenVotingAbi,
     functionName: "proposalCount",
   });
 
   useEffect(() => {
-    if(!proposalCountResponse) return
-    setProposalCount(Number(proposalCountResponse))
-  }, [proposalCountResponse])
+    if (!proposalCountResponse) return;
+    setProposalCount(Number(proposalCountResponse));
+  }, [proposalCountResponse]);
 
-  useEffect(() => { 
-    refetch()
-  }, [blockNumber])
+  useEffect(() => {
+    refetch();
+  }, [blockNumber]);
 
   const skipRender = useSkipFirstRender();
   if (skipRender) return <></>;
@@ -91,13 +95,13 @@ export default function Proposals() {
           </Button>
         </div>
       </If>
-      <IfNot condition={proposalCount}>
+      <If not={proposalCount}>
         <If condition={isLoading}>
           <SectionView>
             <PleaseWaitSpinner />
           </SectionView>
         </If>
-      </IfNot>
+      </If>
     </MainSection>
   );
 }

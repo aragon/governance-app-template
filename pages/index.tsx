@@ -4,7 +4,9 @@ export default function Home() {
   return (
     <main className="w-screen max-w-full flex-col">
       <Card>
-        <h1 className="text-2xl font-[700] text-neutral-800">Welcome to Aragonette!</h1>
+        <h1 className="text-2xl font-[700] text-neutral-800">
+          Welcome to Aragonette!
+        </h1>
         <p className="text-md text-neutral-400">
           We provide a DAO experience for you in a simple template that you can
           customize.
@@ -13,7 +15,9 @@ export default function Home() {
       <Card>
         <div className="grid lg:grid-cols-2 lg:gap-3 lg:text-center">
           <div>
-            <h2 className="text-lg font-[600] pb-2 text-primary-900">About Us</h2>
+            <h2 className="text-lg font-[600] pb-2 text-primary-900">
+              About Us
+            </h2>
             <p className="text-sm text-neutral-400">
               We are a team of professionals dedicated to providing the best
               service.

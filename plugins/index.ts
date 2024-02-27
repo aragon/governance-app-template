@@ -20,7 +20,7 @@ export const plugins: PluginItem[] = [
   {
     id: "core-proposals",
     folderName: "dualGovernance",
-    title: "Core Proposals",
+    title: "Core team proposals",
     icon: IconType.BLOCKCHAIN,
     pluginAddress: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   },

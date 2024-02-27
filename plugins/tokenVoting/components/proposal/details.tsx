@@ -2,12 +2,13 @@ import dayjs from "dayjs";
 import { ReactNode } from "react";
 import { formatEther } from "viem";
 import { useVotingToken } from "@/plugins/tokenVoting/hooks/useVotingToken";
+import { compactNumber } from "@/utils/numbers";
 
-const SUPPORT_THRESHOLD_BASE = BigInt(1e6);
+const PERCENT_BASE = BigInt(1e6);
 
 interface ProposalDetailsProps {
   supportThreshold?: number;
-  endDate?: bigint;
+  minVotingPower?: bigint;
   snapshotBlock?: bigint;
 }
 
@@ -15,15 +16,18 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
   /** Ratio value ranging between 0 and 1_000_000 */
   supportThreshold,
   /** Timestamp */
-  endDate,
+  minVotingPower,
   snapshotBlock,
 }) => {
-  const { tokenSupply } = useVotingToken();
+  const { tokenSupply, symbol } = useVotingToken();
   let threshold = BigInt(0);
   if (supportThreshold && tokenSupply) {
-    threshold =
-      (BigInt(supportThreshold) * tokenSupply) /
-      SUPPORT_THRESHOLD_BASE;
+    threshold = (BigInt(supportThreshold) * tokenSupply) / PERCENT_BASE;
+  }
+  let minTurnoutRatio;
+  if (minVotingPower && tokenSupply) {
+    minTurnoutRatio =
+      Number((minVotingPower * BigInt(10000)) / tokenSupply) / 10000;
   }
 
   return (
@@ -34,21 +38,31 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
         </h2>
         <div className="items-right text-right flex-wrap">
           <span className="text-xl font-semibold">
-            {formatEther(threshold)}
-          </span>
-          <p className="text-neutral-600">voting power</p>
+            {compactNumber(formatEther(threshold))}
+          </span>{" "}
+          <span>{symbol ?? ""}</span>
+          <p className="text-neutral-600">
+            &gt;{" "}
+            {(((supportThreshold ?? 0) * 100) / Number(PERCENT_BASE)).toFixed(
+              1
+            )}
+            %
+          </p>
         </div>
       </Card>
       <Card>
         <h2 className="text-xl flex-grow font-semibold pr-6 text-neutral-600">
-          Ending
+          Minimum turnout
         </h2>
         <div className="items-right text-right flex-wrap">
           <span className="text-xl font-semibold">
-            {dayjs(Number(endDate) * 1000).format("DD/MM/YYYY")}
-          </span>
+            {minVotingPower ? compactNumber(formatEther(minVotingPower)) : null}
+          </span>{" "}
+          <span>{symbol ?? ""}</span>
           <p className="text-neutral-600">
-            {dayjs(Number(endDate) * 1000).format("HH:mm")}h
+            {minTurnoutRatio
+              ? (minTurnoutRatio * 100).toFixed(1) + "% of the supply"
+              : "-"}
           </p>
         </div>
       </Card>

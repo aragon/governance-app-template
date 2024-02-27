@@ -7,7 +7,7 @@ import { AbiFunction } from "abitype";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { isAddress } from "@/utils/evm";
 import { Action } from "@/utils/types";
-import { If, IfNot } from "@/components/if";
+import { If } from "@/components/if";
 import { PUB_ETHERSCAN_API_KEY } from "@/constants";
 
 interface CustomActionInputProps {
@@ -120,9 +120,9 @@ const CustomActionInput: FC<CustomActionInputProps> = ({ setActions }) => {
                             </ul>
                         </div>
                         <div className="w-2/3 bg-primary-50 py-4 overflow-y-auto">
-                            <IfNot condition={selectedAbiItem}>
+                            <If not={selectedAbiItem}>
                                 <p className="ml-4 mt-2">Select a contract function from the list</p>
-                            </IfNot>
+                            </If>
                             <If condition={selectedAbiItem}>
                                 <div className="">
                                     <p className="text-xl font-semibold text-neutral-800 pt-1 pb-3 px-6 border-b border-neutral-200"><code>{selectedAbiItem?.name}</code></p>

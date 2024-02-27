@@ -1,28 +1,29 @@
 import { useState, useEffect } from "react";
-import { Address, getAbiItem } from "viem";
-import { PublicClient } from "viem";
+import { getAbiItem } from "viem";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import {
   Proposal,
   VoteCastEvent,
   VoteCastResponse,
 } from "@/plugins/tokenVoting/utils/types";
+import { usePublicClient } from "wagmi";
+import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 const event = getAbiItem({ abi: TokenVotingAbi, name: "VoteCast" });
 
-export function useProposalVotes(
-  publicClient: PublicClient,
-  address: Address,
+export function useProposalVoteList(
   proposalId: string,
   proposal: Proposal | null
 ) {
+  const publicClient = usePublicClient();
   const [proposalLogs, setLogs] = useState<VoteCastEvent[]>([]);
 
   async function getLogs() {
     if (!proposal?.parameters?.snapshotBlock) return;
+    else if (!publicClient) return;
 
     const logs: VoteCastResponse[] = (await publicClient.getLogs({
-      address,
+      address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
       event: event as any,
       args: {
         proposalId,
@@ -37,7 +38,7 @@ export function useProposalVotes(
 
   useEffect(() => {
     getLogs();
-  }, [proposal?.parameters?.snapshotBlock]);
+  }, [proposalId, proposal?.parameters?.snapshotBlock]);
 
   return proposalLogs;
 }

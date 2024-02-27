@@ -1,31 +1,31 @@
-import dayjs from "dayjs";
 import { ReactNode } from "react";
+import { useVotingToken } from "../../hooks/useVotingToken";
+import { formatEther } from "viem";
+import { compactNumber } from "@/utils/numbers";
 
 interface ProposalDetailsProps {
   minVetoVotingPower?: bigint;
-  endDate?: bigint;
   snapshotBlock?: bigint;
 }
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({
-  /** Timestamp */
-  endDate,
+  minVetoVotingPower,
   snapshotBlock,
 }) => {
-
+  const { symbol } = useVotingToken();
   return (
     <>
       <Card>
         <h2 className="text-xl flex-grow font-semibold pr-6 text-neutral-600">
-          Ending
+          Minimum veto power
         </h2>
         <div className="items-right text-right flex-wrap">
           <span className="text-xl font-semibold">
-            {dayjs(Number(endDate) * 1000).format("DD/MM/YYYY")}
-          </span>
-          <p className="text-neutral-600">
-            {dayjs(Number(endDate) * 1000).format("HH:mm")}h
-          </p>
+            {minVetoVotingPower
+              ? compactNumber(formatEther(minVetoVotingPower))
+              : null}
+          </span>{" "}
+          <span>{symbol ?? ""}</span>
         </div>
       </Card>
       <Card>

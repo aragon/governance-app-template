@@ -1,117 +1,206 @@
-import { ReactNode, createContext, useContext } from "react";
+import React, { ReactElement, ReactNode } from "react";
 
 type Booleanish = any;
-const IfCaseContext = createContext<{ condition: Booleanish }>(null as any);
+type IfProps =
+  | { condition: Booleanish; children?: ReactNode }
+  | { not: Booleanish; children?: ReactNode };
 
 /**
- * Render when condition evaluates to true
+ * Renders the block where the condition evaluates to true
  *
+ * ```
  * <If condition={a && b && c}>
- *    <p>True case</p>
+ *    <p>The condition is true</p>
  * </If>
  *
+ * <If not={a && b && c}>
+ *    <p>The condition is false</p>
+ * </If>
+ *
+ * <If condition={a && b && c}>
+ *   <Then>
+ *     <p>Condition 1 is true</p>
+ *   </Then>
+ *   <ElseIf condition={ d && e }>
+ *     <p>Condition 2 is true</p>
+ *   </ElseIf>
+ *   <ElseIf not={ f || g }>
+ *     <p>Condition 3 is false</p>
+ *   </ElseIf>
+ *   <Else>
+ *     <p>All conditions are false</p>
+ *   </Else>
+ * </If>
+ *
+ * <If not={a && b && c}>
+ *   <Then>
+ *     <p>Condition 1 is false</p>
+ *   </Then>
+ *   <ElseIf condition={ d && e }>
+ *     <p>Condition 2 is true</p>
+ *   </ElseIf>
+ *   <ElseIf not={ f || g }>
+ *     <p>Condition 3 is false</p>
+ *   </ElseIf>
+ *   <Else>
+ *     <p>All conditions are false</p>
+ *   </Else>
+ * </If>
+ * ```
+ *
  * @param props {condition, children}
  * @returns
  */
-export const If = ({
-  condition,
-  children,
-}: {
-  condition: Booleanish;
-  children?: ReactNode;
-}) => {
-  if (!condition) return <></>;
+export const If = (props: IfProps) => {
+  const { children } = props;
+  if (!children) return <></>;
+
+  const mainCondition = resolveCondition(props);
+
+  // Many children
+  if (Array.isArray(children) && hasConditionalChildren(children)) {
+    for (const child of children) {
+      // Match the Then/ElseIf/Else elements only
+      if (child.type === Then) {
+        if (mainCondition) return child.props?.children;
+      } else if (child.type === ElseIf) {
+        if (!mainCondition) {
+          const subCondition = resolveCondition(child.props);
+          if (subCondition) return child.props?.children;
+        }
+        // Continue trying other ElseIf's
+      } else if (child.type === Else) {
+        if (!mainCondition) return child.props?.children;
+      }
+      // Do not render unknown nodes within an array of children
+    }
+    // No match
+    return <></>;
+  }
+  // One child
+  else if (typeof children !== "object") {
+    if (!mainCondition) return <></>;
+
+    return children;
+  }
+
+  const child = children as ReactElement;
+  // Match the Then/ElseIf/Else elements first
+  if (child.type === Then) {
+    if (mainCondition) return child.props?.children;
+    return <></>;
+  } else if (child.type === ElseIf) {
+    if (!mainCondition) {
+      const subCondition = resolveCondition(child.props);
+      if (subCondition) return child.props?.children;
+    }
+    return <></>;
+  } else if (child.type === Else) {
+    if (!mainCondition) return child.props?.children;
+    return <></>;
+  }
+
+  // Fallback for extraneous cases
+  if (!mainCondition) return <></>;
+
   return children;
 };
 
 /**
- * Render when condition evaluates to false
+ * Renders when the parent If condition is true
  *
- * <IfNot condition={a && b && c}>
- *    <p>False case</p>
- * </IfNot>
+ * ```
+ * <If condition={a && b && c}>
+ *   <Then>
+ *     <p>Condition 1 is true</p>
+ *   </Then>
+ *   <Else>
+ *     <p>All conditions are false</p>
+ *   </Else>
+ * </If>
+ * ```
  *
- * @param props {condition, children}
- * @returns
- */
-export const IfNot = ({
-  condition,
-  children,
-}: {
-  condition: Booleanish;
-  children?: ReactNode;
-}) => {
-  if (condition) return <></>;
-  return children;
-};
-
-/**
- * Render the true and false cases
- *
- * <IfCase condition={a && b && c}>
- *    <Then>
- *       <p>True case</p>
- *    </Then>
- *    <Else>
- *       <p>False case</p>
- *    </Else>
- * </IfCase>
- *
- * @param props {condition, children}
- * @returns
- */
-export const IfCase = ({
-  condition,
-  children,
-}: {
-  condition: Booleanish;
-  children?: ReactNode;
-}) => {
-  return (
-    <IfCaseContext.Provider value={{ condition }}>
-      {children}
-    </IfCaseContext.Provider>
-  );
-};
-
-/**
- * Renders when the parent IfCase condition is true
- *
- * <IfCase condition={a && b && c}>
- *    <Then>
- *       <p>True case</p>
- *    </Then>
- * </IfCase>
- *
- * @param props {condition, children}
+ * @param props {children}
  * @returns
  */
 export const Then = ({ children }: { children: ReactNode }) => {
-  const value = useContext(IfCaseContext);
-  if (value === null) {
-    console.warn("<Then> should be placed within an <IfCase> block");
-    return <></>;
-  } else if (!value.condition) return <></>;
   return children;
 };
 
 /**
- * Renders when the parent IfCase condition is false
+ * Renders when the parent If condition is false
  *
- * <IfCase condition={a && b && c}>
- *    <Else>
- *       <p>False case</p>
- *    </Else>
- * </IfCase>
+ * ```
+ * <If condition={a && b && c}>
+ *   <Then>
+ *     <p>Condition 1 is true</p>
+ *   </Then>
+ *   <ElseIf condition={ d && e }>
+ *     <p>Condition 2 is true</p>
+ *   </ElseIf>
+ *   <ElseIf not={ d && e }>
+ *     <p>Condition 3 is false</p>
+ *   </ElseIf>
+ * </If>
+ * ```
  *
- * @param props {condition, children}
+ * @param props {children}
+ * @returns
+ */
+export const ElseIf = ({ children }: IfProps) => {
+  return children;
+};
+
+/**
+ * Renders when the parent If condition is false
+ *
+ * ```
+ * <If condition={a && b && c}>
+ *   <Then>
+ *     <p>Condition 1 is true</p>
+ *   </Then>
+ *   <ElseIf condition={ d && e }>
+ *     <p>Condition 2 is true</p>
+ *   </ElseIf>
+ *   <Else>
+ *     <p>All conditions are false</p>
+ *   </Else>
+ * </If>
+ * ```
+ *
+ * @param props {children}
  * @returns
  */
 export const Else = ({ children }: { children: ReactNode }) => {
-  const value = useContext(IfCaseContext);
-  if (value === null) {
-    console.warn("<Else> should be placed within an <IfCase> block");
-    return <></>;
-  } else if (value.condition) return <></>;
   return children;
 };
+
+// Helpers
+
+function resolveCondition(props: IfProps): boolean {
+  if (
+    typeof (props as any).condition !== "undefined" &&
+    typeof (props as any).not !== "undefined"
+  ) {
+    throw new Error(
+      "Either 'condition' or 'not' are required as an <If> prop, but not both"
+    );
+  } else if (typeof (props as any).condition !== "undefined") {
+    return (props as any).condition;
+  }
+  return !(props as any).not;
+}
+
+function hasConditionalChildren(children: ReactNode): boolean {
+  if (!Array.isArray(children)) {
+    return isConditionalChild(children as ReactElement);
+  }
+  for (const item of children) {
+    if (isConditionalChild(item)) return true;
+  }
+  return false;
+}
+
+function isConditionalChild(node: ReactElement) {
+  return node.type === Then || node.type === ElseIf || node.type === Else;
+}

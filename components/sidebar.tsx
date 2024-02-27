@@ -126,7 +126,7 @@ const Sidebar = () => {
               >
                 <Icon
                   className="mr-2"
-                  icon={IconType.QUESTION}
+                  icon={IconType.HELP}
                   size="md"
                   responsiveSize={{ md: "lg" }}
                 />

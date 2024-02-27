@@ -22,14 +22,10 @@ type CallParameterFieldType =
   | boolean;
 
 export const ActionCard = function ({ action, idx }: ActionCardProps) {
-  const {
-    isLoading,
-    isEthTransfer,
-    args,
-    functionName,
-    functionSignature,
-    functionAbi,
-  } = useAction(action);
+  const { isLoading, args, functionName, functionSignature, functionAbi } =
+    useAction(action);
+
+  const isEthTransfer = !action.data || action.data === "0x";
 
   if (isEthTransfer) {
     return (
@@ -119,6 +115,8 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
     </Card>
   );
 };
+
+// Helpers
 
 // This should be encapsulated as soon as ODS exports this widget
 const Card = function ({ children }: { children: ReactNode }) {

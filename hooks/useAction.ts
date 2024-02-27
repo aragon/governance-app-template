@@ -75,7 +75,6 @@ export function useAction(action: Action) {
 
   return {
     isLoading: loading,
-    isEthTransfer: !action.data || action.data === "0x",
     functionName,
     functionAbi,
     functionSignature,

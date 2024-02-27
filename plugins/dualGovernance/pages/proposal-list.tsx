@@ -71,7 +71,7 @@ export default function Proposals() {
             )}
           />
         ))}
-        <div className="w-full flex flex-row justify-end gap-2 mt-4">
+        <div className="w-full flex flex-row justify-end gap-2 mt-4 mb-10">
           <Button
             variant="tertiary"
             size="sm"

@@ -71,7 +71,7 @@ export default function Proposals() {
             )}
           />
         ))}
-        <div className="w-full flex flex-row justify-end gap-2 mt-4">
+        <div className="w-full flex flex-row justify-end gap-2 mt-4 mb-10">
           <Button
             variant="tertiary"
             size="sm"
@@ -84,7 +84,7 @@ export default function Proposals() {
           <Button
             variant="tertiary"
             size="sm"
-            disabled={(currentPage + 1) * PROPOSALS_PER_PAGE > proposalCount}
+            disabled={(currentPage + 1) * PROPOSALS_PER_PAGE >= proposalCount}
             onClick={() => setCurrentPage((page) => page + 1)}
             iconRight={IconType.CHEVRON_RIGHT}
           >

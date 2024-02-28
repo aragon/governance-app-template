@@ -46,8 +46,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
       <div className="mb-6">
         <InputNumber
           label="Amount"
-          placeholder="1.234"
-          helpText="in ether"
+          placeholder="1.234 ETH"
           min={0}
           variant={
             typeof value === "undefined" || isNumeric(value)

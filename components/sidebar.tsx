@@ -36,7 +36,7 @@ const Sidebar = () => {
   );
 
   return (
-    <header className="h-screen">
+    <header className="h-screen select-none">
       <SidebarSwitchButton />
       <div
         className={`md:w-72 bg-neutral-50 md:bg-neutral-100 h-full flex flex-col justify-between z-40 ${

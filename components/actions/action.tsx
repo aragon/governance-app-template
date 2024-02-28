@@ -4,9 +4,17 @@ import { InputText, Tag } from "@aragon/ods";
 import { AddressText } from "@/components/text/address";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { Action } from "@/utils/types";
-import { ABIFunction, useAction } from "@/hooks/useAction";
-import { Address, Hex, formatEther, toHex } from "viem";
+import { useAction } from "@/hooks/useAction";
+import {
+  AbiFunction,
+  Address,
+  Hex,
+  formatEther,
+  toFunctionSignature,
+  toHex,
+} from "viem";
 import { compactNumber } from "@/utils/numbers";
+import { decodeCamelCase } from "@/utils/case";
 
 type ActionCardProps = {
   action: Action;
@@ -21,8 +29,7 @@ type CallParameterFieldType =
   | boolean;
 
 export const ActionCard = function ({ action, idx }: ActionCardProps) {
-  const { isLoading, args, functionName, functionSignature, functionAbi } =
-    useAction(action);
+  const { isLoading, args, functionName, functionAbi } = useAction(action);
 
   const isEthTransfer = !action.data || action.data === "0x";
 
@@ -48,6 +55,10 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
     );
   }
 
+  const functionSignature = functionAbi
+    ? toFunctionSignature(functionAbi).replace(/,/g, ", ")
+    : "";
+
   return (
     <Card>
       <div className="w-full flex flex-row space-x-10 justify-between">
@@ -63,7 +74,7 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
               <div>
                 <h3 className="font-semibold">Action</h3>
                 <p className="text-sm text-ellipsis">
-                  <code>{functionSignature?.replace(/,/g, ", ")}</code>
+                  <code>{functionSignature}</code>
                 </p>
               </div>
             </If>
@@ -133,7 +144,7 @@ const CallParameterField = ({
 }: {
   value: CallParameterFieldType;
   idx: number;
-  functionAbi: ABIFunction | null;
+  functionAbi: AbiFunction | null;
 }) => {
   if (functionAbi?.type !== "function") return <></>;
 
@@ -146,7 +157,7 @@ const CallParameterField = ({
   return (
     <InputText
       className="w-full"
-      addon={addon}
+      addon={decodeCamelCase(addon)}
       value={resolveValue(value, functionAbi.inputs?.[idx].type)}
       readOnly
       addonPosition="left"

@@ -123,7 +123,7 @@ export const If = (props: IfProps) => {
  * @param props {children}
  * @returns
  */
-export const Then = ({ children }: { children: ReactNode }) => {
+export const Then = ({ children }: { children?: ReactNode }) => {
   return children;
 };
 
@@ -171,7 +171,7 @@ export const ElseIf = ({ children }: IfProps) => {
  * @param props {children}
  * @returns
  */
-export const Else = ({ children }: { children: ReactNode }) => {
+export const Else = ({ children }: { children?: ReactNode }) => {
   return children;
 };
 

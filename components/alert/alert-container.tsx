@@ -35,12 +35,12 @@ function resolveVariant(type: IAlert["type"]) {
 
 function resolveDescription(alert: IAlert) {
   if (!alert.explorerLink) {
-    return <div className="text-sm mt-1">{alert.description}</div>;
+    return <span className="block text-sm mt-1">{alert.description}</span>;
   }
 
   return (
     <>
-      <div className="text-sm mt-1">{alert.description}</div>
+      <span className="block text-sm mt-1">{alert.description}</span>
       <a href={alert.explorerLink} target="_blank">
         <div className="flex flex-row text-xs underline text-primary-200">
           <div className="">Show transaction</div>

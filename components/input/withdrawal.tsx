@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from "react";
 import { InputText, InputNumber } from "@aragon/ods";
 import { Address, parseEther } from "viem";
 import { isAddress } from "@/utils/evm";
-import { Else, ElseIf, If, Then } from "../if";
+import { ElseIf, If, Then } from "../if";
 
 interface WithdrawalInputProps {
   setActions: (actions: Action[]) => any;

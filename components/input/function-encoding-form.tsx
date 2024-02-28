@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { Address, Hex, encodeFunctionData, parseEther } from "viem";
+import { Address, Hex, encodeFunctionData } from "viem";
 import { Button, InputText } from "@aragon/ods";
 import { AbiFunction } from "abitype";
 import { PleaseWaitSpinner } from "@/components/please-wait";

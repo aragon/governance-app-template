@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "prettier": "prettier -c ./components ./context ./hooks ./pages ./plugins ./scripts ./utils ./constants.ts ; echo 'To write the changes: npm run prettier:write'",
+    "prettier:write": "prettier -w ./components ./context ./hooks ./pages ./plugins ./scripts ./utils ./constants.ts",
     "deploy-dao": "bun ./scripts/deploy.ts"
   },
   "dependencies": {
@@ -39,7 +41,17 @@
     "eslint": "^8.56.0",
     "eslint-config-next": "14.0.2",
     "postcss": "^8",
+    "prettier": "^3.2.5",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": false,
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "arrowParens": "always",
+    "useTabs": false
   }
 }

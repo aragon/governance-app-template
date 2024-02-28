@@ -96,11 +96,15 @@ export default function Create() {
   const submitProposal = async () => {
     // Check metadata
     if (!title.trim())
-      return addAlert("Please, enter a title", { type: "error" });
+      return addAlert("Invalid proposal details", {
+        description: "Please, enter a title",
+        type: "error",
+      });
 
     const plainSummary = getPlainText(summary).trim();
     if (!plainSummary.trim())
-      return addAlert("Please, enter a summary of what the proposal is about", {
+      return addAlert("Invalid proposal details", {
+        description: "Please, enter a summary of what the proposal is about",
         type: "error",
       });
 
@@ -110,18 +114,20 @@ export default function Create() {
         break;
       case ActionType.Withdrawal:
         if (!actions.length) {
-          return addAlert(
-            "Please ensure that the withdrawal address and the amount to transfer are valid",
-            { type: "error" }
-          );
+          return addAlert("Invalid proposal details", {
+            description:
+              "Please ensure that the withdrawal address and the amount to transfer are valid",
+            type: "error",
+          });
         }
         break;
       default:
         if (!actions.length || !actions[0].data || actions[0].data === "0x") {
-          return addAlert(
-            "Please ensure that the values of the action to execute are correct",
-            { type: "error" }
-          );
+          return addAlert("Invalid proposal details", {
+            description:
+              "Please ensure that the values of the action to execute are complete and correct",
+            type: "error",
+          });
         }
     }
 

@@ -13,11 +13,11 @@ import { toHex } from "viem";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { useAlertContext } from "@/context/AlertContext";
 import WithdrawalInput from "@/components/input/withdrawal";
-import CustomActionInput from "@/components/input/custom-action";
+import { FunctionEncodingForm } from "@/components/input/function-encoding-form";
 import { Action } from "@/utils/types";
 import { getPlainText } from "@/utils/html";
 import { useRouter } from "next/router";
-import { Else, If, Then } from "@/components/if";
+import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import {
   PUB_IPFS_ENDPOINT,
@@ -25,6 +25,7 @@ import {
   PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   PUB_CHAIN,
 } from "@/constants";
+import { ActionCard } from "@/components/actions/action";
 
 enum ActionType {
   Signaling,
@@ -96,11 +97,15 @@ export default function Create() {
   const submitProposal = async () => {
     // Check metadata
     if (!title.trim())
-      return addAlert("Please, enter a title", { type: "error" });
+      return addAlert("Invalid proposal details", {
+        description: "Please, enter a title",
+        type: "error",
+      });
 
     const plainSummary = getPlainText(summary).trim();
     if (!plainSummary.trim())
-      return addAlert("Please, enter a summary of what the proposal is about", {
+      return addAlert("Invalid proposal details", {
+        description: "Please, enter a summary of what the proposal is about",
         type: "error",
       });
 
@@ -110,18 +115,20 @@ export default function Create() {
         break;
       case ActionType.Withdrawal:
         if (!actions.length) {
-          return addAlert(
-            "Please ensure that the withdrawal address and the amount to transfer are valid",
-            { type: "error" }
-          );
+          return addAlert("Invalid proposal details", {
+            description:
+              "Please ensure that the withdrawal address and the amount to transfer are valid",
+            type: "error",
+          });
         }
         break;
       default:
         if (!actions.length || !actions[0].data || actions[0].data === "0x") {
-          return addAlert(
-            "Please ensure that the values of the action to execute are correct",
-            { type: "error" }
-          );
+          return addAlert("Invalid proposal details", {
+            description:
+              "Please ensure that the values of the action to execute are complete and correct",
+            type: "error",
+          });
         }
     }
 
@@ -173,8 +180,8 @@ export default function Create() {
           />
         </div>
         <div className="mb-6">
-          <span className="block mb-2 text-lg text-neutral-900 ">
-            Select proposal action
+          <span className="font-normal block mb-2 text-lg text-neutral-900 ">
+            Select the type of proposal
           </span>
           <div className="grid grid-cols-3 gap-5 h-24 mt-2">
             <div
@@ -251,7 +258,9 @@ export default function Create() {
               <WithdrawalInput setActions={setActions} />
             )}
             {actionType === ActionType.Custom && (
-              <CustomActionInput setActions={setActions} />
+              <FunctionEncodingForm
+                onAddAction={(action) => setActions(actions.concat([action]))}
+              />
             )}
           </div>
         </div>
@@ -262,15 +271,50 @@ export default function Create() {
               <PleaseWaitSpinner fullMessage="Confirming transaction..." />
             </div>
           </Then>
-          <Else>
+          <ElseIf condition={actionType !== ActionType.Custom}>
             <Button
               className="mt-14 mb-6"
               size="lg"
               variant="primary"
               onClick={() => submitProposal()}
             >
-              Submit
+              Submit proposal
             </Button>
+          </ElseIf>
+          <Else>
+            <div className="mt-14 mb-6">
+              <If condition={!actions.length}>
+                <Then>
+                  <p>Add the first action to continue</p>
+                </Then>
+                <Else>
+                  <p className="flex-grow text-lg text-neutral-900 font-semibold pb-3">
+                    Actions
+                  </p>
+                  <div className="grid gap-3 mb-10">
+                    <If not={actions.length}>
+                      <p className="pt-2">The proposal has no actions</p>
+                    </If>
+                    {actions?.map?.((action, i) => (
+                      <ActionCard
+                        key={`${i}-${action.to}-${action.data}`}
+                        action={action}
+                        idx={i}
+                      />
+                    ))}
+                  </div>
+                </Else>
+              </If>
+              <Button
+                className="mt-3"
+                size="lg"
+                variant="primary"
+                disabled={!actions.length}
+                onClick={() => submitProposal()}
+              >
+                Submit proposal
+              </Button>
+            </div>
           </Else>
         </If>
       </div>

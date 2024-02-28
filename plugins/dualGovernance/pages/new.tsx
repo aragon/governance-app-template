@@ -188,7 +188,12 @@ export default function Create() {
               }`}
             >
               <Icon
-                className="mt-2 p-2 rounded-full text-primary-400 !h-12 !w-12"
+                className={
+                  "mt-2 p-2 !h-12 !w-10 " +
+                  (actionType === ActionType.Signaling
+                    ? "text-primary-400"
+                    : "text-neutral-400")
+                }
                 icon={IconType.INFO}
                 size="lg"
               />
@@ -205,8 +210,13 @@ export default function Create() {
               }`}
             >
               <Icon
-                className="mt-2 p-2 rounded-full text-primary-400 !h-12 !w-12"
-                icon={IconType.TX_WITHDRAW}
+                className={
+                  "mt-2 p-2 !h-12 !w-10 " +
+                  (actionType === ActionType.Withdrawal
+                    ? "text-primary-400"
+                    : "text-neutral-400")
+                }
+                icon={IconType.WITHDRAW}
                 size="lg"
               />
               <span className="text-sm text-neutral-400 text-center">
@@ -222,8 +232,13 @@ export default function Create() {
               }`}
             >
               <Icon
-                className="mt-2 p-2 rounded-full text-primary-400 !h-12 !w-12"
-                icon={IconType.BLOCKCHAIN}
+                className={
+                  "mt-2 p-2 !h-12 !w-10 " +
+                  (actionType === ActionType.Custom
+                    ? "text-primary-400"
+                    : "text-neutral-400")
+                }
+                icon={IconType.APP_PROPOSALS}
                 size="lg"
               />
               <span className="text-sm text-neutral-400 text-center">

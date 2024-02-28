@@ -101,7 +101,7 @@ export const SelfDelegationProfileCard = ({ address, tokenAddress, message, load
                         <Button 
                             variant="primary" 
                             size="sm" 
-                            state={inputDescription === '<p></p>' || !inputDescription ? 'disabled' : undefined} 
+                            disabled={inputDescription === '<p></p>' || !inputDescription}
                             onClick={() => announceDelegate()}>
                                 Announce yourself
                         </Button>

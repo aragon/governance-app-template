@@ -10,7 +10,7 @@
     "deploy-dao": "bun ./scripts/deploy.ts"
   },
   "dependencies": {
-    "@aragon/ods": "1.0.12",
+    "@aragon/ods": "1.0.15",
     "@shazow/whatsabi": "^0.9.1",
     "@tanstack/react-query": "^5.18.1",
     "@typescript-eslint/eslint-plugin": "latest",

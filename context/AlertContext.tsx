@@ -28,15 +28,26 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Add a new alert to the list
   const addAlert = (message: string, alertOptions?: AlertOptions) => {
+    const newAlertList = ([] as IAlert[]).concat(alerts);
+
     // Clean duplicates
     const idx = alerts.findIndex((a) => {
       if (a.message !== message) return false;
       else if (a.description !== alertOptions?.description) return false;
       else if (a.type !== alertOptions?.type) return false;
-
       return true;
     });
-    if (idx >= 0) removeAlert(idx);
+    if (idx >= 0) {
+      const [prevAlert] = newAlertList.splice(idx, 1);
+      clearTimeout(prevAlert.dismissTimeout);
+      const timeout = alertOptions?.timeout ?? DEFAULT_ALERT_TIMEOUT;
+      prevAlert.dismissTimeout = setTimeout(
+        () => removeAlert(prevAlert.id),
+        timeout
+      );
+      setAlerts(newAlertList.concat(prevAlert));
+      return;
+    }
 
     const newAlert: IAlert = {
       id: Date.now(),
@@ -48,13 +59,12 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
       newAlert.explorerLink =
         client.chain.blockExplorers?.default.url + "/tx/" + alertOptions.txHash;
     }
-    setAlerts(alerts.concat(newAlert));
-
-    // Schedule the clean-up
     const timeout = alertOptions?.timeout ?? DEFAULT_ALERT_TIMEOUT;
-    setTimeout(() => {
-      removeAlert(newAlert.id);
-    }, timeout);
+    newAlert.dismissTimeout = setTimeout(
+      () => removeAlert(newAlert.id),
+      timeout
+    );
+    setAlerts(newAlertList.concat(newAlert));
   };
 
   // Function to remove an alert

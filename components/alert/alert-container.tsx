@@ -7,7 +7,7 @@ const AlertContainer: FC = () => {
   const { alerts } = useAlertContext();
 
   return (
-    <div className="fixed top-0 right-0 w-96 m-4">
+    <div className="fixed top-0 right-0 w-72 md:w-96 m-4 z-50">
       {alerts.map((alert: IAlert) => (
         <AlertCard
           className="drop-shadow-lg mb-4"

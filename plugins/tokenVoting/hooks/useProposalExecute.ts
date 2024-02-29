@@ -5,13 +5,13 @@ import {
   useReadContract,
 } from "wagmi";
 import { TokenVotingAbi } from "../artifacts/TokenVoting.sol";
-import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
+import { AlertContextProps, useAlert } from "@/context/AlertContext";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 export function useProposalExecute(proposalId: string) {
   const { reload } = useRouter();
-  const { addAlert } = useAlertContext() as AlertContextProps;
+  const { addAlert } = useAlert() as AlertContextProps;
 
   const {
     data: canExecute,

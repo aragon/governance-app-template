@@ -9,7 +9,7 @@ import { useProposal } from "./useProposal";
 import { useProposalVetoes } from "@/plugins/dualGovernance/hooks/useProposalVetoes";
 import { useUserCanVeto } from "@/plugins/dualGovernance/hooks/useUserCanVeto";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
-import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
+import { useAlert, AlertContextProps } from "@/context/AlertContext";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
 export function useProposalVeto(proposalId: string) {
@@ -30,7 +30,7 @@ export function useProposalVeto(proposalId: string) {
   );
   const canVeto = useUserCanVeto(BigInt(proposalId)) as boolean;
 
-  const { addAlert } = useAlertContext() as AlertContextProps;
+  const { addAlert } = useAlert() as AlertContextProps;
   const {
     writeContract: vetoWrite,
     data: vetoTxHash,

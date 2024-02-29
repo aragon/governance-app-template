@@ -8,7 +8,7 @@ import { Action } from "@/utils/types";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { useAbi } from "@/hooks/useAbi";
 import { decodeCamelCase } from "@/utils/case";
-import { useAlertContext } from "@/context/AlertContext";
+import { useAlert } from "@/context/AlertContext";
 
 interface FunctionEncodingFormProps {
   onAddAction: (action: Action) => any;
@@ -73,7 +73,7 @@ const FunctionSelector = ({
   abi: AbiFunction[];
   actionEntered: (calldata: Hex, value: bigint) => void;
 }) => {
-  const { addAlert } = useAlertContext();
+  const { addAlert } = useAlert();
   const [selectedAbiItem, setSelectedAbiItem] = useState<
     AbiFunction | undefined
   >();

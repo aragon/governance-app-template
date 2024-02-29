@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
-import { fetchJsonFromIpfs } from "@/utils/ipfs";
 import { getAbiItem } from "viem";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import { Action } from "@/utils/types";
@@ -10,8 +9,8 @@ import {
   ProposalParameters,
   Tally,
 } from "@/plugins/tokenVoting/utils/types";
-import { useQuery } from "@tanstack/react-query";
 import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { useMetadata } from "@/hooks/useMetadata";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -79,28 +78,18 @@ export function useProposal(proposalId: string, autoRefresh = false) {
       .catch((err) => {
         console.error("Could not fetch the proposal defailt", err);
       });
-  }, [proposalData?.tally]);
+  }, [proposalData?.tally, !!publicClient]);
 
-  // JSON metadata
   const {
-    data: metadataContent,
-    isLoading: metadataLoading,
-    isSuccess: metadataReady,
+    metadata,
+    isPending: metadataLoading,
     error: metadataError,
-  } = useQuery<ProposalMetadata, Error>({
-    queryKey: [
-      `tokenVotingProposal-${PUB_TOKEN_VOTING_PLUGIN_ADDRESS}-${proposalId}`,
-      metadataUri!,
-    ],
-    queryFn: () =>
-      metadataUri ? fetchJsonFromIpfs(metadataUri) : Promise.resolve(null),
-    enabled: !!metadataUri,
-  });
+  } = useMetadata(metadataUri);
 
   const proposal = arrangeProposalData(
     proposalData,
     proposalCreationEvent,
-    metadataContent
+    metadata as any
   );
 
   return {
@@ -109,7 +98,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
       proposalReady: proposalFetchStatus === "idle",
       proposalLoading: proposalFetchStatus === "fetching",
       proposalError,
-      metadataReady,
+      metadataReady: !metadataError && !metadataLoading && !!metadata,
       metadataLoading,
       metadataError: metadataError !== undefined,
     },

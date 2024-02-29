@@ -5,10 +5,10 @@ import { usePublicClient } from "wagmi";
 import { AbiFunction } from "abitype";
 import { isAddress } from "@/utils/evm";
 import { PUB_CHAIN, PUB_ETHERSCAN_API_KEY } from "@/constants";
-import { useAlertContext } from "@/context/AlertContext";
+import { useAlert } from "@/context/AlertContext";
 
 export const useAbi = (contractAddress: Address) => {
-  const { addAlert } = useAlertContext();
+  const { addAlert } = useAlert();
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
   const [abi, setAbi] = useState<AbiFunction[]>();
   const [isLoading, setIsLoading] = useState<boolean>(false);

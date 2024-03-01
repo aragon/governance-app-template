@@ -1,3 +1,4 @@
+import { Button, IllustrationHuman } from "@aragon/ods";
 import { ReactNode } from "react";
 
 export default function Home() {
@@ -8,27 +9,26 @@ export default function Home() {
           Welcome to Aragonette!
         </h1>
         <p className="text-md text-neutral-400">
-          We provide a DAO experience for you in a simple template that you can
-          customize.
+          A beaufitul DAO experience in a simple template that you can
+          customize. Get started by connecting your wallet and selecting a
+          plugin from the menu.
         </p>
-      </Card>
-      <Card>
-        <div className="grid lg:grid-cols-2 lg:gap-3 lg:text-center">
-          <div>
-            <h2 className="text-lg font-[600] pb-2 text-primary-900">
-              About Us
-            </h2>
-            <p className="text-sm text-neutral-400">
-              We are a team of professionals dedicated to providing the best
-              service.
-            </p>
-          </div>
-
-          <div className="mt-4 lg:mt-0">
-            <h2 className="text-lg font-[600] pb-2 text-primary-900">FAQ</h2>
-            <p className="text-sm text-neutral-400">
-              Let us resolve your questions, we know what we are doing.
-            </p>
+        <div className="">
+          <IllustrationHuman
+            className="max-w-96 mx-auto mb-10"
+            body="BLOCKS"
+            expression="SMILE_WINK"
+            hairs="CURLY"
+          />
+          <div className="flex justify-center">
+            <Button
+              className="mb-2"
+              variant="primary"
+              href="https://devs.aragon.org/docs/osx/"
+              target="_blank"
+            >
+              Learn more about OSx
+            </Button>
           </div>
         </div>
       </Card>
@@ -40,8 +40,8 @@ export default function Home() {
 const Card = function ({ children }: { children: ReactNode }) {
   return (
     <div
-      className="w-full flex flex-col space-y-6 drop-shadow-sm
-    box-border border border-neutral-0
+      className="w-full flex flex-col space-y-6
+    box-border border border-neutral-100
     focus:outline-none focus:ring focus:ring-primary
     px-4 py-5 xs:px-10 md:px-6 lg:px-7 mb-6
     bg-neutral-0 rounded-xl"

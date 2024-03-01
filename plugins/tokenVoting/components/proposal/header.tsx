@@ -1,16 +1,18 @@
 import { AlertInline, Button, Tag } from "@aragon/ods";
-import { Proposal } from "@/plugins/tokenVoting/utils/types";
+import { Proposal, VotingMode } from "@/plugins/tokenVoting/utils/types";
 import { AlertVariant } from "@aragon/ods";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import dayjs from "dayjs";
 
+const RATIO_BASE = 1_000_000;
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 
 interface ProposalHeaderProps {
   proposalNumber: number;
   proposal: Proposal;
+  tokenSupply: bigint;
   userVote: number | undefined;
   canVote: boolean;
   canExecute: boolean;
@@ -22,6 +24,7 @@ interface ProposalHeaderProps {
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposalNumber,
   proposal,
+  tokenSupply,
   userVote,
   canVote,
   canExecute,
@@ -30,7 +33,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   onExecute,
 }) => {
   const userVoteInfo = getUserVoteVariant(userVote);
-  const proposalVariant = getProposalStatusVariant(proposal);
+  const proposalVariant = getProposalStatusVariant(proposal, tokenSupply);
   const ended = proposal.parameters.endDate <= Date.now() / 1000;
 
   return (
@@ -125,23 +128,45 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   );
 };
 
-const getProposalStatusVariant = (proposal: Proposal) => {
-  return {
-    variant: proposal?.active
-      ? "info"
-      : proposal?.executed
-      ? "primary"
-      : proposal?.tally?.no >= proposal?.tally?.yes
-      ? "critical"
-      : ("success" as AlertVariant),
-    label: proposal?.active
-      ? "Active"
-      : proposal?.executed
-      ? "Executed"
-      : proposal?.tally?.no >= proposal?.tally?.yes
-      ? "Defeated"
-      : "Executable",
-  };
+const getProposalStatusVariant = (proposal: Proposal, tokenSupply: bigint) => {
+  // Terminal cases
+  if (!proposal?.tally) return { variant: "info", label: "" };
+  else if (proposal.executed) return { variant: "primary", label: "Executed" };
+
+  const yesNoVotes = proposal.tally.no + proposal.tally.yes;
+  if (!yesNoVotes) return { variant: "info", label: "" };
+
+  const totalVotes = proposal.tally.abstain + yesNoVotes;
+  const supportThreshold = proposal.parameters.supportThreshold;
+
+  if (!proposal.active) {
+    // Defeated or executable?
+    if (totalVotes < proposal.parameters.minVotingPower) {
+      return { variant: "critical", label: "Low turnout" };
+    }
+
+    const totalYesNo = proposal.tally.yes + proposal.tally.no;
+    const finalRatio = (BigInt(RATIO_BASE) * proposal.tally.yes) / totalYesNo;
+
+    if (finalRatio > BigInt(supportThreshold)) {
+      return { variant: "success", label: "Executable" };
+    }
+    return { variant: "critical", label: "Defeated" };
+  }
+
+  // Active or early execution?
+  const noVotesWorstCase =
+    tokenSupply - proposal.tally.yes - proposal.tally.abstain;
+  const totalYesNoWc = proposal.tally.yes + noVotesWorstCase;
+
+  if (proposal.parameters.votingMode == VotingMode.EarlyExecution) {
+    const currentRatio =
+      (BigInt(RATIO_BASE) * proposal.tally.yes) / totalYesNoWc;
+    if (currentRatio > BigInt(supportThreshold)) {
+      return { variant: "success", label: "Executable" };
+    }
+  }
+  return { variant: "info", label: "Active" };
 };
 
 const getUserVoteVariant = (userVote?: number) => {

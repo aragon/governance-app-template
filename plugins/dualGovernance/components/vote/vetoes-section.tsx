@@ -2,7 +2,7 @@ import Blockies from "react-blockies";
 import { VetoCastEvent } from "@/plugins/dualGovernance/utils/types";
 import { formatUnits } from "viem";
 import { AddressText } from "@/components/text/address";
-import { Card, Tag } from "@aragon/ods";
+import { Card } from "@aragon/ods";
 import { compactNumber } from "@/utils/numbers";
 import { If } from "@/components/if";
 
@@ -40,7 +40,6 @@ const VetoCard = function ({ veto }: { veto: VetoCastEvent }) {
             </p>
           </div>
         </div>
-        <Tag className="!text-sm" variant="critical" label="Veto" />
       </div>
     </Card>
   );

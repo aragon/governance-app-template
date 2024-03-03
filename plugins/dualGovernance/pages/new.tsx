@@ -176,7 +176,7 @@ export default function Create() {
             className="pt-2"
             value={summary}
             onChange={setSummary}
-            placeholder="A detailed description for what the proposal is all about"
+            placeholder="A description for what the proposal is all about"
           />
         </div>
         <div className="mb-6">
@@ -291,16 +291,14 @@ export default function Create() {
                   <p className="flex-grow text-lg text-neutral-900 font-semibold pb-3">
                     Actions
                   </p>
-                  <div className="grid gap-3 mb-10">
-                    <If not={actions.length}>
-                      <p className="pt-2">The proposal has no actions</p>
-                    </If>
+                  <div className="mb-10">
                     {actions?.map?.((action, i) => (
-                      <ActionCard
+                      <div
+                        className="mb-3"
                         key={`${i}-${action.to}-${action.data}`}
-                        action={action}
-                        idx={i}
-                      />
+                      >
+                        <ActionCard action={action} idx={i} />
+                      </div>
                     ))}
                   </div>
                 </Else>

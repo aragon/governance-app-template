@@ -149,6 +149,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
             {bottomSection === "description" ? "Description" : "Votes"}
           </h2>
           <ToggleGroup
+            className="justify-end"
             value={bottomSection}
             isMultiSelect={false}
             onChange={(val: string | undefined) =>

@@ -19,16 +19,14 @@ export default function ProposalDescription(proposal: Proposal) {
       <h2 className="flex-grow text-2xl text-neutral-900 font-semibold pt-10 pb-3">
         Actions
       </h2>
-      <div className="grid gap-3">
+      <div className="">
         <If not={proposal.actions.length}>
           <p className="pt-2">The proposal has no actions</p>
         </If>
         {proposal.actions?.map?.((action, i) => (
-          <ActionCard
-            key={`${i}-${action.to}-${action.data}`}
-            action={action}
-            idx={i}
-          />
+          <div className="mb-3" key={`${i}-${action.to}-${action.data}`}>
+            <ActionCard action={action} idx={i} />
+          </div>
         ))}
       </div>
     </div>

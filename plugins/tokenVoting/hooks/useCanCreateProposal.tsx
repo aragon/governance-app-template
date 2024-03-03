@@ -1,42 +1,48 @@
-import { Address } from 'viem'
-import { useState, useEffect } from 'react'
-import { useBalance, useAccount, useReadContracts } from 'wagmi';
-import { TokenVotingAbi } from '@/plugins/tokenVoting/artifacts/TokenVoting.sol';
-import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from '@/constants';
+import { Address } from "viem";
+import { useState, useEffect } from "react";
+import { useBalance, useAccount, useReadContracts } from "wagmi";
+import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
+import { PUB_CHAIN, PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 export function useCanCreateProposal() {
-    const [isCreator, setIsCreator] = useState<boolean>(false);
-    const [minProposerVotingPower, setMinProposerVotingPower] = useState<bigint>();
-    const [votingToken, setVotingToken] = useState<Address>();
-    const { address, isConnecting, isDisconnected } = useAccount()
-    const {data: balance} = useBalance({ address, token: votingToken, })
+  const { address } = useAccount();
+  const [minProposerVotingPower, setMinProposerVotingPower] =
+    useState<bigint>();
+  const [votingToken, setVotingToken] = useState<Address>();
+  const { data: balance } = useBalance({
+    address,
+    token: votingToken,
+    chainId: PUB_CHAIN.id,
+  });
 
-    const { data: contractReads } = useReadContracts({
-        contracts: [
-            {
-                address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
-                abi: TokenVotingAbi,
-                functionName: 'minProposerVotingPower',
-            },
-            {
-                address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
-                abi: TokenVotingAbi,
-                functionName: 'getVotingToken',
-            }
-        ]
-    })
+  const { data: contractReads } = useReadContracts({
+    contracts: [
+      {
+        chainId: PUB_CHAIN.id,
+        address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+        abi: TokenVotingAbi,
+        functionName: "minProposerVotingPower",
+      },
+      {
+        chainId: PUB_CHAIN.id,
+        address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+        abi: TokenVotingAbi,
+        functionName: "getVotingToken",
+      },
+    ],
+  });
 
-    useEffect(() => {
-        if (contractReads?.length) {
-            setMinProposerVotingPower(contractReads[0]?.result as bigint)
+  useEffect(() => {
+    if (!contractReads?.length || contractReads?.length < 2) return;
 
-            setVotingToken(contractReads[1]?.result as Address)
-        }
-    }, [contractReads])
+    setMinProposerVotingPower(contractReads[0].result as bigint);
+    setVotingToken(contractReads[1].result as Address);
+  }, [contractReads?.[0]?.status, contractReads?.[1]?.status]);
 
-    useEffect(() => {
-        if ( balance !== undefined && minProposerVotingPower !== undefined && balance?.value >= minProposerVotingPower) setIsCreator(true)
-    }, [balance])
+  if (!address) return false;
+  else if (!minProposerVotingPower) return true;
+  else if (!balance) return false;
+  else if (balance?.value >= minProposerVotingPower) return true;
 
-    return isCreator
+  return false;
 }

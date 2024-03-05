@@ -1,89 +1,32 @@
-import { FC, useState } from "react";
-import { Address, Hex, encodeFunctionData } from "viem";
+import { useState } from "react";
+import { Hex, encodeFunctionData } from "viem";
 import { Button, InputText } from "@aragon/ods";
 import { AbiFunction } from "abitype";
-import { PleaseWaitSpinner } from "@/components/please-wait";
-import { isAddress } from "@/utils/evm";
-import { Action } from "@/utils/types";
-import { Else, ElseIf, If, Then } from "@/components/if";
-import { useAbi } from "@/hooks/useAbi";
+import { Else, If, Then } from "@/components/if";
 import { decodeCamelCase } from "@/utils/case";
 import { useAlertContext } from "@/context/AlertContext";
+import { InputParameter } from "./input-parameter";
+import { InputValue, isValidValue } from "@/utils/input-values";
 
-interface FunctionEncodingFormProps {
-  onAddAction: (action: Action) => any;
-}
-export const FunctionEncodingForm: FC<FunctionEncodingFormProps> = ({
-  onAddAction,
-}) => {
-  const [targetContract, setTargetContract] = useState<string>("");
-  const { abi, isLoading: loadingAbi } = useAbi(targetContract as Address);
-
-  const actionEntered = (data: Hex, value: bigint) => {
-    onAddAction({
-      to: targetContract,
-      value,
-      data,
-    });
-  };
-
-  return (
-    <div className="my-6">
-      <div className="mb-3 pb-3">
-        <InputText
-          className=""
-          label="Contract address"
-          placeholder="0x1234..."
-          variant={
-            !targetContract || isAddress(targetContract)
-              ? "default"
-              : "critical"
-          }
-          value={targetContract}
-          onChange={(e) => setTargetContract(e.target.value || "")}
-        />
-      </div>
-      <If condition={loadingAbi}>
-        <Then>
-          <div>
-            <PleaseWaitSpinner />
-          </div>
-        </Then>
-        <ElseIf condition={!targetContract}>
-          <p>Enter the address of the contract to interact with</p>
-        </ElseIf>
-        <ElseIf condition={!isAddress(targetContract)}>
-          <p>The address of the contract is not valid</p>
-        </ElseIf>
-        <ElseIf condition={!abi?.length}>
-          <p>The ABI of the contract is not publicly available</p>
-        </ElseIf>
-        <Else>
-          <FunctionSelector abi={abi} actionEntered={actionEntered} />
-        </Else>
-      </If>
-    </div>
-  );
-};
-
-const FunctionSelector = ({
-  abi,
-  actionEntered,
-}: {
+interface IFunctionSelectorProps {
   abi: AbiFunction[];
   actionEntered: (calldata: Hex, value: bigint) => void;
-}) => {
+}
+export const FunctionSelector = ({
+  abi,
+  actionEntered,
+}: IFunctionSelectorProps) => {
   const { addAlert } = useAlertContext();
   const [selectedAbiItem, setSelectedAbiItem] = useState<
     AbiFunction | undefined
   >();
-  const [abiInputValues, setAbiInputValues] = useState<string[]>([]);
+  const [inputValues, setInputValues] = useState<InputValue[]>([]);
   const [value, setValue] = useState<string>("");
 
-  const onFunctionParameterChange = (idx: number, value: string) => {
-    const newInputValues = [...abiInputValues];
-    newInputValues[idx] = value;
-    setAbiInputValues(newInputValues);
+  const onParameterChange = (paramIdx: number, value: InputValue) => {
+    const newInputValues = [...inputValues];
+    newInputValues[paramIdx] = value;
+    setInputValues(newInputValues);
   };
 
   const onAddAction = () => {
@@ -93,12 +36,12 @@ const FunctionSelector = ({
     let invalidParams = false;
     if (!abi?.length) invalidParams = true;
     else if (!selectedAbiItem?.name) invalidParams = true;
-    else if (selectedAbiItem.inputs.length !== abiInputValues.length)
+    else if (selectedAbiItem.inputs.length !== inputValues.length)
       invalidParams = true;
 
     for (const i in selectedAbiItem.inputs) {
       const item = selectedAbiItem.inputs[i];
-      if (hasTypeError(abiInputValues[i], item.type)) {
+      if (!isValidValue(inputValues[i], item)) {
         invalidParams = true;
         break;
       }
@@ -124,7 +67,7 @@ const FunctionSelector = ({
       const booleanIdxs = selectedAbiItem.inputs
         .map((inp, i) => (inp.type === "bool" ? i : -1))
         .filter((v) => v >= 0);
-      const args: any[] = [].concat(abiInputValues as any) as string[];
+      const args: any[] = [].concat(inputValues as any) as string[];
       for (const i of booleanIdxs) {
         if (["false", "False", "no", "No"].includes(args[i])) args[i] = false;
         else args[i] = true;
@@ -137,7 +80,7 @@ const FunctionSelector = ({
       });
       actionEntered(data, BigInt(value ?? "0"));
 
-      setAbiInputValues([]);
+      setInputValues([]);
     } catch (err) {
       console.error(err);
       addAlert("Invalid parameters", {
@@ -193,31 +136,21 @@ const FunctionSelector = ({
                 font-size: 1rem;
               }
               `}</style>
-              {selectedAbiItem?.inputs.map((argument, i) => (
+              {selectedAbiItem?.inputs.map((paramAbi, i) => (
                 <div key={i} className="mx-4 my-3">
-                  <InputText
-                    className=""
-                    label={
-                      argument.name
-                        ? decodeCamelCase(argument.name)
-                        : "Parameter " + (i + 1)
-                    }
-                    placeholder={
-                      argument.type || decodeCamelCase(argument.name) || ""
-                    }
-                    variant={
-                      hasTypeError(abiInputValues[i], argument.type)
-                        ? "critical"
-                        : "default"
-                    }
-                    value={abiInputValues[i] || ""}
-                    onChange={(e) =>
-                      onFunctionParameterChange(i, e.target.value)
-                    }
+                  <InputParameter
+                    abi={paramAbi}
+                    idx={i}
+                    onChange={onParameterChange}
                   />
                 </div>
               ))}
-              <If condition={selectedAbiItem?.payable}>
+              <If
+                condition={
+                  selectedAbiItem?.stateMutability === "payable" ||
+                  selectedAbiItem?.payable
+                }
+              >
                 <div className="mx-4 my-3">
                   <InputText
                     className=""
@@ -239,37 +172,3 @@ const FunctionSelector = ({
     </div>
   );
 };
-
-function hasTypeError(value: string, solidityType: string): boolean {
-  if (!value || !solidityType) return false;
-
-  switch (solidityType) {
-    case "address":
-      return !/^0x[0-9a-fA-F]{40}$/.test(value);
-    case "bytes":
-      return value.length % 2 !== 0 || !/^0x[0-9a-fA-F]*$/.test(value);
-    case "string":
-      return false;
-    case "bool":
-      return ![
-        "true",
-        "false",
-        "True",
-        "False",
-        "yes",
-        "no",
-        "Yes",
-        "No",
-      ].includes(value);
-    case "tuple":
-      return false;
-  }
-  if (solidityType.match(/^bytes[0-9]{1,2}$/)) {
-    return value.length % 2 !== 0 || !/^0x[0-9a-fA-F]+$/.test(value);
-  } else if (solidityType.match(/^uint[0-9]+$/)) {
-    return value.length % 2 !== 0 || !/^[0-9]*$/.test(value);
-  } else if (solidityType.match(/^int[0-9]+$/)) {
-    return value.length % 2 !== 0 || !/^-?[0-9]*$/.test(value);
-  }
-  return false;
-}

@@ -40,26 +40,25 @@ export const InputParameterArray = ({
   };
 
   return (
-    <div>
+    <div className="mt-6">
+      <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg mb-3">
+        {abi.name ? decodeCamelCase(abi.name) : "Parameter " + (idx + 1)}
+      </p>
       {value.map((item, i) => (
-        <InputText
-          className={i > 0 ? "mt-3" : ""}
-          label={
-            i === 0
-              ? (abi.name
-                  ? decodeCamelCase(abi.name)
-                  : "Parameter " + (i + 1)) + " (list)"
-              : undefined
-          }
-          placeholder={
-            abi.type?.replace(/\[\]$/, "") || decodeCamelCase(abi.name) || ""
-          }
-          variant={
-            isValidStringValue(item[i], abi.type) ? "default" : "critical"
-          }
-          value={item[i] || ""}
-          onChange={(e) => onItemChange(i, e.target.value)}
-        />
+        <div className="flex">
+          <InputText
+            className={i > 0 ? "mt-3" : ""}
+            addon={(i + 1).toString()}
+            placeholder={
+              abi.type?.replace(/\[\]$/, "") || decodeCamelCase(abi.name) || ""
+            }
+            variant={
+              isValidStringValue(item[i], abi.type) ? "default" : "critical"
+            }
+            value={item[i] || ""}
+            onChange={(e) => onItemChange(i, e.target.value)}
+          />
+        </div>
       ))}
       <div className="flex justify-end mt-3">
         <Button size="sm" variant="secondary" onClick={addMore}>

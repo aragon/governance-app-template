@@ -94,22 +94,26 @@ export const FunctionSelector = ({
   return (
     <div className="flex h-96 bg-neutral-0 rounded-lg border border-neutral-200">
       {/* Side bar */}
-      <div className="w-2/5 px-2 py-4 overflow-y-auto overflow-x-auto border-r border-neutral-200">
+      <div className="w-1/3 px-2 py-4 overflow-y-auto overflow-x-auto border-r border-neutral-200">
         <ul className="select-none space-y-1">
-          {abi?.map((targetFunc, index) => (
+          {abi?.map((fn, index) => (
             <li
               key={index}
-              onClick={() => setSelectedAbiItem(targetFunc)}
-              className={`w-full text-left font-sm hover:bg-neutral-100 py-2 px-3 rounded-xl hover:cursor-pointer ${targetFunc.name === selectedAbiItem?.name && "bg-neutral-100 font-semibold"}`}
+              onClick={() =>
+                !["pure", "view"].includes(fn.stateMutability) &&
+                setSelectedAbiItem(fn)
+              }
+              className={`w-full text-left font-sm hover:bg-neutral-100 py-2 px-3 rounded-xl hover:cursor-pointer ${fn.name === selectedAbiItem?.name && "bg-neutral-100 font-semibold"}`}
             >
-              {decodeCamelCase(targetFunc.name)}
-              <If
-                condition={["pure", "view"].includes(
-                  targetFunc.stateMutability
-                )}
-              >
-                <br />
-                <span className="text-xs text-neutral-400">(read only)</span>
+              <If condition={!["pure", "view"].includes(fn.stateMutability)}>
+                <Then>{decodeCamelCase(fn.name)}</Then>
+                <Else>
+                  <span className="line-through">
+                    {decodeCamelCase(fn.name)}
+                  </span>
+                  <br />
+                  <span className="text-xs text-neutral-400">(read only)</span>
+                </Else>
               </If>
             </li>
           ))}

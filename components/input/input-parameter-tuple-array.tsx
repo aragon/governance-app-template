@@ -43,9 +43,9 @@ export const InputParameterTupleArray = ({
   return (
     <div>
       {value.map((_, i) => (
-        <div className="mt-3">
+        <div className="mt-6">
           <div className="flex justify-between">
-            <p className="text-base font-normal leading-tight text-neutral-800 md:text-md mb-3">
+            <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg mb-3">
               {abi.name ? decodeCamelCase(abi.name) : "Parameter " + (idx + 1)}
             </p>
             <Tag label={(i + 1).toString()} variant="primary" />

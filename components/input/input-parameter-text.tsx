@@ -31,17 +31,19 @@ export const InputParameterText = ({
   };
 
   return (
-    <InputText
-      name={
-        "abi-input-" + idx + "-" + (abi.name || abi.internalType || abi.type)
-      }
-      label={abi.name ? decodeCamelCase(abi.name) : "Parameter " + (idx + 1)}
-      placeholder={abi.type || decodeCamelCase(abi.name) || ""}
-      variant={
-        !value || isValidStringValue(value, abi.type) ? "default" : "critical"
-      }
-      value={value}
-      onChange={(e) => handleValue(e.target.value)}
-    />
+    <div className="flex">
+      <InputText
+        name={
+          "abi-input-" + idx + "-" + (abi.name || abi.internalType || abi.type)
+        }
+        addon={abi.name ? decodeCamelCase(abi.name) : "Parameter " + (idx + 1)}
+        placeholder={abi.type || decodeCamelCase(abi.name) || ""}
+        variant={
+          !value || isValidStringValue(value, abi.type) ? "default" : "critical"
+        }
+        value={value}
+        onChange={(e) => handleValue(e.target.value)}
+      />
+    </div>
   );
 };

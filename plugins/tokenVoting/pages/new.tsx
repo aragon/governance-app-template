@@ -282,7 +282,7 @@ export default function Create() {
           </ElseIf>
           <Else>
             <div className="mt-14 mb-6">
-              <If condition={!actions.length}>
+              <If not={actions.length}>
                 <Then>
                   <p>Add the first action to continue</p>
                 </Then>

@@ -47,13 +47,13 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({
             <PleaseWaitSpinner />
           </div>
         </Then>
-        <ElseIf condition={!targetContract}>
+        <ElseIf not={targetContract}>
           <p>Enter the address of the contract to interact with</p>
         </ElseIf>
-        <ElseIf condition={!isAddress(targetContract)}>
+        <ElseIf not={isAddress(targetContract)}>
           <p>The address of the contract is not valid</p>
         </ElseIf>
-        <ElseIf condition={!abi?.length}>
+        <ElseIf not={abi?.length}>
           <p>The ABI of the contract is not publicly available</p>
         </ElseIf>
         <Else>

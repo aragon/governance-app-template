@@ -34,11 +34,11 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
           value={to}
           onChange={handleTo}
         />
-        <If condition={!to}>
+        <If not={to}>
           <Then>
             <p className="mt-3">Enter the address to transfer to</p>
           </Then>
-          <ElseIf condition={!isAddress(to)}>
+          <ElseIf not={isAddress(to)}>
             <p className="mt-3">The address you entered is not valid</p>
           </ElseIf>
         </If>

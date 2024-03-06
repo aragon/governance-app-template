@@ -23,8 +23,9 @@ export const InputParameterText = ({
   const [value, setValue] = useState<string | null>(null);
 
   useEffect(() => {
+    // Clean up if another function is selected
     setValue(null);
-  }, [abi]);
+  }, [abi, idx]);
 
   const handleValue = (val: string) => {
     setValue(val);

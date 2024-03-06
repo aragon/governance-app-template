@@ -105,7 +105,7 @@ export const FunctionSelector = ({
               }
               className={`w-full text-left font-sm hover:bg-neutral-100 py-2 px-3 rounded-xl hover:cursor-pointer ${fn.name === selectedAbiItem?.name && "bg-neutral-100 font-semibold"}`}
             >
-              <If condition={!["pure", "view"].includes(fn.stateMutability)}>
+              <If not={["pure", "view"].includes(fn.stateMutability)}>
                 <Then>{decodeCamelCase(fn.name)}</Then>
                 <Else>
                   <span className="line-through">

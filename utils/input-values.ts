@@ -153,7 +153,7 @@ export function readableTypeName(paramType: string): string {
     case "address":
       return "Address";
     case "bytes":
-      return "Hexadecimal value";
+      return "Hexadecimal bytes";
     case "string":
       return "Text";
     case "bool":
@@ -161,7 +161,8 @@ export function readableTypeName(paramType: string): string {
   }
 
   if (paramType.match(/^bytes[0-9]{1,2}$/)) {
-    return "Hexadecimal value";
+    const len = paramType.replace(/^bytes/, "");
+    return "Hexadecimal bytes (" + len + ")";
   } else if (paramType.match(/^uint[0-9]+$/)) {
     return "Positive number (in wei)";
   } else if (paramType.match(/^int[0-9]+$/)) {

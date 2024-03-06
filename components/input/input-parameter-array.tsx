@@ -24,8 +24,9 @@ export const InputParameterArray = ({
   const baseType = abi.type.replace(/\[\]$/, "");
 
   useEffect(() => {
+    // Clean up if another function is selected
     setValue([null]);
-  }, [abi]);
+  }, [abi, idx]);
 
   const onItemChange = (i: number, newVal: string) => {
     const newArray = ([] as Array<string | null>).concat(value);

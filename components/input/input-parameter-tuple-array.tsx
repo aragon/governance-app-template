@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react";
-import { Button, Tag } from "@aragon/ods";
+import { AlertInline, Button, Tag } from "@aragon/ods";
 import { AbiParameter } from "viem";
-import {
-  InputValue,
-  handleStringValue,
-  isValidStringValue,
-} from "@/utils/input-values";
+import { InputValue } from "@/utils/input-values";
 import { InputParameterTuple } from "./input-parameter-tuple";
 import { decodeCamelCase } from "@/utils/case";
+import { Else, If, Then } from "../if";
 
 interface IInputParameterTupleArrayProps {
   abi: AbiParameter;
   idx: number;
-  onChange: (paramIdx: number, value: InputValue) => any;
+  onChange: (paramIdx: number, value: Array<Record<string, InputValue>>) => any;
 }
 
 export const InputParameterTupleArray = ({
@@ -20,54 +17,79 @@ export const InputParameterTupleArray = ({
   idx,
   onChange,
 }: IInputParameterTupleArrayProps) => {
-  const [value, setValue] = useState<string[][]>([[]]);
+  const [values, setValues] = useState<
+    Array<Record<string, InputValue> | undefined>
+  >([undefined]);
 
   useEffect(() => {
-    setValue([[]]);
-  }, [abi]);
+    // Clean up if another function is selected
+    setValues([undefined]);
+  }, [abi, idx]);
 
-  const onItemChange = (i: number, newVal: InputValue) => {
-    console.log(i, newVal);
+  const onItemChange = (i: number, newVal: Record<string, InputValue>) => {
+    const newValues = [...values];
+    newValues[i] = newVal;
+    setValues(newValues);
 
-    // const newArray = ([] as string[][]).concat(value);
-    // newArray[i] = newVal;
-    // setValue(newArray);
-    // const transformedItems = newArray.map((item) =>
-    //   handleStringValue(item, abi.type)
-    // );
-    // if (transformedItems.some((item) => item === null)) return;
-    // onChange(idx, transformedItems as InputValue[]);
+    if (newValues.some((item) => !item)) return;
+
+    onChange(idx, newValues as Array<Record<string, InputValue>>);
   };
 
   const addMore = () => {
-    const newValue = [...value, []];
-    setValue(newValue);
+    const newValues = [...values, undefined];
+    setValues(newValues);
   };
+
+  const components: AbiParameter[] = (abi as any).components || [];
+  const someMissingName = true || components.some((c) => !c.name);
 
   return (
     <div>
-      {value.map((_, i) => (
-        <div className="mt-6">
-          <div className="flex justify-between">
-            <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg mb-3">
-              {abi.name ? decodeCamelCase(abi.name) : "Parameter " + (idx + 1)}
-            </p>
-            <Tag label={(i + 1).toString()} variant="primary" />
-          </div>
+      <If not={someMissingName}>
+        <Then>
+          {values.map((_, i) => (
+            <div className="mt-6">
+              <div className="flex justify-between">
+                <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg mb-3">
+                  {abi.name
+                    ? decodeCamelCase(abi.name)
+                    : "Parameter " + (idx + 1)}
+                </p>
+                <Tag label={(i + 1).toString()} variant="primary" />
+              </div>
 
-          <InputParameterTuple
-            abi={abi}
-            idx={i}
-            onChange={onItemChange}
-            hideTitle
+              <InputParameterTuple
+                abi={abi}
+                idx={i}
+                onChange={onItemChange}
+                hideTitle
+              />
+            </div>
+          ))}
+          <div className="flex justify-end mt-3">
+            <Button size="sm" variant="secondary" onClick={addMore}>
+              Add more{" "}
+              {!abi.name ? "" : decodeCamelCase(abi.name).toLowerCase()}
+            </Button>
+          </div>
+        </Then>
+        <Else>
+          <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg mb-3">
+            {abi.name ? decodeCamelCase(abi.name) : "Parameter " + (idx + 1)}
+          </p>
+          <AlertInline
+            message={
+              "Cannot display the input fields" +
+              (!abi.name
+                ? ""
+                : " for " + decodeCamelCase(abi.name).toLowerCase()) +
+              ". The function definition is incomplete."
+            }
+            variant="critical"
           />
-        </div>
-      ))}
-      <div className="flex justify-end mt-3">
-        <Button size="sm" variant="secondary" onClick={addMore}>
-          Add more {!abi.name ? "" : decodeCamelCase(abi.name).toLowerCase()}
-        </Button>
-      </div>
+        </Else>
+      </If>
     </div>
   );
 };

@@ -42,7 +42,7 @@ export const InputParameterTupleArray = ({
   };
 
   const components: AbiParameter[] = (abi as any).components || [];
-  const someMissingName = true || components.some((c) => !c.name);
+  const someMissingName = components.some((c) => !c.name);
 
   return (
     <div>

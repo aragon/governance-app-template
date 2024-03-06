@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Hex, encodeFunctionData } from "viem";
 import { Button, InputText } from "@aragon/ods";
 import { AbiFunction } from "abitype";
@@ -6,7 +6,7 @@ import { Else, If, Then } from "@/components/if";
 import { decodeCamelCase } from "@/utils/case";
 import { useAlertContext } from "@/context/AlertContext";
 import { InputParameter } from "./input-parameter";
-import { InputValue, isValidValue } from "@/utils/input-values";
+import { InputValue } from "@/utils/input-values";
 
 interface IFunctionSelectorProps {
   abi: AbiFunction[];
@@ -23,6 +23,11 @@ export const FunctionSelector = ({
   const [inputValues, setInputValues] = useState<InputValue[]>([]);
   const [value, setValue] = useState<string>("");
 
+  useEffect(() => {
+    // Clean up if another function is selected
+    setInputValues([]);
+  }, [abi]);
+
   const onParameterChange = (paramIdx: number, value: InputValue) => {
     const newInputValues = [...inputValues];
     newInputValues[paramIdx] = value;
@@ -30,57 +35,33 @@ export const FunctionSelector = ({
   };
 
   const onAddAction = () => {
-    // Validate params
     if (!abi || !selectedAbiItem) return;
 
-    let invalidParams = false;
-    if (!abi?.length) invalidParams = true;
-    else if (!selectedAbiItem?.name) invalidParams = true;
-    else if (selectedAbiItem.inputs.length !== inputValues.length)
-      invalidParams = true;
+    // The values we have now are the result of
+    // validation having happened at the specific components
 
-    for (const i in selectedAbiItem.inputs) {
-      const item = selectedAbiItem.inputs[i];
-      if (!isValidValue(inputValues[i], item)) {
-        invalidParams = true;
-        break;
+    for (let i = 0; i < selectedAbiItem.inputs.length; i++) {
+      if (inputValues[i] === null || inputValues[i] === undefined) {
+        return addAlert("Invalid parameters", {
+          description:
+            "Make sure that you have filled all the parameters and that they contain valid values",
+          type: "error",
+        });
       }
-    }
-    invalidParams = invalidParams || !/^[0-9]*$/.test(value);
-
-    if (invalidParams) {
-      addAlert("Invalid parameters", {
-        description: "Check that the parameters you entered are correct",
-        type: "error",
-      });
-      return;
-    }
-
-    if (["pure", "view"].includes(selectedAbiItem.stateMutability)) {
-      addAlert("Read only function", {
-        description: "The action you have added will have no effect",
-        timeout: 11 * 1000,
-      });
     }
 
     try {
-      const booleanIdxs = selectedAbiItem.inputs
-        .map((inp, i) => (inp.type === "bool" ? i : -1))
-        .filter((v) => v >= 0);
-      const args: any[] = [].concat(inputValues as any) as string[];
-      for (const i of booleanIdxs) {
-        if (["false", "False", "no", "No"].includes(args[i])) args[i] = false;
-        else args[i] = true;
-      }
-
       const data = encodeFunctionData({
         abi,
         functionName: selectedAbiItem.name,
-        args,
+        args: inputValues,
       });
       actionEntered(data, BigInt(value ?? "0"));
 
       setInputValues([]);
+
+      // Clean up the form
+      setSelectedAbiItem(undefined);
     } catch (err) {
       console.error(err);
       addAlert("Invalid parameters", {

@@ -1,6 +1,7 @@
 import { AlertInline, Button, Tag } from "@aragon/ods";
 import { Proposal } from "@/plugins/tokenVoting/utils/types";
 import { AlertVariant } from "@aragon/ods";
+import { getProposalStatusVariant } from "@/plugins/tokenVoting/utils/proposal-status";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { AddressText } from "@/components/text/address";
 import { PleaseWaitSpinner } from "@/components/please-wait";
@@ -11,6 +12,7 @@ const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 interface ProposalHeaderProps {
   proposalNumber: number;
   proposal: Proposal;
+  tokenSupply: bigint;
   userVote: number | undefined;
   canVote: boolean;
   canExecute: boolean;
@@ -22,6 +24,7 @@ interface ProposalHeaderProps {
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposalNumber,
   proposal,
+  tokenSupply,
   userVote,
   canVote,
   canExecute,
@@ -30,7 +33,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   onExecute,
 }) => {
   const userVoteInfo = getUserVoteVariant(userVote);
-  const proposalVariant = getProposalStatusVariant(proposal);
+  const proposalVariant = getProposalStatusVariant(proposal, tokenSupply);
   const ended = proposal.parameters.endDate <= Date.now() / 1000;
 
   return (
@@ -123,25 +126,6 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
       </p>
     </div>
   );
-};
-
-const getProposalStatusVariant = (proposal: Proposal) => {
-  return {
-    variant: proposal?.active
-      ? "info"
-      : proposal?.executed
-      ? "primary"
-      : proposal?.tally?.no >= proposal?.tally?.yes
-      ? "critical"
-      : ("success" as AlertVariant),
-    label: proposal?.active
-      ? "Active"
-      : proposal?.executed
-      ? "Executed"
-      : proposal?.tally?.no >= proposal?.tally?.yes
-      ? "Defeated"
-      : "Executable",
-  };
 };
 
 const getUserVoteVariant = (userVote?: number) => {

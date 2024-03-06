@@ -9,6 +9,7 @@ import { If } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { useVotingToken } from "@/plugins/tokenVoting/hooks/useVotingToken";
 
 const PROPOSALS_PER_PAGE = 10;
 
@@ -16,6 +17,7 @@ export default function Proposals() {
   const [proposalCount, setProposalCount] = useState(0);
   const { data: blockNumber } = useBlockNumber({ watch: true });
   const canCreate = useCanCreateProposal();
+  const { tokenSupply } = useVotingToken();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [paginatedProposals, setPaginatedProposals] = useState<number[]>([]);
@@ -72,6 +74,7 @@ export default function Proposals() {
             proposalId={BigInt(
               proposalCount! - 1 - currentPage * PROPOSALS_PER_PAGE - i
             )}
+            tokenSupply={tokenSupply || BigInt("0")}
           />
         ))}
         <div className="w-full flex flex-row justify-end gap-2 mt-4 mb-10">

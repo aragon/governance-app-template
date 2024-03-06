@@ -15,6 +15,7 @@ import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useProposalVoting } from "../hooks/useProposalVoting";
+import { useVotingToken } from "../hooks/useVotingToken";
 import { useProposalExecute } from "../hooks/useProposalExecute";
 
 type BottomSection = "description" | "votes";
@@ -26,6 +27,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     proposalId,
     true
   );
+  const { tokenSupply } = useVotingToken();
   const {
     voteProposal,
     votingStatus,
@@ -109,6 +111,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         <ProposalHeader
           proposalNumber={Number(proposalId) + 1}
           proposal={proposal}
+          tokenSupply={tokenSupply || BigInt("0")}
           userVote={votedOption}
           transactionConfirming={showTransactionConfirming}
           canVote={!!userCanVote}

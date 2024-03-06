@@ -5,7 +5,7 @@ export type ProposalInputs = {
   proposalId: bigint;
 };
 
-enum VotingMode {
+export enum VotingMode {
   Standard,
   EarlyExecution,
   VoteReplacement,

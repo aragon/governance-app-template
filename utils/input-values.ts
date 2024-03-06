@@ -1,4 +1,5 @@
 import { AbiParameter } from "viem";
+import { decodeCamelCase } from "./case";
 
 export type InputValue =
   | string
@@ -70,7 +71,10 @@ export function isValidValue(
     return typeof value === "bigint";
   }
 
-  throw new Error("Complex types should be checked directly");
+  throw new Error(
+    "Complex types need to be checked in a higher order function. Got: " +
+      paramType
+  );
 }
 
 export function isValidStringValue(value: string, paramType: string): boolean {
@@ -97,14 +101,17 @@ export function isValidStringValue(value: string, paramType: string): boolean {
   }
 
   if (paramType.match(/^bytes[0-9]{1,2}$/)) {
-    return value.length % 2 === 0 && /^0x[0-9a-fA-F]+$/.test(value);
+    const len = parseInt(paramType.replace(/^bytes/, ""));
+    if (value.length !== len * 2) return false;
+    return /^0x[0-9a-fA-F]+$/.test(value);
   } else if (paramType.match(/^uint[0-9]+$/)) {
-    return value.length % 2 === 0 && /^[0-9]*$/.test(value);
+    return /^[0-9]*$/.test(value);
   } else if (paramType.match(/^int[0-9]+$/)) {
-    return value.length % 2 === 0 && /^-?[0-9]*$/.test(value);
+    return /^-?[0-9]*$/.test(value);
   }
   throw new Error(
-    "Complex types need to be checked in a higher order function"
+    "Complex types need to be checked in a higher order function. Got: " +
+      paramType
   );
 }
 
@@ -136,6 +143,30 @@ export function handleStringValue(
     return BigInt(value);
   }
   throw new Error(
-    "Complex types need to be checked in a higher order function"
+    "Complex types need to be checked in a higher order function. Got: " +
+      paramType
   );
+}
+
+export function readableTypeName(paramType: string): string {
+  switch (paramType) {
+    case "address":
+      return "Address";
+    case "bytes":
+      return "Hexadecimal value";
+    case "string":
+      return "Text";
+    case "bool":
+      return "Yes or no";
+  }
+
+  if (paramType.match(/^bytes[0-9]{1,2}$/)) {
+    return "Hexadecimal value";
+  } else if (paramType.match(/^uint[0-9]+$/)) {
+    return "Positive number (in wei)";
+  } else if (paramType.match(/^int[0-9]+$/)) {
+    return "Number (in wei)";
+  }
+
+  return decodeCamelCase(paramType.replace(/\[\]/, ""));
 }

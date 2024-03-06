@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, InputText } from "@aragon/ods";
 import { AbiParameter } from "viem";
 import { decodeCamelCase } from "@/utils/case";
@@ -6,6 +6,7 @@ import {
   InputValue,
   handleStringValue,
   isValidStringValue,
+  readableTypeName,
 } from "@/utils/input-values";
 
 interface IInputParameterArrayProps {
@@ -19,15 +20,20 @@ export const InputParameterArray = ({
   idx,
   onChange,
 }: IInputParameterArrayProps) => {
-  const [value, setValue] = useState([""]);
+  const [value, setValue] = useState<Array<string | null>>([null]);
+  const baseType = abi.type.replace(/\[\]$/, "");
+
+  useEffect(() => {
+    setValue([null]);
+  }, [abi]);
 
   const onItemChange = (i: number, newVal: string) => {
-    const newArray = ([] as string[]).concat(value);
+    const newArray = ([] as Array<string | null>).concat(value);
     newArray[i] = newVal;
     setValue(newArray);
 
     const transformedItems = newArray.map((item) =>
-      handleStringValue(item, abi.type)
+      handleStringValue(item || "", baseType)
     );
     if (transformedItems.some((item) => item === null)) return;
 
@@ -35,7 +41,7 @@ export const InputParameterArray = ({
   };
 
   const addMore = () => {
-    const newValue = [...value, ""];
+    const newValue = [...value, null];
     setValue(newValue);
   };
 
@@ -50,19 +56,23 @@ export const InputParameterArray = ({
             className={i > 0 ? "mt-3" : ""}
             addon={(i + 1).toString()}
             placeholder={
-              abi.type?.replace(/\[\]$/, "") || decodeCamelCase(abi.name) || ""
+              baseType
+                ? readableTypeName(baseType)
+                : decodeCamelCase(abi.name) || ""
             }
             variant={
-              isValidStringValue(item[i], abi.type) ? "default" : "critical"
+              item === null || isValidStringValue(item, baseType)
+                ? "default"
+                : "critical"
             }
-            value={item[i] || ""}
+            value={item || ""}
             onChange={(e) => onItemChange(i, e.target.value)}
           />
         </div>
       ))}
       <div className="flex justify-end mt-3">
         <Button size="sm" variant="secondary" onClick={addMore}>
-          Add more
+          Add more {!abi.name ? "" : decodeCamelCase(abi.name).toLowerCase()}
         </Button>
       </div>
     </div>

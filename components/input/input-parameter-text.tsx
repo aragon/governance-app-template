@@ -5,8 +5,9 @@ import {
   InputValue,
   isValidStringValue,
   handleStringValue,
+  readableTypeName,
 } from "@/utils/input-values";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface IInputParameterTextProps {
   abi: AbiParameter;
@@ -19,10 +20,14 @@ export const InputParameterText = ({
   idx,
   onChange,
 }: IInputParameterTextProps) => {
-  const [value, setvalue] = useState("");
+  const [value, setValue] = useState<string | null>(null);
+
+  useEffect(() => {
+    setValue(null);
+  }, [abi]);
 
   const handleValue = (val: string) => {
-    setvalue(val);
+    setValue(val);
 
     const parsedValue = handleStringValue(val, abi.type);
     if (parsedValue === null) return;
@@ -37,11 +42,17 @@ export const InputParameterText = ({
           "abi-input-" + idx + "-" + (abi.name || abi.internalType || abi.type)
         }
         addon={abi.name ? decodeCamelCase(abi.name) : "Parameter " + (idx + 1)}
-        placeholder={abi.type || decodeCamelCase(abi.name) || ""}
-        variant={
-          !value || isValidStringValue(value, abi.type) ? "default" : "critical"
+        placeholder={
+          abi.type
+            ? readableTypeName(abi.type)
+            : decodeCamelCase(abi.name) || ""
         }
-        value={value}
+        variant={
+          value === null || isValidStringValue(value, abi.type)
+            ? "default"
+            : "critical"
+        }
+        value={value || ""}
         onChange={(e) => handleValue(e.target.value)}
       />
     </div>

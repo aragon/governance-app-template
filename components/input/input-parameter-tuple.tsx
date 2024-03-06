@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AbiParameter } from "viem";
 import { decodeCamelCase } from "@/utils/case";
 import { InputParameter } from "./input-parameter";
@@ -19,6 +19,11 @@ export const InputParameterTuple = ({
   hideTitle,
 }: IInputParameterTupleProps) => {
   const [value, setValue] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setValue({});
+  }, [abi]);
+
   // const ohChange = (idx: number, value: string) => {
   //   const newInputValues = [...abiInputValues];
   //   newInputValues[idx] = value;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Tag } from "@aragon/ods";
 import { AbiParameter } from "viem";
 import {
@@ -21,6 +21,10 @@ export const InputParameterTupleArray = ({
   onChange,
 }: IInputParameterTupleArrayProps) => {
   const [value, setValue] = useState<string[][]>([[]]);
+
+  useEffect(() => {
+    setValue([[]]);
+  }, [abi]);
 
   const onItemChange = (i: number, newVal: InputValue) => {
     console.log(i, newVal);
@@ -61,7 +65,7 @@ export const InputParameterTupleArray = ({
       ))}
       <div className="flex justify-end mt-3">
         <Button size="sm" variant="secondary" onClick={addMore}>
-          Add more
+          Add more {!abi.name ? "" : decodeCamelCase(abi.name).toLowerCase()}
         </Button>
       </div>
     </div>

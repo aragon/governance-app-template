@@ -9,30 +9,20 @@ import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { digestPagination } from "@/utils/pagination";
 import { useVotingToken } from "@/plugins/tokenVoting/hooks/useVotingToken";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useRouter } from "next/router";
-
-const PROPOSALS_PER_PAGE = 10;
 
 export default function Proposals() {
   const { isConnected } = useAccount();
   const { open } = useWeb3Modal();
   const { push } = useRouter();
-  const [proposalCount, setProposalCount] = useState(0);
+
   const { data: blockNumber } = useBlockNumber({ watch: true });
   const canCreate = useCanCreateProposal();
   const { tokenSupply } = useVotingToken();
-
   const [currentPage, setCurrentPage] = useState(0);
-  const [paginatedProposals, setPaginatedProposals] = useState<number[]>([]);
-
-  useEffect(() => {
-    const start = currentPage * PROPOSALS_PER_PAGE;
-    const end = (currentPage + 1) * PROPOSALS_PER_PAGE;
-    const propIds = new Array(proposalCount).fill(0).map((_, i) => i);
-    setPaginatedProposals(propIds.slice(start, end));
-  }, [proposalCount, currentPage]);
 
   const {
     data: proposalCountResponse,
@@ -45,16 +35,17 @@ export default function Proposals() {
   });
 
   useEffect(() => {
-    if (!proposalCountResponse) return;
-    setProposalCount(Number(proposalCountResponse));
-  }, [proposalCountResponse]);
-
-  useEffect(() => {
     refetch();
   }, [blockNumber]);
 
   const skipRender = useSkipFirstRender();
   if (skipRender) return <></>;
+
+  const proposalCount = Number(proposalCountResponse);
+  const { visibleProposalIds, showNext, showPrev } = digestPagination(
+    proposalCount,
+    currentPage
+  );
 
   return (
     <MainSection>
@@ -74,12 +65,10 @@ export default function Proposals() {
       </SectionView>
       <If condition={proposalCount}>
         <Then>
-          {paginatedProposals.map((_, i) => (
+          {visibleProposalIds.map((id) => (
             <ProposalCard
-              key={i}
-              proposalId={BigInt(
-                proposalCount! - 1 - currentPage * PROPOSALS_PER_PAGE - i
-              )}
+              key={id}
+              proposalId={BigInt(id)}
               tokenSupply={tokenSupply || BigInt("0")}
             />
           ))}
@@ -87,7 +76,7 @@ export default function Proposals() {
             <Button
               variant="tertiary"
               size="sm"
-              disabled={!currentPage}
+              disabled={!showPrev}
               onClick={() => setCurrentPage((page) => Math.max(page - 1, 0))}
               iconLeft={IconType.CHEVRON_LEFT}
             >
@@ -96,7 +85,7 @@ export default function Proposals() {
             <Button
               variant="tertiary"
               size="sm"
-              disabled={(currentPage + 1) * PROPOSALS_PER_PAGE >= proposalCount}
+              disabled={!showNext}
               onClick={() => setCurrentPage((page) => page + 1)}
               iconRight={IconType.CHEVRON_RIGHT}
             >

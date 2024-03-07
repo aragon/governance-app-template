@@ -86,7 +86,7 @@ export const SelfDelegationProfileCard = ({ address, tokenAddress, message, load
                         className='pt-2'
                         value={inputDescription}
                         onChange={setInputDescription}
-                        placeholder="A short description of who are you and what do you bring into the DAO."
+                        placeholder="A brief description of who you are and what you can bring to the DAO"
                     />
                 </If>
             </div>

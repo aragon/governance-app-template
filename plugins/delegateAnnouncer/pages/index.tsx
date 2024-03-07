@@ -2,7 +2,7 @@ import { usePublicClient, useReadContract } from "wagmi";
 import { useAccount } from "wagmi";
 import { PublicClient, parseAbi } from "viem";
 import { ReactNode } from "react";
-import { If } from "@/components/if";
+import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useDelegateAnnouncements } from "../hooks/useDelegateAnnouncements";
@@ -55,32 +55,32 @@ export default function DelegateAnnouncements() {
       </If>
 
       <h2 className="text-3xl font-semibold text-neutral-700">Delegates</h2>
-      <If not={delegateAnnouncements.length}>
-        <If condition={delegateAnnouncementsIsLoading}>
+      <If condition={delegateAnnouncements.length}>
+        <Then>
+          <div className="grid grid-cols-1 lg:grid-cols-2 mt-4 mb-14 gap-4">
+            {delegateAnnouncements.map((announcement) => (
+              <DelegateCard
+                key={announcement.logIndex}
+                delegates={delegates!}
+                delegate={announcement.delegate}
+                message={announcement.message}
+                tokenAddress={PUB_TOKEN_ADDRESS}
+              />
+            ))}
+          </div>
+        </Then>
+        <ElseIf condition={delegateAnnouncementsIsLoading}>
           <SectionView>
             <span className="my-3">
               <PleaseWaitSpinner />
             </span>
           </SectionView>
-        </If>
-        <If condition={!delegateAnnouncementsIsLoading}>
+        </ElseIf>
+        <Else>
           <span className="my-3">
-            No delegations have been registered on this DAO
+            There are no delegate announcements on the DAO
           </span>
-        </If>
-      </If>
-      <If condition={delegateAnnouncements.length}>
-        <div className="grid grid-cols-1 lg:grid-cols-2 mt-4 mb-14 gap-4">
-          {delegateAnnouncements.map((announcement) => (
-            <DelegateCard
-              key={announcement.logIndex}
-              delegates={delegates!}
-              delegate={announcement.delegate}
-              message={announcement.message}
-              tokenAddress={PUB_TOKEN_ADDRESS}
-            />
-          ))}
-        </div>
+        </Else>
       </If>
     </MainSection>
   );

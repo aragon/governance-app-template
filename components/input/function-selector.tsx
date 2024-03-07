@@ -62,6 +62,8 @@ export const FunctionSelector = ({
 
       // Clean up the form
       setSelectedAbiItem(undefined);
+
+      addAlert("New action added");
     } catch (err) {
       console.error(err);
       addAlert("Invalid parameters", {
@@ -72,30 +74,24 @@ export const FunctionSelector = ({
     }
   };
 
+  const functionAbiList = (abi || []).filter(
+    (item) =>
+      item.type === "function" &&
+      !["pure", "view"].includes(item.stateMutability)
+  );
+
   return (
     <div className="flex h-96 bg-neutral-0 rounded-lg border border-neutral-200">
       {/* Side bar */}
       <div className="w-1/3 px-2 py-4 overflow-y-auto overflow-x-auto border-r border-neutral-200">
         <ul className="select-none space-y-1">
-          {abi?.map((fn, index) => (
+          {functionAbiList.map((fn, index) => (
             <li
               key={index}
-              onClick={() =>
-                !["pure", "view"].includes(fn.stateMutability) &&
-                setSelectedAbiItem(fn)
-              }
+              onClick={() => setSelectedAbiItem(fn)}
               className={`w-full text-left font-sm hover:bg-neutral-100 py-2 px-3 rounded-xl hover:cursor-pointer ${fn.name === selectedAbiItem?.name && "bg-neutral-100 font-semibold"}`}
             >
-              <If not={["pure", "view"].includes(fn.stateMutability)}>
-                <Then>{decodeCamelCase(fn.name)}</Then>
-                <Else>
-                  <span className="line-through">
-                    {decodeCamelCase(fn.name)}
-                  </span>
-                  <br />
-                  <span className="text-xs text-neutral-400">(read only)</span>
-                </Else>
-              </If>
+              {decodeCamelCase(fn.name)}
             </li>
           ))}
         </ul>

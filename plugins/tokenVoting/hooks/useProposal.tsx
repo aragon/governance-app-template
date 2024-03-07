@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { fetchJsonFromIpfs } from "@/utils/ipfs";
-import { getAbiItem } from "viem";
+import { getAbiItem, fromHex } from "viem";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import { Action } from "@/utils/types";
+import { promiseFuncWithTimeout } from "@/utils/promises";
 import {
   Proposal,
   ProposalMetadata,
@@ -77,24 +78,31 @@ export function useProposal(proposalId: string, autoRefresh = false) {
         setMetadata(log.args.metadata);
       })
       .catch((err) => {
-        console.error("Could not fetch the proposal defailt", err);
+        console.error("Could not fetch the proposal details", err);
       });
   }, [proposalData?.tally]);
 
   // JSON metadata
+
   const {
     data: metadataContent,
     isLoading: metadataLoading,
     isSuccess: metadataReady,
     error: metadataError,
   } = useQuery<ProposalMetadata, Error>({
-    queryKey: [
-      `tokenVotingProposal-${PUB_TOKEN_VOTING_PLUGIN_ADDRESS}-${proposalId}`,
-      metadataUri!,
-    ],
+    queryKey: [metadataUri || ""],
     queryFn: () =>
-      metadataUri ? fetchJsonFromIpfs(metadataUri) : Promise.resolve(null),
-    enabled: !!metadataUri,
+      promiseFuncWithTimeout(() => {
+        if (!metadataUri || !fromHex(metadataUri as any, "string")) {
+          return Promise.resolve("");
+        }
+        return fetchJsonFromIpfs(metadataUri);
+      }, 1500),
+    retry: true,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    retryOnMount: true,
+    staleTime: Infinity,
   });
 
   const proposal = arrangeProposalData(

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Address } from "viem";
+import { Address, fromHex } from "viem";
 import { useBlockNumber, useReadContract } from "wagmi";
 import { fetchJsonFromIpfs } from "@/utils/ipfs";
 import { PublicClient, getAbiItem } from "viem";
@@ -10,6 +10,7 @@ import {
   ProposalMetadata,
   ProposalParameters,
 } from "@/plugins/dualGovernance/utils/types";
+import { promiseFuncWithTimeout } from "@/utils/promises";
 import { useQuery } from "@tanstack/react-query";
 import { PUB_CHAIN } from "@/constants";
 
@@ -39,15 +40,19 @@ export function useProposal(
   const [proposalCreationEvent, setProposalCreationEvent] =
     useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();
-  const { data: blockNumber} = useBlockNumber();
+  const { data: blockNumber } = useBlockNumber();
 
   // Proposal on-chain data
   const {
     data: proposalResult,
     error: proposalError,
     fetchStatus: proposalFetchStatus,
-    refetch: proposalRefetch
-  } = useReadContract<typeof OptimisticTokenVotingPluginAbi, "getProposal", any[]>({
+    refetch: proposalRefetch,
+  } = useReadContract<
+    typeof OptimisticTokenVotingPluginAbi,
+    "getProposal",
+    any[]
+  >({
     address,
     abi: OptimisticTokenVotingPluginAbi,
     functionName: "getProposal",
@@ -57,8 +62,8 @@ export function useProposal(
   const proposalData = decodeProposalResultData(proposalResult as any);
 
   useEffect(() => {
-    if (autoRefresh) proposalRefetch()
-  }, [blockNumber])
+    if (autoRefresh) proposalRefetch();
+  }, [blockNumber]);
 
   // Creation event
   useEffect(() => {
@@ -81,22 +86,33 @@ export function useProposal(
         setMetadata(log.args.metadata);
       })
       .catch((err) => {
-        console.error("Could not fetch the proposal defailt", err);
+        console.error("Could not fetch the proposal details", err);
         return null;
       });
   }, [proposalData?.vetoTally]);
 
   // JSON metadata
+
   const {
     data: metadataContent,
     isLoading: metadataLoading,
     isSuccess: metadataReady,
     error: metadataError,
   } = useQuery<ProposalMetadata, Error>({
-    queryKey: [`dualGovernanceProposal-${address}-${proposalId}`, metadataUri!],
-    queryFn: () => metadataUri ? fetchJsonFromIpfs(metadataUri) : Promise.resolve(null),
-    enabled: !!metadataUri
-});
+    queryKey: [metadataUri || ""],
+    queryFn: () =>
+      promiseFuncWithTimeout(() => {
+        if (!metadataUri || !fromHex(metadataUri as any, "string")) {
+          return Promise.resolve("");
+        }
+        return fetchJsonFromIpfs(metadataUri);
+      }, 1500),
+    retry: true,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    retryOnMount: true,
+    staleTime: Infinity,
+  });
 
   const proposal = arrangeProposalData(
     proposalData,

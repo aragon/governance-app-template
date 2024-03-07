@@ -16,13 +16,17 @@ async function fetchFromIPFS(hexIpfsUri: string): Promise<Response> {
   if (!hexIpfsUri || hexIpfsUri === "0x") throw new Error("Invalid IPFS URI");
 
   const path = getPath(hexIpfsUri);
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), 1500);
   const response = await fetch(`${PUB_IPFS_ENDPOINT}/cat?arg=${path}`, {
     method: "POST",
     headers: {
       "X-API-KEY": PUB_IPFS_API_KEY,
       Accept: "application/json",
     },
+    signal: controller.signal,
   });
+  clearTimeout(id);
   if (!response.ok) {
     throw new Error("Could not connect to the IPFS endpoint");
   }

@@ -127,7 +127,7 @@ function getTokenVotingInstallSettings(
       pluginSetupRepo: tokenVotingPluginRepo,
       versionTag: {
         release: 1,
-        build: 1,
+        build: 2,
       },
     },
   };

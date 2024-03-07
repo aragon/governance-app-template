@@ -7,7 +7,7 @@ import { parseEther } from "viem";
 export const DEPLOYMENT_TARGET_CHAIN_ID = (getEnv(
   "DEPLOYMENT_TARGET_CHAIN_ID",
   true
-) ?? "goerli") as SupportedNetworks;
+) ?? "sepolia") as SupportedNetworks;
 
 // DAO
 export const DEPLOYMENT_DAO_NAME = "Aragonette DAO";

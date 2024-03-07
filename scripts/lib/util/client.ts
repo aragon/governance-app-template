@@ -1,13 +1,14 @@
-import { createPublicClient, createWalletClient, http } from "viem";
+import { Chain, createPublicClient, createWalletClient, http } from "viem";
 import { deploymentAccount as account } from "./account";
 import { getEnv } from "./env";
-import { goerli } from "viem/chains";
+import { sepolia, mainnet, polygon, arbitrum, base } from "viem/chains";
 
 const ALCHEMY_API_KEY = getEnv("DEPLOYMENT_ALCHEMY_API_KEY", true);
 const WEB3_ENDPOINT = getEnv("DEPLOYMENT_WEB3_ENDPOINT", true);
+const TARGET_CHAIN_ID = getEnv("DEPLOYMENT_TARGET_CHAIN_ID", true);
 
 export const deploymentPublicClient = createPublicClient({
-  chain: goerli,
+  chain: resolveNetwork(),
   transport: http(WEB3_ENDPOINT + ALCHEMY_API_KEY, {
     batch: true,
   }),
@@ -15,8 +16,19 @@ export const deploymentPublicClient = createPublicClient({
 
 export const deploymentWalletClient = createWalletClient({
   account,
-  chain: goerli,
+  chain: resolveNetwork(),
   transport: http(WEB3_ENDPOINT + ALCHEMY_API_KEY, {
     batch: true,
   }),
 });
+
+function resolveNetwork(): Chain {
+  switch(TARGET_CHAIN_ID) {
+    case "sepolia": return sepolia;
+    case "mainnet": return mainnet;
+    case "polygon": return polygon;
+    case "arbitrum": return arbitrum;
+    case "base": return base;
+  }
+  throw new Error("Unsupported network");
+}

@@ -36,7 +36,7 @@ export function useProposalVeto(proposalId: string) {
   } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash: vetoTxHash });
-  const canVeto = useUserCanVeto(BigInt(proposalId), isConfirmed) as boolean;
+  const { canVeto, canVetoRefetch } = useUserCanVeto(BigInt(proposalId));
 
   useEffect(() => {
     if (vetoingStatus === "idle" || vetoingStatus === "pending") return;
@@ -66,6 +66,7 @@ export function useProposalVeto(proposalId: string) {
       type: "success",
       txHash: vetoTxHash,
     });
+    canVetoRefetch();
   }, [vetoingStatus, vetoTxHash, isConfirming, isConfirmed]);
 
   const vetoProposal = () => {

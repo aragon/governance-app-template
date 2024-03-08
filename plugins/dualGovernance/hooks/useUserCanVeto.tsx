@@ -3,10 +3,9 @@ import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifac
 import { useEffect, useState } from "react";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
-export function useUserCanVeto(proposalId: bigint, forceRefetch: boolean) {
+export function useUserCanVeto(proposalId: bigint) {
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber({ watch: true });
-  const [userVetoed, setUserVetoed] = useState<boolean>(false)
 
   const { data: canVeto, refetch: canVetoRefetch } = useReadContract({
     chainId: PUB_CHAIN.id,
@@ -22,12 +21,5 @@ export function useUserCanVeto(proposalId: bigint, forceRefetch: boolean) {
     }
   }, [blockNumber])
 
-  useEffect(() => {
-    if (forceRefetch && !userVetoed) {
-      canVetoRefetch();
-    }
-    setUserVetoed(true)
-  }, [forceRefetch])
-
-  return canVeto;
+  return { canVeto, canVetoRefetch };
 }

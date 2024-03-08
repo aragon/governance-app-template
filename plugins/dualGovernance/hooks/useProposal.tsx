@@ -12,6 +12,7 @@ import {
 } from "@/plugins/dualGovernance/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import { PUB_CHAIN } from "@/constants";
+import { useQueryClient } from '@tanstack/react-query'
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -36,17 +37,19 @@ export function useProposal(
   proposalId: string,
   autoRefresh = false
 ) {
+  const queryClient = useQueryClient()
   const [proposalCreationEvent, setProposalCreationEvent] =
     useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();
-  const { data: blockNumber} = useBlockNumber();
+  const { data: blockNumber } = useBlockNumber({ watch: true });
 
   // Proposal on-chain data
   const {
     data: proposalResult,
     error: proposalError,
     fetchStatus: proposalFetchStatus,
-    refetch: proposalRefetch
+    refetch: proposalRefetch,
+    queryKey: proposalQueryKey,
   } = useReadContract<typeof OptimisticTokenVotingPluginAbi, "getProposal", any[]>({
     address,
     abi: OptimisticTokenVotingPluginAbi,
@@ -96,7 +99,7 @@ export function useProposal(
     queryKey: [`dualGovernanceProposal-${address}-${proposalId}`, metadataUri!],
     queryFn: () => metadataUri ? fetchJsonFromIpfs(metadataUri) : Promise.resolve(null),
     enabled: !!metadataUri
-});
+  });
 
   const proposal = arrangeProposalData(
     proposalData,

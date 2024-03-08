@@ -37,7 +37,6 @@ export function useProposal(
   proposalId: string,
   autoRefresh = false
 ) {
-  const queryClient = useQueryClient()
   const [proposalCreationEvent, setProposalCreationEvent] =
     useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();

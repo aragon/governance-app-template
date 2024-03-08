@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Address, fromHex } from "viem";
+import { Address } from "viem";
 import { useBlockNumber, useReadContract } from "wagmi";
-import { fetchJsonFromIpfs } from "@/utils/ipfs";
 import { PublicClient, getAbiItem } from "viem";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { Action } from "@/utils/types";
@@ -10,9 +9,8 @@ import {
   ProposalMetadata,
   ProposalParameters,
 } from "@/plugins/dualGovernance/utils/types";
-import { promiseFuncWithTimeout } from "@/utils/promises";
-import { useQuery } from "@tanstack/react-query";
 import { PUB_CHAIN } from "@/constants";
+import { useMetadata } from "@/hooks/useMetadata";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -92,27 +90,12 @@ export function useProposal(
   }, [proposalData?.vetoTally]);
 
   // JSON metadata
-
   const {
     data: metadataContent,
-    isLoading: metadataLoading,
     isSuccess: metadataReady,
+    isLoading: metadataLoading,
     error: metadataError,
-  } = useQuery<ProposalMetadata, Error>({
-    queryKey: [metadataUri || ""],
-    queryFn: () =>
-      promiseFuncWithTimeout(() => {
-        if (!metadataUri || !fromHex(metadataUri as any, "string")) {
-          return Promise.resolve("");
-        }
-        return fetchJsonFromIpfs(metadataUri);
-      }, 1500),
-    retry: true,
-    refetchOnMount: true,
-    refetchOnReconnect: true,
-    retryOnMount: true,
-    staleTime: Infinity,
-  });
+  } = useMetadata<ProposalMetadata>(metadataUri);
 
   const proposal = arrangeProposalData(
     proposalData,

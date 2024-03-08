@@ -1,18 +1,16 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
-import { fetchJsonFromIpfs } from "@/utils/ipfs";
-import { getAbiItem, fromHex } from "viem";
+import { getAbiItem } from "viem";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import { Action } from "@/utils/types";
-import { promiseFuncWithTimeout } from "@/utils/promises";
 import {
   Proposal,
   ProposalMetadata,
   ProposalParameters,
   Tally,
 } from "@/plugins/tokenVoting/utils/types";
-import { useQuery } from "@tanstack/react-query";
 import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { useMetadata } from "@/hooks/useMetadata";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -83,27 +81,12 @@ export function useProposal(proposalId: string, autoRefresh = false) {
   }, [proposalData?.tally]);
 
   // JSON metadata
-
   const {
     data: metadataContent,
-    isLoading: metadataLoading,
     isSuccess: metadataReady,
+    isLoading: metadataLoading,
     error: metadataError,
-  } = useQuery<ProposalMetadata, Error>({
-    queryKey: [metadataUri || ""],
-    queryFn: () =>
-      promiseFuncWithTimeout(() => {
-        if (!metadataUri || !fromHex(metadataUri as any, "string")) {
-          return Promise.resolve("");
-        }
-        return fetchJsonFromIpfs(metadataUri);
-      }, 1500),
-    retry: true,
-    refetchOnMount: true,
-    refetchOnReconnect: true,
-    retryOnMount: true,
-    staleTime: Infinity,
-  });
+  } = useMetadata<ProposalMetadata>(metadataUri);
 
   const proposal = arrangeProposalData(
     proposalData,

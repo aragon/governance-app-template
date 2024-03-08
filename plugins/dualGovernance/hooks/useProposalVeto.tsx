@@ -13,7 +13,6 @@ import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
 export function useProposalVeto(proposalId: string) {
-  const { reload } = useRouter();
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
 
   const { proposal, status: proposalFetchStatus } = useProposal(
@@ -28,7 +27,6 @@ export function useProposalVeto(proposalId: string) {
     proposalId,
     proposal
   );
-  const canVeto = useUserCanVeto(BigInt(proposalId)) as boolean;
 
   const { addAlert } = useAlertContext() as AlertContextProps;
   const {
@@ -39,6 +37,7 @@ export function useProposalVeto(proposalId: string) {
   } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash: vetoTxHash });
+  const canVeto = useUserCanVeto(BigInt(proposalId), isConfirmed) as boolean;
 
   useEffect(() => {
     if (vetoingStatus === "idle" || vetoingStatus === "pending") return;
@@ -68,7 +67,6 @@ export function useProposalVeto(proposalId: string) {
       type: "success",
       txHash: vetoTxHash,
     });
-    reload();
   }, [vetoingStatus, vetoTxHash, isConfirming, isConfirmed]);
 
   const vetoProposal = () => {

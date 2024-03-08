@@ -8,7 +8,7 @@ export function useUserCanVeto(proposalId: bigint, forceRefetch: boolean) {
   const { data: blockNumber } = useBlockNumber({ watch: true });
   const [userVetoed, setUserVetoed] = useState<boolean>(false)
 
-  const { data: canVeto, refetch: canVetoRefetch, queryKey } = useReadContract({
+  const { data: canVeto, refetch: canVetoRefetch } = useReadContract({
     chainId: PUB_CHAIN.id,
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     abi: OptimisticTokenVotingPluginAbi,

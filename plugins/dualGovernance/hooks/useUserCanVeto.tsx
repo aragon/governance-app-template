@@ -1,6 +1,6 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
 export function useUserCanVeto(proposalId: bigint) {
@@ -16,8 +16,10 @@ export function useUserCanVeto(proposalId: bigint) {
   });
 
   useEffect(() => {
-    canVetoRefetch();
-  }, [blockNumber]);
+    if (Number(blockNumber) % 2 === 0) {
+      canVetoRefetch();
+    }
+  }, [blockNumber])
 
-  return canVeto;
+  return { canVeto, canVetoRefetch };
 }

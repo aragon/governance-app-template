@@ -4,7 +4,6 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { useRouter } from "next/router";
 import { useProposal } from "./useProposal";
 import { useProposalVetoes } from "@/plugins/dualGovernance/hooks/useProposalVetoes";
 import { useUserCanVeto } from "@/plugins/dualGovernance/hooks/useUserCanVeto";

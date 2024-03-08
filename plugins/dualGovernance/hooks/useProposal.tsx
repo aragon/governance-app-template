@@ -100,6 +100,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
   return {
     proposal,
+    refetch: proposalRefetch,
     status: {
       proposalReady: proposalFetchStatus === "idle",
       proposalLoading: proposalFetchStatus === "fetching",

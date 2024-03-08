@@ -48,7 +48,6 @@ export function useProposal(
     error: proposalError,
     fetchStatus: proposalFetchStatus,
     refetch: proposalRefetch,
-    queryKey: proposalQueryKey,
   } = useReadContract<typeof OptimisticTokenVotingPluginAbi, "getProposal", any[]>({
     address,
     abi: OptimisticTokenVotingPluginAbi,

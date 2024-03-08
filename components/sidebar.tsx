@@ -62,7 +62,7 @@ const Sidebar = () => {
             {/* Home page */}
             <li
               onClick={() => setIsOpen(false)}
-              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 ${isHome ? "bg-neutral-100 md:bg-neutral-200 font-semibold" : ""
+              className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 ${isHome ? "bg-neutral-100 md:bg-neutral-200 font-semibold text-primary-500" : ""
                 } rounded-lg shadow-lg hover:bg-neutral-100 md:hover:bg-neutral-200`}
             >
               <Link href="/" className="flex items-center w-full p-3">
@@ -89,7 +89,7 @@ const Sidebar = () => {
                 key={idx}
                 onClick={() => setIsOpen(false)}
                 className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 ${plugin.id === pluginId
-                  ? "bg-neutral-100 md:bg-neutral-200 font-semibold rounded-lg shadow-lg"
+                  ? "bg-neutral-100 md:bg-neutral-200 font-semibold text-primary-500 rounded-lg shadow-lg"
                   : ""
                   } rounded-lg shadow-lg hover:bg-neutral-100 md:hover:bg-neutral-200`}
               >

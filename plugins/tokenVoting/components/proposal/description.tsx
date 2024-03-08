@@ -24,7 +24,7 @@ export default function ProposalDescription(proposal: Proposal) {
           <p className="pt-2">The proposal has no actions</p>
         </If>
         {proposal.actions?.map?.((action, i) => (
-          <div className="mb-3" key={`${i}-${action.to}-${action.data}`}>
+          <div className="mb-3" key={i}>
             <ActionCard action={action} idx={i} />
           </div>
         ))}

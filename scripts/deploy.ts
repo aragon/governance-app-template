@@ -1,4 +1,6 @@
 import { Address } from "viem";
+import { DEPLOYMENT_TARGET_CHAIN_ID } from "./deploy/priv-constants.js";
+import { deploymentPublicClient as publicClient } from "./lib/util/client";
 import { checkDependencies } from "./deploy/0-checks.js";
 import { deployTokenContracts } from "./deploy/1-governance-erc20-token.js";
 import { ensurePluginRepo as ensureTokenVoting } from "./deploy/2-token-voting.js";
@@ -35,22 +37,37 @@ async function main() {
       dualGovernancePluginRepo
     );
 
-    console.log("\nSummary");
-    console.log("- DAO address:", daoAddress);
-    console.log("- DAO ENS:", subdomain + ".dao.eth");
-    console.log("- ERC20 token:", daoToken);
+    const currentBlock = await publicClient.getBlockNumber();
 
-    console.log("- Plugins");
-    console.log("  - Token voting:", installedPlugins[0]);
-    console.log("  - Dual governance:", installedPlugins[1]);
+    const summary = `
 
-    console.log("- Other");
-    console.log("  - Delegation announcer:", delegationAnnouncer);
+Your DAO has been deployed successfully:
+- DAO address:  ${daoAddress}
+- DAO ENS:      ${subdomain}.dao.eth
 
-    console.log(
-      "\nPlease, update the .env file to make use of the deployed contracts"
-    );
-    console.log("Deployment successful");
+Please, update your .env file to use the newly deployed DAO
+
+# General
+NEXT_PUBLIC_DAO_ADDRESS=${daoAddress}
+NEXT_PUBLIC_TOKEN_ADDRESS=${daoToken}
+NEXT_PUBLIC_DELEGATION_ANNOUNCEMENTS_START_BLOCK=${currentBlock}
+
+# Plugin addresses
+NEXT_PUBLIC_TOKEN_VOTING_PLUGIN_ADDRESS=${installedPlugins[0]} 
+NEXT_PUBLIC_DELEGATION_CONTRACT_ADDRESS=${delegationAnnouncer}
+NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS=${installedPlugins[1]}
+
+# Network and services
+NEXT_PUBLIC_CHAIN_NAME=${DEPLOYMENT_TARGET_CHAIN_ID}
+NEXT_PUBLIC_WEB3_URL_PREFIX=https://eth-${DEPLOYMENT_TARGET_CHAIN_ID}.g.alchemy.com/v2/
+
+NEXT_PUBLIC_ALCHEMY_API_KEY=<YOUR KEY GOES HERE>
+NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=<YOUR KEY GOES HERE>
+NEXT_PUBLIC_IPFS_ENDPOINT=<YOUR IPFS API URL GOES HERE>
+NEXT_PUBLIC_IPFS_API_KEY=<YOUR IPFS API KEY GOES HERE>
+NEXT_PUBLIC_ETHERSCAN_API_KEY=<YOUR API KEY GOES HERE>
+`;
+    console.log(summary);
   } catch (err) {
     console.error(err);
     process.exit(1);

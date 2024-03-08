@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 import { Address, Hex } from "viem";
-import { InputText } from "@aragon/ods";
+import { AlertInline, InputText } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { isAddress } from "@/utils/evm";
 import { Action } from "@/utils/types";
@@ -27,9 +27,8 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({
 
   return (
     <div className="my-6">
-      <div className="mb-3 pb-3">
+      <div className="mb-3">
         <InputText
-          className=""
           label="Contract address"
           placeholder="0x1234..."
           variant={
@@ -51,10 +50,16 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({
           <p>Enter the address of the contract to interact with</p>
         </ElseIf>
         <ElseIf not={isAddress(targetContract)}>
-          <p>The address of the contract is not valid</p>
+          <AlertInline
+            message="The address of the contract is not valid"
+            variant="critical"
+          />
         </ElseIf>
         <ElseIf not={abi?.length}>
-          <p>The ABI of the contract is not publicly available</p>
+          <AlertInline
+            message="The ABI of the contract is not publicly available"
+            variant="critical"
+          />
         </ElseIf>
         <Else>
           <FunctionSelector abi={abi} actionEntered={actionEntered} />

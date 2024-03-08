@@ -1,6 +1,6 @@
 import { Action } from "@/utils/types";
 import { FC, useEffect, useState } from "react";
-import { InputText, InputNumber } from "@aragon/ods";
+import { InputText, InputNumber, AlertInline } from "@aragon/ods";
 import { Address, parseEther } from "viem";
 import { isAddress } from "@/utils/evm";
 import { ElseIf, If, Then } from "../if";
@@ -39,7 +39,11 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
             <p className="mt-3">Enter the address to transfer to</p>
           </Then>
           <ElseIf not={isAddress(to)}>
-            <p className="mt-3">The address you entered is not valid</p>
+            <AlertInline
+              className="mt-3"
+              message="The address of the contract is not valid"
+              variant="critical"
+            />
           </ElseIf>
         </If>
       </div>

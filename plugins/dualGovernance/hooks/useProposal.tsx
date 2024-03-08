@@ -12,7 +12,6 @@ import {
 } from "@/plugins/dualGovernance/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import { PUB_CHAIN } from "@/constants";
-import { useQueryClient } from '@tanstack/react-query'
 
 type ProposalCreatedLogResponse = {
   args: {

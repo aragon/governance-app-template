@@ -14,10 +14,11 @@ import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 export function useProposalVeto(proposalId: string) {
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
 
-  const { proposal, status: proposalFetchStatus } = useProposal(
-    proposalId,
-    true
-  );
+  const {
+    proposal,
+    status: proposalFetchStatus,
+    refetch: refetchProposal,
+  } = useProposal(proposalId, true);
   const vetoes = useProposalVetoes(
     publicClient!,
     PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
@@ -34,7 +35,9 @@ export function useProposalVeto(proposalId: string) {
   } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash: vetoTxHash });
-  const { canVeto, canVetoRefetch } = useUserCanVeto(BigInt(proposalId));
+  const { canVeto, refetch: refetchCanVeto } = useUserCanVeto(
+    BigInt(proposalId)
+  );
 
   useEffect(() => {
     if (vetoingStatus === "idle" || vetoingStatus === "pending") return;
@@ -64,7 +67,8 @@ export function useProposalVeto(proposalId: string) {
       type: "success",
       txHash: vetoTxHash,
     });
-    canVetoRefetch();
+    refetchCanVeto();
+    refetchProposal();
   }, [vetoingStatus, vetoTxHash, isConfirming, isConfirmed]);
 
   const vetoProposal = () => {

@@ -30,6 +30,17 @@ export default function ProposalCard(props: ProposalInputs) {
         </Card>
       </section>
     );
+  } else if (!proposal?.title && !proposal?.summary) {
+    // We have the proposal but no metadata yet
+    return (
+      <Link href={`#/proposals/${props.proposalId}`} className="w-full mb-4">
+        <Card className="p-4">
+          <span className="px-4 py-5 xs:px-10 md:px-6 lg:px-7">
+            <PleaseWaitSpinner fullMessage="Loading metadata..." />
+          </span>
+        </Card>
+      </Link>
+    );
   } else if (status.metadataReady && !proposal?.title) {
     return (
       <Link href={`#/proposals/${props.proposalId}`} className="w-full mb-4">

@@ -17,7 +17,7 @@ async function fetchFromIPFS(hexIpfsUri: string): Promise<Response> {
 
   const path = getPath(hexIpfsUri);
   const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), 1500);
+  const id = setTimeout(() => controller.abort(), 800);
   const response = await fetch(`${PUB_IPFS_ENDPOINT}/cat?arg=${path}`, {
     method: "POST",
     headers: {

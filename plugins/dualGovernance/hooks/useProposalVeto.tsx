@@ -15,8 +15,6 @@ export function useProposalVeto(proposalId: string) {
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
 
   const { proposal, status: proposalFetchStatus } = useProposal(
-    publicClient!,
-    PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     proposalId,
     true
   );

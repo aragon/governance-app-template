@@ -17,7 +17,7 @@ export function useUserCanVeto(proposalId: bigint, forceRefetch: boolean) {
   });
 
   useEffect(() => {
-    if (Number(blockNumber?.toString()) % 2 === 0) {
+    if (Number(blockNumber) % 2 === 0) {
       canVetoRefetch();
     }
   }, [blockNumber])

@@ -78,12 +78,16 @@ export function useProposal(proposalId: string, autoRefresh = false) {
       .catch((err) => {
         console.error("Could not fetch the proposal details", err);
       });
-  }, [proposalData?.tally]);
+  }, [
+    proposalData?.tally.yes,
+    proposalData?.tally.no,
+    proposalData?.tally.abstain,
+    !!publicClient,
+  ]);
 
   // JSON metadata
   const {
     data: metadataContent,
-    isSuccess: metadataReady,
     isLoading: metadataLoading,
     error: metadataError,
   } = useMetadata<ProposalMetadata>(metadataUri);
@@ -100,7 +104,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
       proposalReady: proposalFetchStatus === "idle",
       proposalLoading: proposalFetchStatus === "fetching",
       proposalError,
-      metadataReady,
+      metadataReady: !metadataError && !metadataLoading && !!metadataContent,
       metadataLoading,
       metadataError: metadataError !== undefined,
     },

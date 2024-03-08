@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Address } from "viem";
-import { useBlockNumber, useReadContract } from "wagmi";
-import { PublicClient, getAbiItem } from "viem";
+import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
+import { getAbiItem } from "viem";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { Action } from "@/utils/types";
 import {
@@ -9,7 +8,7 @@ import {
   ProposalMetadata,
   ProposalParameters,
 } from "@/plugins/dualGovernance/utils/types";
-import { PUB_CHAIN } from "@/constants";
+import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 
 type ProposalCreatedLogResponse = {
@@ -29,12 +28,8 @@ const ProposalCreatedEvent = getAbiItem({
   name: "ProposalCreated",
 });
 
-export function useProposal(
-  publicClient: PublicClient,
-  address: Address,
-  proposalId: string,
-  autoRefresh = false
-) {
+export function useProposal(proposalId: string, autoRefresh = false) {
+  const publicClient = usePublicClient();
   const [proposalCreationEvent, setProposalCreationEvent] =
     useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();
@@ -51,7 +46,7 @@ export function useProposal(
     "getProposal",
     any[]
   >({
-    address,
+    address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     abi: OptimisticTokenVotingPluginAbi,
     functionName: "getProposal",
     args: [proposalId],
@@ -65,10 +60,11 @@ export function useProposal(
 
   // Creation event
   useEffect(() => {
-    if (!proposalData) return;
+    if (!proposalData || !publicClient) return;
+
     publicClient
       .getLogs({
-        address,
+        address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
         event: ProposalCreatedEvent as any,
         args: {
           proposalId,
@@ -87,12 +83,11 @@ export function useProposal(
         console.error("Could not fetch the proposal details", err);
         return null;
       });
-  }, [proposalData?.vetoTally]);
+  }, [proposalData?.vetoTally, !!publicClient]);
 
   // JSON metadata
   const {
     data: metadataContent,
-    isSuccess: metadataReady,
     isLoading: metadataLoading,
     error: metadataError,
   } = useMetadata<ProposalMetadata>(metadataUri);
@@ -109,7 +104,7 @@ export function useProposal(
       proposalReady: proposalFetchStatus === "idle",
       proposalLoading: proposalFetchStatus === "fetching",
       proposalError,
-      metadataReady,
+      metadataReady: !metadataError && !metadataLoading && !!metadataContent,
       metadataLoading,
       metadataError: metadataError !== undefined,
     },

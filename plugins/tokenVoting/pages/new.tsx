@@ -13,7 +13,7 @@ import { toHex } from "viem";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import { useAlertContext } from "@/context/AlertContext";
 import WithdrawalInput from "@/components/input/withdrawal";
-import { FunctionEncodingForm } from "@/components/input/function-encoding-form";
+import { FunctionCallForm } from "@/components/input/function-call-form";
 import { Action } from "@/utils/types";
 import { getPlainText } from "@/utils/html";
 import { useRouter } from "next/router";
@@ -244,7 +244,7 @@ export default function Create() {
                     ? "text-primary-400"
                     : "text-neutral-400")
                 }
-                icon={IconType.APP_PROPOSALS}
+                icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
                 size="lg"
               />
               <span className="text-sm text-neutral-400 text-center">
@@ -257,7 +257,7 @@ export default function Create() {
               <WithdrawalInput setActions={setActions} />
             )}
             {actionType === ActionType.Custom && (
-              <FunctionEncodingForm
+              <FunctionCallForm
                 onAddAction={(action) => setActions(actions.concat([action]))}
               />
             )}
@@ -282,7 +282,7 @@ export default function Create() {
           </ElseIf>
           <Else>
             <div className="mt-14 mb-6">
-              <If condition={!actions.length}>
+              <If not={actions.length}>
                 <Then>
                   <p>Add the first action to continue</p>
                 </Then>

@@ -7,14 +7,15 @@ import { Action } from "@/utils/types";
 import { useAction } from "@/hooks/useAction";
 import {
   AbiFunction,
+  AbiParameter,
   Address,
   Hex,
   formatEther,
   toFunctionSignature,
-  toHex,
 } from "viem";
 import { compactNumber } from "@/utils/numbers";
 import { decodeCamelCase } from "@/utils/case";
+import { InputValue } from "@/utils/input-values";
 
 type ActionCardProps = {
   action: Action;
@@ -26,7 +27,9 @@ type CallParameterFieldType =
   | bigint
   | Address
   | Hex
-  | boolean;
+  | boolean
+  | CallParameterFieldType[]
+  | { [k: string]: CallParameterFieldType };
 
 export const ActionCard = function ({ action, idx }: ActionCardProps) {
   const { isLoading, args, functionName, functionAbi } = useAction(action);
@@ -158,22 +161,47 @@ const CallParameterField = ({
     <InputText
       className="w-full"
       addon={decodeCamelCase(addon)}
-      value={resolveValue(value, functionAbi.inputs?.[idx].type)}
+      value={resolveValue(value, functionAbi.inputs?.[idx])}
       readOnly
       addonPosition="left"
     />
   );
 };
 
-function resolveValue(value: CallParameterFieldType, abiType?: string): string {
-  if (!abiType) return value.toString();
-  else if (abiType === "address") {
+function resolveValue(
+  value: CallParameterFieldType,
+  abi?: AbiParameter
+): string {
+  if (!abi?.type) {
+    if (Array.isArray(value)) return value.join(", ");
     return value.toString();
-  } else if (abiType === "bytes32") {
-    return toHex(value);
-  } else if (abiType.startsWith("uint") || abiType.startsWith("int")) {
+  } else if (abi.type === "tuple[]") {
+    const abiClone = Object.assign({}, { ...abi });
+    abiClone.type = abiClone.type.replace(/\[\]$/, "");
+
+    const items = (value as any as any[]).map((item) =>
+      resolveValue(item, abiClone)
+    );
+    return items.join(", ");
+  } else if (abi.type === "tuple") {
+    const result = {} as Record<string, string>;
+    const components: AbiParameter[] = (abi as any).components || [];
+
+    for (let i = 0; i < components.length; i++) {
+      const k = components[i].name!;
+      result[k] = resolveValue((value as any)[k], components[i]);
+    }
+
+    return getReadableJson(result);
+  } else if (abi.type.endsWith("[]")) {
+    return (value as any as any[]).join(", ");
+  } else if (abi.type === "address") {
+    return value as string;
+  } else if (abi.type === "bytes32") {
+    return value as string;
+  } else if (abi.type.startsWith("uint") || abi.type.startsWith("int")) {
     return value.toString();
-  } else if (abiType.startsWith("bool")) {
+  } else if (abi.type.startsWith("bool")) {
     return value ? "Yes" : "No";
   }
   return value.toString();
@@ -201,4 +229,10 @@ function resolveAddon(
     }
   }
   return (idx + 1).toString();
+}
+
+function getReadableJson(value: Record<string, InputValue>): string {
+  const items = Object.keys(value).map((k) => k + ": " + value[k]);
+
+  return "{ " + items.join(", ") + " }";
 }

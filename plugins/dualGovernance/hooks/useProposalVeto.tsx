@@ -84,7 +84,7 @@ export function useProposalVeto(proposalId: string) {
     proposal,
     proposalFetchStatus,
     vetoes,
-    canVeto,
+    canVeto: !!canVeto,
     isConfirming: vetoingStatus === "pending" || isConfirming,
     isConfirmed,
     vetoProposal,

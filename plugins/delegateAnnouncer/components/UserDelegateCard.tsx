@@ -96,7 +96,7 @@ export const SelfDelegationProfileCard = ({ address, tokenAddress, message, load
                         <Button variant="secondary" size="sm" onClick={() => delegateTo()}>Delegate</Button>
                     </div>
                 </If>
-                <If condition={!message}>
+                <If not={message}>
                     <div className="mt-1">
                         <Button 
                             variant="primary" 

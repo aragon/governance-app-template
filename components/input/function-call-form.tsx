@@ -57,7 +57,7 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({
         </ElseIf>
         <ElseIf not={abi?.length}>
           <AlertInline
-            message="The ABI of the contract is not publicly available"
+            message="Cannot find any public interface for the given contract address"
             variant="critical"
           />
         </ElseIf>

@@ -1,9 +1,9 @@
 import { useProposal } from "@/plugins/lockToVote/hooks/useProposal";
 import { ToggleGroup, Toggle } from "@aragon/ods";
-import ProposalDescription from "@/plugins/dualGovernance/components/proposal/description";
+import ProposalDescription from "@/plugins/lockToVote/components/proposal/description";
 import VetoesSection from "@/plugins/dualGovernance/components/vote/vetoes-section";
-import ProposalHeader from "@/plugins/dualGovernance/components/proposal/header";
-import VetoTally from "@/plugins/dualGovernance/components/vote/tally";
+import ProposalHeader from "@/plugins/lockToVote/components/proposal/header";
+import VetoTally from "@/plugins/lockToVote/components/vote/tally";
 import ProposalDetails from "@/plugins/lockToVote/components/proposal/details";
 import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";

@@ -22,8 +22,8 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import {
   PUB_IPFS_ENDPOINT,
   PUB_IPFS_API_KEY,
-  PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
   PUB_CHAIN,
+  PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
 } from "@/constants";
 import { ActionCard } from "@/components/actions/action";
 
@@ -141,7 +141,7 @@ export default function Create() {
     createProposalWrite({
       chainId: PUB_CHAIN.id,
       abi: OptimisticTokenVotingPluginAbi,
-      address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+      address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
       functionName: "createProposal",
       args: [toHex(ipfsPin), actions, 0, 0, 0],
     });

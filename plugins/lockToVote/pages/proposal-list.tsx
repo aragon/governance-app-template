@@ -1,9 +1,9 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { ReactNode, useEffect, useState } from "react";
-import ProposalCard from "@/plugins/dualGovernance/components/proposal";
-import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
+import ProposalCard from "@/plugins/lockToVote/components/proposal";
+import { OptimisticTokenVotingPluginAbi } from "@/plugins/lockToVote/artifacts/OptimisticTokenVotingPlugin.sol";
 import { Button, CardEmptyState, IconType } from "@aragon/ods";
-import { useCanCreateProposal } from "@/plugins/dualGovernance/hooks/useCanCreateProposal";
+import { useCanCreateProposal } from "@/plugins/lockToVote/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";

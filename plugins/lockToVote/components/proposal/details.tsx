@@ -12,7 +12,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
   endDate,
   snapshotBlock,
 }) => {
-
   return (
     <>
       <Card>

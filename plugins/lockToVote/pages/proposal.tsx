@@ -71,7 +71,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           }
         />
         <ProposalDetails
-          minVetoVotingPower={proposal?.parameters?.minVetoVotingPower}
+          endDate={proposal?.parameters?.endDate}
           snapshotBlock={proposal?.parameters?.snapshotBlock}
         />
       </div>

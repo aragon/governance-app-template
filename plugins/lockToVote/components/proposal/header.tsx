@@ -14,9 +14,11 @@ interface ProposalHeaderProps {
   proposal: Proposal;
   canVeto: boolean;
   canExecute: boolean;
+  addressLockedTokens: boolean;
   transactionConfirming: boolean;
   onVetoPressed: () => void;
   onExecutePressed: () => void;
+  onClaimLockPressed: () => void;
 }
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
@@ -24,9 +26,11 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposal,
   canVeto,
   canExecute,
+  addressLockedTokens,
   transactionConfirming,
   onVetoPressed,
   onExecutePressed,
+  onClaimLockPressed,
 }) => {
   const proposalVariant = useProposalVariantStatus(proposal);
   const ended = proposal.parameters.endDate <= Date.now() / 1000;
@@ -76,6 +80,16 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 onClick={() => onExecutePressed()}
               >
                 Execute
+              </Button>
+            </ElseIf>
+            <ElseIf condition={ended && addressLockedTokens}>
+              <Button
+                className="flex h-5 items-center"
+                size="lg"
+                variant="primary"
+                onClick={() => onClaimLockPressed()}
+              >
+                Claim Locked Tokens
               </Button>
             </ElseIf>
           </If>

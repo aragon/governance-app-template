@@ -9,13 +9,15 @@ import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useState } from "react";
-import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
+import { useProposalVeto } from "@/plugins/lockToVote/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/dualGovernance/hooks/useProposalExecute";
+import { useAccount } from "wagmi";
 
 type BottomSection = "description" | "vetoes";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const skipRender = useSkipFirstRender();
+  const account = useAccount();
   const [bottomSection, setBottomSection] =
     useState<BottomSection>("description");
 
@@ -56,8 +58,12 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           transactionConfirming={isConfirmingVeto || isConfirmingExecution}
           canVeto={canVeto}
           canExecute={canExecute}
+          addressLockedTokens={vetoes.some((veto) => {
+            veto.voter === account.address;
+          })}
           onVetoPressed={() => vetoProposal()}
           onExecutePressed={() => executeProposal()}
+          // onClaimLockPressed={() => claimLockProposal()}
         />
       </div>
 

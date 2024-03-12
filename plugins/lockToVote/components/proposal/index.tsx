@@ -1,11 +1,9 @@
 import Link from "next/link";
-import { usePublicClient } from "wagmi";
 import { useProposal } from "@/plugins/lockToVote/hooks/useProposal";
 import { Card, Tag, TagVariant } from "@aragon/ods";
 import * as DOMPurify from "dompurify";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalVariantStatus } from "../../hooks/useProposalVariantStatus";
-import { PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY =
@@ -16,12 +14,7 @@ type ProposalInputs = {
 };
 
 export default function ProposalCard(props: ProposalInputs) {
-  const publicClient = usePublicClient();
-  const { proposal, status } = useProposal(
-    publicClient!,
-    PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
-    props.proposalId.toString()
-  );
+  const { proposal, status } = useProposal(props.proposalId.toString());
   const proposalVariant = useProposalVariantStatus(proposal!);
 
   const showLoading = getShowProposalLoading(proposal, status);
@@ -36,9 +29,20 @@ export default function ProposalCard(props: ProposalInputs) {
         </Card>
       </section>
     );
+  } else if (!proposal?.title && !proposal?.summary) {
+    // We have the proposal but no metadata yet
+    return (
+      <Link href={`#/proposals/${props.proposalId}`} className="w-full mb-4">
+        <Card className="p-4">
+          <span className="px-4 py-5 xs:px-10 md:px-6 lg:px-7">
+            <PleaseWaitSpinner fullMessage="Loading metadata..." />
+          </span>
+        </Card>
+      </Link>
+    );
   } else if (status.metadataReady && !proposal?.title) {
     return (
-      <Link href={`/proposals/${props.proposalId}`} className="w-full mb-4">
+      <Link href={`#/proposals/${props.proposalId}`} className="w-full mb-4">
         <Card className="p-4">
           <div className="md:w-7/12 lg:w-3/4 xl:4/5 pr-4 text-nowrap text-ellipsis overflow-hidden">
             <h4 className="mb-1 text-lg text-neutral-300 line-clamp-1">

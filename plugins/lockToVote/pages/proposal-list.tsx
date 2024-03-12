@@ -1,14 +1,14 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { ReactNode, useEffect, useState } from "react";
 import ProposalCard from "@/plugins/lockToVote/components/proposal";
-import { OptimisticTokenVotingPluginAbi } from "@/plugins/lockToVote/artifacts/OptimisticTokenVotingPlugin.sol";
+import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { Button, CardEmptyState, IconType } from "@aragon/ods";
-import { useCanCreateProposal } from "@/plugins/lockToVote/hooks/useCanCreateProposal";
+import { useCanCreateProposal } from "@/plugins/dualGovernance/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
-import { PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
+import { PUB_CHAIN, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
 import { digestPagination } from "@/utils/pagination";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useRouter } from "next/router";

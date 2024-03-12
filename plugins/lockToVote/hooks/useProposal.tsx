@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
-import { Address } from "viem";
-import { useBlockNumber, useReadContract } from "wagmi";
-import { fetchJsonFromIpfs } from "@/utils/ipfs";
-import { PublicClient, getAbiItem } from "viem";
-import { OptimisticTokenVotingPluginAbi } from "@/plugins/lockToVote/artifacts/OptimisticTokenVotingPlugin.sol";
+import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
+import { getAbiItem } from "viem";
 import { Action } from "@/utils/types";
 import {
   Proposal,
   ProposalMetadata,
   ProposalParameters,
-} from "@/plugins/dualGovernance/utils/types";
-import { useQuery } from "@tanstack/react-query";
-import { PUB_CHAIN } from "@/constants";
+} from "@/plugins/lockToVote/utils/types";
+import { PUB_CHAIN, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
+import { useMetadata } from "@/hooks/useMetadata";
+import { LockToVetoPluginAbi } from "../artifacts/LockToVetoPlugin.sol";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -26,30 +24,26 @@ type ProposalCreatedLogResponse = {
 };
 
 const ProposalCreatedEvent = getAbiItem({
-  abi: OptimisticTokenVotingPluginAbi,
+  abi: LockToVetoPluginAbi,
   name: "ProposalCreated",
 });
 
-export function useProposal(
-  publicClient: PublicClient,
-  address: Address,
-  proposalId: string,
-  autoRefresh = false
-) {
+export function useProposal(proposalId: string, autoRefresh = false) {
+  const publicClient = usePublicClient();
   const [proposalCreationEvent, setProposalCreationEvent] =
     useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();
-  const { data: blockNumber} = useBlockNumber();
+  const { data: blockNumber } = useBlockNumber({ watch: true });
 
   // Proposal on-chain data
   const {
     data: proposalResult,
     error: proposalError,
     fetchStatus: proposalFetchStatus,
-    refetch: proposalRefetch
-  } = useReadContract<typeof OptimisticTokenVotingPluginAbi, "getProposal", any[]>({
-    address,
-    abi: OptimisticTokenVotingPluginAbi,
+    refetch: proposalRefetch,
+  } = useReadContract<typeof LockToVetoPluginAbi, "getProposal", any[]>({
+    address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
+    abi: LockToVetoPluginAbi,
     functionName: "getProposal",
     args: [proposalId],
     chainId: PUB_CHAIN.id,
@@ -57,15 +51,16 @@ export function useProposal(
   const proposalData = decodeProposalResultData(proposalResult as any);
 
   useEffect(() => {
-    if (autoRefresh) proposalRefetch()
-  }, [blockNumber])
+    if (autoRefresh) proposalRefetch();
+  }, [blockNumber]);
 
   // Creation event
   useEffect(() => {
-    if (!proposalData) return;
+    if (!proposalData || !publicClient) return;
+
     publicClient
       .getLogs({
-        address,
+        address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
         event: ProposalCreatedEvent as any,
         args: {
           proposalId,
@@ -81,22 +76,17 @@ export function useProposal(
         setMetadata(log.args.metadata);
       })
       .catch((err) => {
-        console.error("Could not fetch the proposal defailt", err);
+        console.error("Could not fetch the proposal details", err);
         return null;
       });
-  }, [proposalData?.vetoTally]);
+  }, [proposalData?.vetoTally, !!publicClient]);
 
   // JSON metadata
   const {
     data: metadataContent,
     isLoading: metadataLoading,
-    isSuccess: metadataReady,
     error: metadataError,
-  } = useQuery<ProposalMetadata, Error>({
-    queryKey: [`dualGovernanceProposal-${address}-${proposalId}`, metadataUri!],
-    queryFn: () => metadataUri ? fetchJsonFromIpfs(metadataUri) : Promise.resolve(null),
-    enabled: !!metadataUri
-});
+  } = useMetadata<ProposalMetadata>(metadataUri);
 
   const proposal = arrangeProposalData(
     proposalData,
@@ -106,11 +96,12 @@ export function useProposal(
 
   return {
     proposal,
+    refetch: proposalRefetch,
     status: {
       proposalReady: proposalFetchStatus === "idle",
       proposalLoading: proposalFetchStatus === "fetching",
       proposalError,
-      metadataReady,
+      metadataReady: !metadataError && !metadataLoading && !!metadataContent,
       metadataLoading,
       metadataError: metadataError !== undefined,
     },

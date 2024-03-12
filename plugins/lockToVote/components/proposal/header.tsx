@@ -14,6 +14,7 @@ interface ProposalHeaderProps {
   proposal: Proposal;
   canVeto: boolean;
   canExecute: boolean;
+  hasClaimed: boolean;
   addressLockedTokens: boolean;
   transactionConfirming: boolean;
   onVetoPressed: () => void;
@@ -26,6 +27,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposal,
   canVeto,
   canExecute,
+  hasClaimed,
   addressLockedTokens,
   transactionConfirming,
   onVetoPressed,
@@ -82,7 +84,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 Execute
               </Button>
             </ElseIf>
-            <ElseIf condition={ended && addressLockedTokens}>
+            <ElseIf condition={ended && addressLockedTokens && !hasClaimed}>
               <Button
                 className="flex h-5 items-center"
                 size="lg"

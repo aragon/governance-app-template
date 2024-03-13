@@ -1,7 +1,7 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
-import { OptimisticTokenVotingPluginAbi } from "@/plugins/lockToVote/artifacts/OptimisticTokenVotingPlugin.sol";
 import { useEffect } from "react";
 import { PUB_CHAIN, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
+import { LockToVetoPluginAbi } from "../artifacts/LockToVetoPlugin.sol";
 
 export function useUserCanVeto(proposalId: bigint) {
   const { address } = useAccount();
@@ -10,7 +10,7 @@ export function useUserCanVeto(proposalId: bigint) {
   const { data: canVeto, refetch } = useReadContract({
     chainId: PUB_CHAIN.id,
     address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
-    abi: OptimisticTokenVotingPluginAbi,
+    abi: LockToVetoPluginAbi,
     functionName: "canVeto",
     args: [proposalId, address],
   });

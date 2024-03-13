@@ -5,11 +5,12 @@ import {
   useWriteContract,
 } from "wagmi";
 import { useProposal } from "./useProposal";
-import { useProposalVetoes } from "@/plugins/dualGovernance/hooks/useProposalVetoes";
-import { useUserCanVeto } from "@/plugins/dualGovernance/hooks/useUserCanVeto";
-import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
+import { useProposalVetoes } from "@/plugins/lockToVote/hooks/useProposalVetoes";
+import { useUserCanVeto } from "@/plugins/lockToVote/hooks/useUserCanVeto";
+import { OptimisticTokenVotingPluginAbi } from "@/plugins/lockToVote/artifacts/OptimisticTokenVotingPlugin.sol";
 import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
 import { PUB_CHAIN, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
+import { LockToVetoPluginAbi } from "../artifacts/LockToVetoPlugin.sol";
 
 export function useProposalVeto(proposalId: string) {
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
@@ -40,10 +41,6 @@ export function useProposalVeto(proposalId: string) {
   );
 
   useEffect(() => {
-    console.log(canVeto);
-  }, [canVeto]);
-
-  useEffect(() => {
     if (vetoingStatus === "idle" || vetoingStatus === "pending") return;
     else if (vetoingStatus === "error") {
       if (vetoingError?.message?.startsWith("User rejected the request")) {
@@ -51,7 +48,7 @@ export function useProposalVeto(proposalId: string) {
           timeout: 4 * 1000,
         });
       } else {
-        addAlert("Could not create the proposal", { type: "error" });
+        addAlert("Could not create the veto", { type: "error" });
       }
       return;
     }
@@ -77,10 +74,10 @@ export function useProposalVeto(proposalId: string) {
 
   const vetoProposal = () => {
     vetoWrite({
-      abi: OptimisticTokenVotingPluginAbi,
+      abi: LockToVetoPluginAbi,
       address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
       functionName: "veto",
-      args: [proposalId],
+      args: [proposalId, 50000000000000000000],
     });
   };
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
-import { getAbiItem } from "viem";
+import { Hex, fromHex, getAbiItem } from "viem";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { Action } from "@/utils/types";
 import {
@@ -77,7 +77,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
         const log: ProposalCreatedLogResponse = logs[0] as any;
         setProposalCreationEvent(log.args);
-        setMetadata(log.args.metadata);
+        setMetadata(fromHex(log.args.metadata as Hex, "string"));
       })
       .catch((err) => {
         console.error("Could not fetch the proposal details", err);

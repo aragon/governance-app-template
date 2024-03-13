@@ -1,9 +1,9 @@
 import { PUB_IPFS_ENDPOINT, PUB_IPFS_API_KEY } from "@/constants";
 import { CID, IPFSHTTPClient } from "ipfs-http-client";
-import { fromHex } from "viem";
+import { Hex, fromHex } from "viem";
 
-export function fetchJsonFromIpfs(hexIpfsUri: string) {
-  return fetchFromIPFS(hexIpfsUri).then((res) => res.json());
+export function fetchJsonFromIpfs(ipfsUri: string) {
+  return fetchFromIPFS(ipfsUri).then((res) => res.json());
 }
 
 export function uploadToIPFS(client: IPFSHTTPClient, blob: Blob) {
@@ -12,10 +12,16 @@ export function uploadToIPFS(client: IPFSHTTPClient, blob: Blob) {
   });
 }
 
-async function fetchFromIPFS(hexIpfsUri: string): Promise<Response> {
-  if (!hexIpfsUri || hexIpfsUri === "0x") throw new Error("Invalid IPFS URI");
+async function fetchFromIPFS(ipfsUri: string): Promise<Response> {
+  if (!ipfsUri) throw new Error("Invalid IPFS URI");
+  else if (ipfsUri.startsWith("0x")) {
+    // fallback
+    ipfsUri = fromHex(ipfsUri as Hex, "string");
 
-  const path = getPath(hexIpfsUri);
+    if (!ipfsUri) throw new Error("Invalid IPFS URI");
+  }
+
+  const path = resolvePath(ipfsUri);
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), 800);
   const response = await fetch(`${PUB_IPFS_ENDPOINT}/cat?arg=${path}`, {
@@ -33,10 +39,7 @@ async function fetchFromIPFS(hexIpfsUri: string): Promise<Response> {
   return response; // .json(), .text(), .blob(), etc.
 }
 
-function getPath(hexIpfsUri: string) {
-  const decodedUri = fromHex(hexIpfsUri as `0x${string}`, "string");
-  const path = decodedUri.includes("ipfs://")
-    ? decodedUri.substring(7)
-    : decodedUri;
+function resolvePath(uri: string) {
+  const path = uri.includes("ipfs://") ? uri.substring(7) : uri;
   return path;
 }

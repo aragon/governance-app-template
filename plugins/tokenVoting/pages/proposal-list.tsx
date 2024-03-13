@@ -101,6 +101,7 @@ export default function Proposals() {
         <ElseIf condition={isConnected}>
           <SectionView>
             <CardEmptyState
+              className="w-full"
               heading="There are no proposals yet"
               humanIllustration={{
                 body: "VOTING",

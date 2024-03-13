@@ -40,6 +40,10 @@ export function useProposalVeto(proposalId: string) {
   );
 
   useEffect(() => {
+    console.log(canVeto);
+  }, [canVeto]);
+
+  useEffect(() => {
     if (vetoingStatus === "idle" || vetoingStatus === "pending") return;
     else if (vetoingStatus === "error") {
       if (vetoingError?.message?.startsWith("User rejected the request")) {

@@ -7,17 +7,19 @@ export function useUserCanVeto(proposalId: bigint) {
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
-  const { data: canVeto, refetch: canVetoRefetch } = useReadContract({
+  const { data: canVeto, refetch } = useReadContract({
     chainId: PUB_CHAIN.id,
-    address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+    address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
     abi: OptimisticTokenVotingPluginAbi,
     functionName: "canVeto",
     args: [proposalId, address],
   });
 
   useEffect(() => {
-    canVetoRefetch();
+    if (Number(blockNumber) % 2 === 0) {
+      refetch();
+    }
   }, [blockNumber]);
 
-  return canVeto;
+  return { canVeto, refetch };
 }

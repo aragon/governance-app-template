@@ -1,5 +1,5 @@
 import { Button, Tag } from "@aragon/ods";
-import { Proposal } from "@/plugins/dualGovernance/utils/types";
+import { Proposal } from "@/plugins/lockToVote/utils/types";
 import { AlertVariant } from "@aragon/ods";
 import { ElseIf, If, Then, Else } from "@/components/if";
 import { AddressText } from "@/components/text/address";

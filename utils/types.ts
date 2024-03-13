@@ -12,3 +12,11 @@ export interface IAlert {
   explorerLink?: string;
   dismissTimeout?: ReturnType<typeof setTimeout>;
 }
+
+// General types
+
+type JsonLiteral = string | number | boolean;
+export type JsonValue =
+  | JsonLiteral
+  | Record<string, JsonLiteral>
+  | Array<JsonLiteral>;

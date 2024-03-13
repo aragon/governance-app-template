@@ -68,7 +68,7 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
         <div>
           <div className="w-full flex flex-row space-x-10">
             <div>
-              <h3 className="font-semibold">Contract call</h3>
+              <h3 className="font-semibold">Contract</h3>
               <p>
                 <AddressText>{action.to}</AddressText>
               </p>

@@ -23,6 +23,7 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({
       value,
       data,
     });
+    setTargetContract("");
   };
 
   return (
@@ -47,7 +48,7 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({
           </div>
         </Then>
         <ElseIf not={targetContract}>
-          <p>Enter the address of the contract to interact with</p>
+          <p>Enter the address of the contract to call in a new action</p>
         </ElseIf>
         <ElseIf not={isAddress(targetContract)}>
           <AlertInline

@@ -14,7 +14,7 @@ const VetoTally: FC<VoteTallyProps> = ({ voteCount, votePercentage }) => (
         Vetoed
       </p>
       <p className="text-xl font-semibold">
-        {compactNumber(formatUnits(voteCount + BigInt(1) || BigInt(0), 18))}
+        {compactNumber(formatUnits(voteCount || BigInt(0), 18))}
       </p>
     </div>
     <div className={`bg-primary-100 h-4 w-full rounded`}>

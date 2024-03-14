@@ -9,8 +9,8 @@ import {
 } from "wagmi";
 import { hexToSignature } from "viem";
 import { useProposal } from "./useProposal";
-import { useProposalVetoes } from "@/plugins/dualGovernance/hooks/useProposalVetoes";
-import { useUserCanVeto } from "@/plugins/dualGovernance/hooks/useUserCanVeto";
+import { useProposalVetoes } from "@/plugins/lockToVote/hooks/useProposalVetoes";
+import { useUserCanVeto } from "@/plugins/lockToVote/hooks/useUserCanVeto";
 import { LockToVetoPluginAbi } from "@/plugins/lockToVote/artifacts/LockToVetoPlugin.sol";
 import { ERC20Abi } from "@/plugins/lockToVote/artifacts/ERC20withPermit.sol";
 import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
@@ -84,8 +84,7 @@ export function useProposalVeto(proposalId: string) {
           timeout: 4 * 1000,
         });
       } else {
-        console.error(vetoingError);
-        addAlert("Could not veto", { type: "error" });
+        addAlert("Could not create the veto", { type: "error" });
       }
       return;
     }

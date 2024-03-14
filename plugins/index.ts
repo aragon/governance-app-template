@@ -33,17 +33,17 @@ export const plugins: PluginItem[] = [
     pluginAddress: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
   },
   {
+    id: "lock-to-vote",
+    folderName: "lockToVote",
+    title: "Morpho Vault Gov",
+    icon: IconType.BLOCKCHAIN_BLOCK,
+    pluginAddress: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
+  },
+  {
     id: "delegate-wall",
     folderName: "delegateAnnouncer",
     title: "Delegation",
     icon: IconType.FEEDBACK,
     pluginAddress: PUB_DELEGATION_CONTRACT_ADDRESS,
-  },
-  {
-    id: "lock-to-vote",
-    folderName: "lockToVote",
-    title: "Lock To Vote",
-    icon: IconType.DEPOSIT,
-    pluginAddress: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
   },
 ];

@@ -1,11 +1,9 @@
 import { fetchJsonFromIpfs } from "@/utils/ipfs";
+import { JsonValue } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import { fromHex } from "viem";
 
-type JsonValue = string | number | boolean;
-type JsonObject = JsonValue | Record<string, JsonValue> | Array<JsonValue>;
-
-export function useMetadata<T = JsonObject>(ipfsUri?: string) {
+export function useMetadata<T = JsonValue>(ipfsUri?: string) {
   const { data, isLoading, isSuccess, error } = useQuery<T, Error>({
     queryKey: [ipfsUri || ""],
     queryFn: () => {

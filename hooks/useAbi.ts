@@ -6,19 +6,39 @@ import { useQuery } from "@tanstack/react-query";
 import { isAddress } from "@/utils/evm";
 import { PUB_CHAIN, PUB_ETHERSCAN_API_KEY } from "@/constants";
 import { useAlerts } from "@/context/Alerts";
+import { getImplementation, isProxyContract } from "@/utils/proxies";
 
 export const useAbi = (contractAddress: Address) => {
   const { addAlert } = useAlerts();
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
+
+  const { data: implementationAddress, isLoading: isLoadingImpl } =
+    useQuery<Address | null>({
+      queryKey: [contractAddress, !!publicClient],
+      queryFn: () => {
+        if (!contractAddress || !publicClient) return null;
+
+        return isProxyContract(publicClient, contractAddress)
+          .then((isProxy) => {
+            if (!isProxy) return null;
+            return getImplementation(publicClient, contractAddress);
+          })
+          .catch(() => null);
+      },
+    });
+
+  const resolvedAddress = isAddress(implementationAddress)
+    ? implementationAddress
+    : contractAddress;
 
   const {
     data: abi,
     isLoading,
     error,
   } = useQuery<AbiFunction[], Error>({
-    queryKey: [contractAddress || "", !!publicClient],
+    queryKey: [resolvedAddress || "", !!publicClient],
     queryFn: () => {
-      if (!contractAddress || !isAddress(contractAddress) || !publicClient) {
+      if (!resolvedAddress || !isAddress(resolvedAddress) || !publicClient) {
         return Promise.resolve([]);
       }
 
@@ -27,10 +47,10 @@ export const useAbi = (contractAddress: Address) => {
       });
 
       return whatsabi
-        .autoload(contractAddress!, {
+        .autoload(resolvedAddress, {
           provider: publicClient,
           abiLoader,
-          followProxies: true,
+          followProxies: false,
           enableExperimentalMetadata: true,
         })
         .then(({ abi }) => {
@@ -76,7 +96,7 @@ export const useAbi = (contractAddress: Address) => {
 
   return {
     abi: abi ?? [],
-    isLoading,
+    isLoading: isLoading || isLoadingImpl,
     error,
   };
 };

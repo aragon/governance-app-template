@@ -1,58 +1,53 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Aragonette 🚀
 
-It contains two main components:
-- The App project itself
-- A deployment script for your DAO and plugins
+Welcome to **Aragonette**, the sleek and snappy UI template designed for lightning-fast prototyping with Aragon DAOs and plugins! Built with the power of Next.js and the speed of Bun.js, Aragonette is your go-to toolkit for bringing your Aragon DAO visions to life with style and efficiency. 🎨✨
 
-## Getting Started
+## Getting Started 🏁
 
-### Development
-Install the NPM packages and run the development server:
+Before you dive into the world of DAOs and decentralized governance, make sure you have Bun installed on your machine. If not, hop over to [Bun's official documentation](https://bun.sh/) for installation instructions.
+
+Once you're set with Bun, clone this repository to your local machine:
+
+```bash
+git clone https://github.com/your-repo/aragonette.git
+cd aragonette
+```
+
+To get the development server running, simply execute:
 
 ```bash
 bun install
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser.
+And voilà! You're now in the fast lane to DAO prototyping. 🌟
 
-### Production build
-To compile the project and run a production version:
+## Adding Your Plugin 🧩
 
-```bash
-bun run build
-bun start
-```
+Got a plugin idea that's going to revolutionize the Aragon ecosystem? Adding it to Aragonette is as easy as pie:
 
-### Contract deployment
-To deploy your DAO and plugins, edit the `.env` file and set the relevant variables prefixed by `DEPLOYMENT_`. Then, run:
+1. **Duplicate a Plugin Directory**: Navigate to the `/plugins` directory, pick a plugin that closely resembles your idea, and duplicate its directory.
+2. **Rename Your Plugin**: Give your plugin a unique and catchy name that captures its essence.
+3. **Register Your Plugin**: Open the `index.tsx` file inside the `/plugins` directory and add an entry for your new plugin.
 
-```bash
-bun run scripts/deploy.ts
-```
+And that's it! Your plugin is now part of the Aragonette universe. 🌌
 
-Use the output of the command to update your `.env` file accordingly.
+## Leveraging Aragon OSx Primitives 🛠
 
-## Contents
+Aragonette is built to work seamlessly with Aragon OSx primitives, such as `IProposal` or `MajorityVoting`. This means you can focus on the fun part of creating and experimenting, without sweating the small stuff. Your plugin should integrate smoothly into the UI, making your development journey as breezy as a blockchain. 😉
 
-- Structure
-  - Pages
-  - Plugins
-- Env vars management
-  - Public
-  - Private
-- ODS components
-- Deployment script
+## Contributing 🤝
 
-## Learn More
+Got ideas on how to make Aragonette even better? We're all ears! Whether it's a bug fix, a new feature, or a plugin that could benefit everyone, we welcome your contributions. Check out our [contributing guidelines](CONTRIBUTING.md) for more information on how to get involved.
 
-To learn more about Next.js, take a look at the following resources:
+## Need Help? 🆘
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Stuck on something? Our community is here to help! Join our [Discord channel](https://discord.com/invite/eqQJkdp) for support, advice, or just to share your awesome plugin creations with fellow Aragon enthusiasts.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## License 📜
 
-## Other
+Aragonette is released under the AGPL v3 License.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+---
+
+Happy prototyping! With Aragonette, the future of decentralized organizations is in your hands. Let's build something amazing together! 🚀🌈

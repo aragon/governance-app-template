@@ -58,11 +58,6 @@ export function useProposalVeto(proposalId: string) {
 
   const [balanceResult, nonceResult, nameResult, versionResult] = erc20data || [];
 
-  const balance = BigInt(Number(balanceResult?.result));
-  const nonce = BigInt(Number(nonceResult?.result));
-  const erc20_name = nameResult?.result;
-  const versionFromContract = versionResult?.result;
-
   const { signTypedData: vetoPermitSign } = useSignTypedData();
   const {
     writeContract: vetoWrite,
@@ -109,6 +104,12 @@ export function useProposalVeto(proposalId: string) {
   }, [vetoingStatus, vetoTxHash, isConfirming, isConfirmed]);
 
   const vetoProposal = () => {
+    if (!proposal || !balanceResult || !nonceResult || !nameResult || !versionResult) return;
+    const balance = BigInt(Number(balanceResult?.result));
+    const nonce = BigInt(Number(nonceResult?.result));
+    const erc20_name = nameResult?.result;
+    const versionFromContract = versionResult?.result;
+
     let deadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 60);
     let value = balance; 
     let destination: `0x${string}` = PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS;

@@ -7,13 +7,13 @@ export const useProposalVariantStatus = (proposal: Proposal) => {
   useEffect(() => {
     if (!proposal || !proposal?.parameters) return;
     setStatus(
-      proposal?.vetoTally >= proposal?.parameters?.minVetoVotingPower 
-        ? { variant: 'critical', label: 'Defeated' }
+      proposal?.vetoTally >= proposal?.parameters?.minVetoVotingPower
+        ? { variant: 'success', label: 'Executable' }
         : proposal?.active
           ? { variant: 'primary', label: 'Active' }
-          : proposal?.executed 
+          : proposal?.executed
             ? { variant: 'success', label: 'Executed' }
-            : { variant: 'success', label: 'Executable' }
+            : { variant: 'critical', label: 'Defeated' }
     );
   }, [proposal?.vetoTally, proposal?.active, proposal?.executed, proposal?.parameters?.minVetoVotingPower]);
 

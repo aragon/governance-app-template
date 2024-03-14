@@ -10,7 +10,7 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useState } from "react";
 import { useProposalVeto } from "@/plugins/lockToVote/hooks/useProposalVeto";
-import { useProposalExecute } from "@/plugins/dualGovernance/hooks/useProposalExecute";
+import { useProposalExecute } from "@/plugins/lockToVote/hooks/useProposalExecute";
 import { useProposalClaimLock } from "@/plugins/lockToVote/hooks/useProposalClaimLock";
 import { useAccount } from "wagmi";
 
@@ -86,7 +86,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         />
         <ProposalDetails
           endDate={proposal?.parameters?.endDate}
-          snapshotBlock={proposal?.parameters?.snapshotBlock}
+          minVetoVotingPower={proposal?.parameters?.minVetoVotingPower}
         />
       </div>
       <div className="py-12 w-full">

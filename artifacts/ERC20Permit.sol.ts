@@ -1,5 +1,5 @@
 import { Abi } from "viem";
-export const ERC20Abi: Abi = [
+export const ERC20PermitAbi: Abi = [
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",

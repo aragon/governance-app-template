@@ -88,7 +88,7 @@ export function useProposalClaimLock(proposalId: string) {
 
   return {
     claimLockProposal,
-    hasClaimed,
+    hasClaimed: !!hasClaimed,
     isConfirming,
     isConfirmed,
   };

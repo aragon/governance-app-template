@@ -75,9 +75,7 @@ export const FunctionSelector = ({
   };
 
   const functionAbiList = (abi || []).filter(
-    (item) =>
-      item.type === "function" &&
-      !["pure", "view"].includes(item.stateMutability)
+    (item) => item.type === "function"
   );
 
   return (

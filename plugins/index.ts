@@ -2,6 +2,7 @@ import {
   PUB_DELEGATION_CONTRACT_ADDRESS,
   PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+  PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
 } from "@/constants";
 import { IconType } from "@aragon/ods";
 
@@ -30,6 +31,13 @@ export const plugins: PluginItem[] = [
     title: "Community proposals",
     icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+  },
+  {
+    id: "lock-to-vote",
+    folderName: "lockToVote",
+    title: "Morpho Vault Gov",
+    icon: IconType.BLOCKCHAIN_BLOCK,
+    pluginAddress: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
   },
   {
     id: "delegate-wall",

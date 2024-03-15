@@ -20,6 +20,7 @@ import { useRouter } from "next/router";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import {
+  PUB_CHAIN,
   PUB_IPFS_API_KEY,
   PUB_IPFS_ENDPOINT,
   PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
@@ -139,6 +140,7 @@ export default function Create() {
 
     const ipfsPin = await uploadToIPFS(ipfsClient, blob);
     createProposalWrite({
+      chainId: PUB_CHAIN.id,
       abi: TokenVotingAbi,
       address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
       functionName: "createProposal",

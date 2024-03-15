@@ -11,7 +11,7 @@ const VetoTally: FC<VoteTallyProps> = ({ voteCount, votePercentage }) => (
   <Card>
     <div className="space-between flex flex-row pb-2">
       <p className={`text-primary-700 flex-grow text-xl font-semibold`}>
-        Vetoed
+        For
       </p>
       <p className="text-xl font-semibold">
         {compactNumber(formatUnits(voteCount || BigInt(0), 18))}
@@ -27,7 +27,7 @@ const VetoTally: FC<VoteTallyProps> = ({ voteCount, votePercentage }) => (
 );
 
 // This should be encapsulated as soon as ODS exports this widget
-const Card = function ({ children }: { children: ReactNode }) {
+const Card = function({ children }: { children: ReactNode }) {
   return (
     <div
       className="bg-neutral-0 box-border flex w-full flex-col space-y-6

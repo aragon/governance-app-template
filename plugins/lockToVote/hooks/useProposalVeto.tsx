@@ -3,14 +3,18 @@ import {
   usePublicClient,
   useWaitForTransactionReceipt,
   useWriteContract,
+  useReadContract,
+  useAccount,
 } from "wagmi";
+import { Address } from "viem";
+import { ERC20PermitAbi } from "@/artifacts/ERC20Permit.sol";
 import { useProposal } from "./useProposal";
 import { useProposalVetoes } from "@/plugins/lockToVote/hooks/useProposalVetoes";
 import { useUserCanVeto } from "@/plugins/lockToVote/hooks/useUserCanVeto";
-import { OptimisticTokenVotingPluginAbi } from "@/plugins/lockToVote/artifacts/OptimisticTokenVotingPlugin.sol";
+import { LockToVetoPluginAbi } from "@/plugins/lockToVote/artifacts/LockToVetoPlugin.sol";
+import { usePermit } from "@/hooks/usePermit";
 import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
-import { PUB_CHAIN, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
-import { LockToVetoPluginAbi } from "../artifacts/LockToVetoPlugin.sol";
+import { PUB_CHAIN, PUB_TOKEN_ADDRESS, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
 
 export function useProposalVeto(proposalId: string) {
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
@@ -26,8 +30,18 @@ export function useProposalVeto(proposalId: string) {
     proposalId,
     proposal
   );
+  const { signPermit, refetchPermitData } = usePermit();
 
   const { addAlert } = useAlertContext() as AlertContextProps;
+  const account_address = useAccount().address!;
+
+  const { data: balanceData } = useReadContract({    
+    address: PUB_TOKEN_ADDRESS,
+    abi: ERC20PermitAbi,
+    functionName: "balanceOf",
+    args: [account_address],
+  });
+
   const {
     writeContract: vetoWrite,
     data: vetoTxHash,
@@ -70,14 +84,23 @@ export function useProposalVeto(proposalId: string) {
     });
     refetchCanVeto();
     refetchProposal();
+    refetchPermitData();
   }, [vetoingStatus, vetoTxHash, isConfirming, isConfirmed]);
 
   const vetoProposal = () => {
-    vetoWrite({
-      abi: LockToVetoPluginAbi,
-      address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
-      functionName: "veto",
-      args: [proposalId, 50000000000000000000],
+    let dest: Address = PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS;
+    let value = BigInt(Number(balanceData));
+    let deadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 60); // 1 hour from now
+
+    signPermit(dest, value, deadline).then((sig) => {
+      if (!sig) return;
+
+      vetoWrite({
+        abi: LockToVetoPluginAbi,
+        address: dest,
+        functionName: "vetoPermit",
+        args: [proposalId, value, deadline, sig.v, sig.r, sig.s],
+      });
     });
   };
 

@@ -1,6 +1,6 @@
 import { PUB_IPFS_ENDPOINT, PUB_IPFS_API_KEY } from "@/constants";
 import { CID, IPFSHTTPClient } from "ipfs-http-client";
-import { fromHex } from "viem";
+import { fromHex, Address } from "viem";
 
 export function fetchJsonFromIpfs(hexIpfsUri: string) {
   return fetchFromIPFS(hexIpfsUri).then((res) => res.json());
@@ -34,7 +34,7 @@ async function fetchFromIPFS(hexIpfsUri: string): Promise<Response> {
 }
 
 function getPath(hexIpfsUri: string) {
-  const decodedUri = fromHex(hexIpfsUri as `0x${string}`, "string");
+  const decodedUri = fromHex(hexIpfsUri as Address, "string");
   const path = decodedUri.includes("ipfs://")
     ? decodedUri.substring(7)
     : decodedUri;

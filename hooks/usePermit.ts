@@ -4,7 +4,7 @@ import {
   useSignTypedData,
   useAccount,
 } from "wagmi";
-import { hexToSignature } from "viem";
+import { hexToSignature, Address } from "viem";
 import { ERC20PermitAbi } from "@/artifacts/ERC20Permit.sol";
 import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
 import { PUB_CHAIN, PUB_TOKEN_ADDRESS } from "@/constants";
@@ -54,7 +54,7 @@ export function usePermit() {
     }
   }, [permitSignStatus]);
 
-  const signPermit = async (dest: `0x${string}`, value: BigInt, deadline: BigInt = BigInt(Math.floor(Date.now() / 1000) + 60 * 60)) => {
+  const signPermit = async (dest: Address, value: BigInt, deadline: BigInt = BigInt(Math.floor(Date.now() / 1000) + 60 * 60)) => {
     if (!nonceResult || !nameResult || !versionResult) return;
 
     const nonce = BigInt(Number(nonceResult?.result));

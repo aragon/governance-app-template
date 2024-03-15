@@ -6,6 +6,7 @@ import {
   useReadContract,
   useAccount,
 } from "wagmi";
+import { Address } from "viem";
 import { ERC20PermitAbi } from "@/artifacts/ERC20Permit.sol";
 import { useProposal } from "./useProposal";
 import { useProposalVetoes } from "@/plugins/lockToVote/hooks/useProposalVetoes";
@@ -87,7 +88,7 @@ export function useProposalVeto(proposalId: string) {
   }, [vetoingStatus, vetoTxHash, isConfirming, isConfirmed]);
 
   const vetoProposal = () => {
-    let dest: `0x${string}` = PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS;
+    let dest: Address = PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS;
     let value = BigInt(Number(balanceData));
     let deadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 60); // 1 hour from now
 

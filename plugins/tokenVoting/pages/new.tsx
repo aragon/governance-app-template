@@ -11,7 +11,7 @@ import { uploadToIPFS } from "@/utils/ipfs";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { toHex } from "viem";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
-import { useAlertContext } from "@/context/AlertContext";
+import { useAlerts } from "@/context/Alerts";
 import WithdrawalInput from "@/components/input/withdrawal";
 import { FunctionCallForm } from "@/components/input/function-call-form";
 import { Action } from "@/utils/types";
@@ -43,7 +43,7 @@ export default function Create() {
   const [title, setTitle] = useState<string>("");
   const [summary, setSummary] = useState<string>("");
   const [actions, setActions] = useState<Action[]>([]);
-  const { addAlert } = useAlertContext();
+  const { addAlert } = useAlerts();
   const {
     writeContract: createProposalWrite,
     data: createTxHash,

@@ -5,7 +5,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
+import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
 import { LockToVetoPluginAbi } from "../artifacts/LockToVetoPlugin.sol";
@@ -13,7 +13,7 @@ import { LockToVetoPluginAbi } from "../artifacts/LockToVetoPlugin.sol";
 export function useProposalClaimLock(proposalId: string) {
   const { reload } = useRouter();
   const account = useAccount();
-  const { addAlert } = useAlertContext() as AlertContextProps;
+  const { addAlert } = useAlerts() as AlertContextProps;
 
   const {
     data: hasClaimed,

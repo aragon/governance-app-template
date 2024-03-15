@@ -5,10 +5,10 @@ import { AbiFunction } from "abitype";
 import { useQuery } from "@tanstack/react-query";
 import { isAddress } from "@/utils/evm";
 import { PUB_CHAIN, PUB_ETHERSCAN_API_KEY } from "@/constants";
-import { useAlertContext } from "@/context/AlertContext";
+import { useAlerts } from "@/context/Alerts";
 
 export const useAbi = (contractAddress: Address) => {
-  const { addAlert } = useAlertContext();
+  const { addAlert } = useAlerts();
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
 
   const {

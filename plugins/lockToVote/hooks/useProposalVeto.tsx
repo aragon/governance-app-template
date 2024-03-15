@@ -13,7 +13,7 @@ import { useProposalVetoes } from "@/plugins/lockToVote/hooks/useProposalVetoes"
 import { useUserCanVeto } from "@/plugins/lockToVote/hooks/useUserCanVeto";
 import { LockToVetoPluginAbi } from "@/plugins/lockToVote/artifacts/LockToVetoPlugin.sol";
 import { usePermit } from "@/hooks/usePermit";
-import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
+import { useAlerts, AlertContextProps } from "@/context/Alerts";
 import { PUB_CHAIN, PUB_TOKEN_ADDRESS, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
 
 export function useProposalVeto(proposalId: string) {
@@ -32,7 +32,7 @@ export function useProposalVeto(proposalId: string) {
   );
   const { signPermit, refetchPermitData } = usePermit();
 
-  const { addAlert } = useAlertContext() as AlertContextProps;
+  const { addAlert } = useAlerts() as AlertContextProps;
   const account_address = useAccount().address!;
 
   const { data: balanceData } = useReadContract({    

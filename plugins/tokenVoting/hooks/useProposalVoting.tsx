@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
-import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
+import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 export function useProposalVoting(proposalId: string) {
   const { reload } = useRouter();
-  const { addAlert } = useAlertContext() as AlertContextProps;
+  const { addAlert } = useAlerts() as AlertContextProps;
   const {
     writeContract: voteWrite,
     data: votingTxHash,

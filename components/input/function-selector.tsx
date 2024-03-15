@@ -4,7 +4,7 @@ import { Button, InputText } from "@aragon/ods";
 import { AbiFunction } from "abitype";
 import { Else, If, Then } from "@/components/if";
 import { decodeCamelCase } from "@/utils/case";
-import { useAlertContext } from "@/context/AlertContext";
+import { useAlerts } from "@/context/Alerts";
 import { InputParameter } from "./input-parameter";
 import { InputValue } from "@/utils/input-values";
 
@@ -16,7 +16,7 @@ export const FunctionSelector = ({
   abi,
   actionEntered,
 }: IFunctionSelectorProps) => {
-  const { addAlert } = useAlertContext();
+  const { addAlert } = useAlerts();
   const [selectedAbiItem, setSelectedAbiItem] = useState<
     AbiFunction | undefined
   >();

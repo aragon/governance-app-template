@@ -6,11 +6,11 @@ import {
 } from "wagmi";
 import { hexToSignature, Address } from "viem";
 import { ERC20PermitAbi } from "@/artifacts/ERC20Permit.sol";
-import { useAlertContext, AlertContextProps } from "@/context/AlertContext";
+import { useAlerts, AlertContextProps } from "@/context/Alerts";
 import { PUB_CHAIN, PUB_TOKEN_ADDRESS } from "@/constants";
 
 export function usePermit() {
-  const { addAlert } = useAlertContext() as AlertContextProps;
+  const { addAlert } = useAlerts() as AlertContextProps;
 
   const account_address = useAccount().address!;
   const erc20Contract = {

@@ -61,7 +61,6 @@ export function useProposalVeto(proposalId: string) {
           timeout: 4 * 1000,
         });
       } else {
-        console.error(vetoingError);
         addAlert("Could not create the veto", { type: "error" });
       }
       return;

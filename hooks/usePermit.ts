@@ -32,7 +32,7 @@ export function usePermit() {
   });
   const [nonceResult, nameResult, versionResult] = erc20data || [];
 
-  const { signTypedDataAsync: permitSign, status: permitSignStatus } = useSignTypedData();
+  const { signTypedDataAsync: permitSign, status: permitSignStatus, error: permitSignError } = useSignTypedData();
 
   useEffect(() => {
     switch (permitSignStatus) {
@@ -40,7 +40,13 @@ export function usePermit() {
       case "pending":
         return;
       case "error":
-        addAlert("Could not sign the permit", { type: "error", timeout: 1500 });
+        if (permitSignError?.message?.startsWith("User rejected the request")) {
+          addAlert("Transaction rejected by the user", {
+            timeout: 4 * 1000,
+          });
+        } else {
+          addAlert("Could not sign the permit", { type: "error", timeout: 1500 });
+        }
         return;
       case "success":
         addAlert("Permit signed", { type: "success", timeout: 1500 });
@@ -81,15 +87,19 @@ export function usePermit() {
       deadline,
     };
 
-    let sig = await permitSign({
-      account: account_address,
-      types,
-      domain,
-      primaryType: 'Permit',
-      message,
-    });
+    try {
+      let sig = await permitSign({
+        account: account_address,
+        types,
+        domain,
+        primaryType: 'Permit',
+        message,
+      });
 
-    return hexToSignature(sig);
+      return hexToSignature(sig);
+    } catch (e) {
+      return;
+    }
   };
 
   return {

@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export function useMetadata<T = JsonValue>(ipfsUri?: string) {
   const { data, isLoading, isSuccess, error } = useQuery<T, Error>({
-    queryKey: [ipfsUri || ""],
+    queryKey: ["ipfs", ipfsUri || ""],
     queryFn: () => {
       if (!ipfsUri) return Promise.resolve("");
 

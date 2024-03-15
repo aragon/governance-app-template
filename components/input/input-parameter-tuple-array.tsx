@@ -49,7 +49,7 @@ export const InputParameterTupleArray = ({
       <If not={someMissingName}>
         <Then>
           {values.map((_, i) => (
-            <div className="mt-6">
+            <div key={i} className="mt-6">
               <div className="flex justify-between">
                 <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg mb-3">
                   {abi.name

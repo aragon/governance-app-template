@@ -7,6 +7,9 @@ import { isAddress } from "@/utils/evm";
 import { PUB_CHAIN, PUB_ETHERSCAN_API_KEY } from "@/constants";
 import { useAlerts } from "@/context/Alerts";
 import { getImplementation, isProxyContract } from "@/utils/proxies";
+import { ChainName } from "@/utils/chains";
+
+const CHAIN_NAME = PUB_CHAIN.name.toLowerCase() as ChainName;
 
 export const useAbi = (contractAddress: Address) => {
   const { addAlert } = useAlerts();
@@ -14,7 +17,7 @@ export const useAbi = (contractAddress: Address) => {
 
   const { data: implementationAddress, isLoading: isLoadingImpl } =
     useQuery<Address | null>({
-      queryKey: [contractAddress, !!publicClient],
+      queryKey: ["proxy-check", contractAddress, !!publicClient],
       queryFn: () => {
         if (!contractAddress || !publicClient) return null;
 
@@ -25,6 +28,11 @@ export const useAbi = (contractAddress: Address) => {
           })
           .catch(() => null);
       },
+      retry: 4,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      retryOnMount: true,
+      staleTime: Infinity,
     });
 
   const resolvedAddress = isAddress(implementationAddress)
@@ -36,16 +44,13 @@ export const useAbi = (contractAddress: Address) => {
     isLoading,
     error,
   } = useQuery<AbiFunction[], Error>({
-    queryKey: [resolvedAddress || "", !!publicClient],
+    queryKey: ["abi", resolvedAddress || "", !!publicClient],
     queryFn: () => {
       if (!resolvedAddress || !isAddress(resolvedAddress) || !publicClient) {
         return Promise.resolve([]);
       }
 
-      const abiLoader = new whatsabi.loaders.EtherscanABILoader({
-        apiKey: PUB_ETHERSCAN_API_KEY,
-      });
-
+      const abiLoader = getEtherscanAbiLoader();
       return whatsabi
         .autoload(resolvedAddress, {
           provider: publicClient,
@@ -62,18 +67,17 @@ export const useAbi = (contractAddress: Address) => {
               name: (item as any).name ?? "(function)",
               inputs: item.inputs ?? [],
               outputs: item.outputs ?? [],
-              stateMutability: item.stateMutability ?? "payable",
+              stateMutability: item.stateMutability || "payable",
               type: item.type,
             });
           }
           functionItems.sort((a, b) => {
-            if (
-              ["pure", "view"].includes(a.stateMutability) &&
-              ["pure", "view"].includes(b.stateMutability)
-            ) {
-              return 0;
-            } else if (["pure", "view"].includes(a.stateMutability)) return 1;
-            else if (["pure", "view"].includes(b.stateMutability)) return -1;
+            const a_RO = ["pure", "view"].includes(a.stateMutability);
+            const b_RO = ["pure", "view"].includes(b.stateMutability);
+
+            if (a_RO === b_RO) return 0;
+            else if (a_RO) return 1;
+            else if (b_RO) return -1;
             return 0;
           });
           return functionItems;
@@ -100,3 +104,34 @@ export const useAbi = (contractAddress: Address) => {
     error,
   };
 };
+
+function getEtherscanAbiLoader() {
+  switch (CHAIN_NAME) {
+    case "mainnet":
+      return new whatsabi.loaders.EtherscanABILoader({
+        apiKey: PUB_ETHERSCAN_API_KEY,
+      });
+    case "polygon":
+      return new whatsabi.loaders.EtherscanABILoader({
+        apiKey: PUB_ETHERSCAN_API_KEY,
+        baseURL: "https://api.polygonscan.com/api",
+      });
+    case "arbitrum":
+      return new whatsabi.loaders.EtherscanABILoader({
+        apiKey: PUB_ETHERSCAN_API_KEY,
+        baseURL: "https://api.arbiscan.io/api",
+      });
+    case "sepolia":
+      return new whatsabi.loaders.EtherscanABILoader({
+        apiKey: PUB_ETHERSCAN_API_KEY,
+        baseURL: "https://api-sepolia.etherscan.io/api",
+      });
+    case "mumbai":
+      return new whatsabi.loaders.EtherscanABILoader({
+        apiKey: PUB_ETHERSCAN_API_KEY,
+        baseURL: "https://api-mumbai.polygonscan.com/api",
+      });
+    default:
+      throw new Error("Unknown chain");
+  }
+}

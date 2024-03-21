@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Hex, encodeFunctionData } from "viem";
-import { Button, InputText } from "@aragon/ods";
+import { AlertInline, Button, InputText } from "@aragon/ods";
 import { AbiFunction } from "abitype";
 import { Else, If, Then } from "@/components/if";
 import { decodeCamelCase } from "@/utils/case";
@@ -75,9 +75,7 @@ export const FunctionSelector = ({
   };
 
   const functionAbiList = (abi || []).filter(
-    (item) =>
-      item.type === "function" &&
-      !["pure", "view"].includes(item.stateMutability)
+    (item) => item.type === "function"
   );
 
   return (
@@ -91,7 +89,14 @@ export const FunctionSelector = ({
               onClick={() => setSelectedAbiItem(fn)}
               className={`w-full text-left font-sm hover:bg-neutral-100 py-2 px-3 rounded-xl hover:cursor-pointer ${fn.name === selectedAbiItem?.name && "bg-neutral-100 font-semibold"}`}
             >
-              {decodeCamelCase(fn.name)}
+              <If condition={!["pure", "view"].includes(fn.stateMutability)}>
+                <Then>{decodeCamelCase(fn.name)}</Then>
+                <Else>
+                  <span>{decodeCamelCase(fn.name)}</span>
+                  <br />
+                  <span className="text-xs text-neutral-300">(read only)</span>
+                </Else>
+              </If>
             </li>
           ))}
         </ul>
@@ -102,21 +107,31 @@ export const FunctionSelector = ({
           <Then>
             <div className="">
               <div className="flex flex-row justify-between items-center mx-4 mb-3 pb-4 border-b border-neutral-200">
-                <p className="text-lg font-semibold text-neutral-800">
+                <p className="text-md font-semibold text-neutral-800 mr-3">
                   <code>{decodeCamelCase(selectedAbiItem?.name)}</code>
                 </p>
-                <div className="ml-4 min-w-10">
-                  <Button className="" size="sm" onClick={onAddAction}>
+                <div className="">
+                  <Button
+                    className="!min-w-[110px]"
+                    size="sm"
+                    onClick={onAddAction}
+                  >
                     Add action
                   </Button>
                 </div>
               </div>
-              {/* Make titles smaller */}
-              <style>{`
-              label div p.leading-tight {
-                font-size: 1rem;
-              }
-              `}</style>
+              <If
+                condition={["pure", "view"].includes(
+                  selectedAbiItem?.stateMutability || ""
+                )}
+              >
+                <div className="mx-4">
+                  <AlertInline
+                    message="This function is marked as read only. An action with it would have no impact"
+                    variant="warning"
+                  />
+                </div>
+              </If>
               {selectedAbiItem?.inputs.map((paramAbi, i) => (
                 <div key={i} className="mx-4 my-3">
                   <InputParameter

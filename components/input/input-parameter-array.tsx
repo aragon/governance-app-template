@@ -52,7 +52,7 @@ export const InputParameterArray = ({
         {abi.name ? decodeCamelCase(abi.name) : "Parameter " + (idx + 1)}
       </p>
       {value.map((item, i) => (
-        <div className="flex">
+        <div key={i} className="flex">
           <InputText
             className={i > 0 ? "mt-3" : ""}
             addon={(i + 1).toString()}

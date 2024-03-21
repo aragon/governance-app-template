@@ -43,6 +43,18 @@ ol {
   color: var(--ods-color-neutral-600);
 }
 
+/* Inline alerts */
+div.inline-flex.items-center.gap-x-2.rounded p {
+  font-size: 14px !important;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+/* Smaller titles */
+label div p.leading-tight {
+  font-size: 1rem;
+}
+
 /* Dark mode snippet */
 /* 
 @media (prefers-color-scheme: dark) {

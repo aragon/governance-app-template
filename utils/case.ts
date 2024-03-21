@@ -1,7 +1,7 @@
 export function decodeCamelCase(input?: string): string {
   if (!input || typeof input !== "string") return "";
 
-  if (input.startsWith("_")) input = input.replace(/^_+/, "");
+  input = input.replace(/_+/g, " ").trim();
   return (
     input
       .replace(/([a-z])([A-Z])/g, "$1 $2")

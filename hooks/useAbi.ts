@@ -102,6 +102,8 @@ export const useAbi = (contractAddress: Address) => {
     abi: abi ?? [],
     isLoading: isLoading || isLoadingImpl,
     error,
+    isProxy: !!implementationAddress,
+    implementation: implementationAddress,
   };
 };
 

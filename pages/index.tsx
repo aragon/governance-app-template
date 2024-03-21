@@ -1,7 +1,13 @@
 import { Button, IllustrationHuman } from "@aragon/ods";
 import { ReactNode } from "react";
+import { useAccount } from "wagmi";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { Else, If, Then } from "@/components/if";
 
 export default function Home() {
+  const { isConnected } = useAccount();
+  const { open } = useWeb3Modal();
+
   return (
     <main className="w-screen max-w-full flex-col">
       <Card>
@@ -21,14 +27,23 @@ export default function Home() {
             hairs="CURLY"
           />
           <div className="flex justify-center">
-            <Button
-              className="mb-2"
-              variant="primary"
-              href="https://devs.aragon.org/docs/osx/"
-              target="_blank"
-            >
-              Learn more about OSx
-            </Button>
+            <If condition={isConnected}>
+              <Then>
+                <Button
+                  className="mb-2"
+                  variant="primary"
+                  href="https://devs.aragon.org/docs/osx/"
+                  target="_blank"
+                >
+                  Learn more about OSx
+                </Button>
+              </Then>
+              <Else>
+                <Button size="md" variant="primary" onClick={() => open()}>
+                  <span>Connect wallet</span>
+                </Button>
+              </Else>
+            </If>
           </div>
         </div>
       </Card>

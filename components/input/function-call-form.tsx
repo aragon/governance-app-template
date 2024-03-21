@@ -7,6 +7,7 @@ import { Action } from "@/utils/types";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { useAbi } from "@/hooks/useAbi";
 import { FunctionSelector } from "./function-selector";
+import { AddressText } from "../text/address";
 
 interface FunctionCallFormProps {
   onAddAction: (action: Action) => any;
@@ -15,7 +16,12 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({
   onAddAction,
 }) => {
   const [targetContract, setTargetContract] = useState<string>("");
-  const { abi, isLoading: loadingAbi } = useAbi(targetContract as Address);
+  const {
+    abi,
+    isLoading: loadingAbi,
+    isProxy,
+    implementation,
+  } = useAbi(targetContract as Address);
 
   const actionEntered = (data: Hex, value: bigint) => {
     onAddAction({
@@ -63,6 +69,12 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({
           />
         </ElseIf>
         <Else>
+          <If condition={isProxy}>
+            <p className="mb-6 text-sm opacity-80">
+              The given contract is a proxy of{" "}
+              <AddressText>{implementation}</AddressText>
+            </p>
+          </If>
           <FunctionSelector abi={abi} actionEntered={actionEntered} />
         </Else>
       </If>

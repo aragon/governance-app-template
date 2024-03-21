@@ -1,10 +1,10 @@
 import { FC } from "react";
-import { useAlertContext } from "@/context/AlertContext";
+import { useAlerts } from "@/context/Alerts";
 import { AlertCard, AlertVariant, Icon, IconType } from "@aragon/ods";
 import { IAlert } from "@/utils/types";
 
 const AlertContainer: FC = () => {
-  const { alerts } = useAlertContext();
+  const { alerts } = useAlerts();
 
   return (
     <div className="fixed top-0 right-0 w-72 md:w-96 m-4 z-50">

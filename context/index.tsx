@@ -1,4 +1,4 @@
-import { AlertProvider } from "./AlertContext";
+import { AlertProvider } from "./Alerts";
 import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { config } from "@/context/Web3Modal";

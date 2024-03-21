@@ -28,8 +28,6 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Add a new alert to the list
   const addAlert = (message: string, alertOptions?: AlertOptions) => {
-    const newAlertList = ([] as IAlert[]).concat(alerts);
-
     // Clean duplicates
     const idx = alerts.findIndex((a) => {
       if (a.message !== message) return false;
@@ -38,14 +36,17 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
       return true;
     });
     if (idx >= 0) {
-      const [prevAlert] = newAlertList.splice(idx, 1);
-      clearTimeout(prevAlert.dismissTimeout);
-      const timeout = alertOptions?.timeout ?? DEFAULT_ALERT_TIMEOUT;
-      prevAlert.dismissTimeout = setTimeout(
-        () => removeAlert(prevAlert.id),
-        timeout
-      );
-      setAlerts(newAlertList.concat(prevAlert));
+      // Update the existing one
+      setAlerts((curAlerts) => {
+        const [prevAlert] = curAlerts.splice(idx, 1);
+        clearTimeout(prevAlert.dismissTimeout);
+        const timeout = alertOptions?.timeout ?? DEFAULT_ALERT_TIMEOUT;
+        prevAlert.dismissTimeout = setTimeout(
+          () => removeAlert(prevAlert.id),
+          timeout
+        );
+        return curAlerts.concat(prevAlert);
+      });
       return;
     }
 
@@ -64,12 +65,12 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
       () => removeAlert(newAlert.id),
       timeout
     );
-    setAlerts(newAlertList.concat(newAlert));
+    setAlerts((curAlerts) => curAlerts.concat(newAlert));
   };
 
   // Function to remove an alert
   const removeAlert = (id: number) => {
-    setAlerts(alerts.filter((alert) => alert.id !== id));
+    setAlerts((prevAlerts) => prevAlerts.filter((alert) => alert.id !== id));
   };
 
   return (
@@ -79,7 +80,7 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useAlertContext = () => {
+export const useAlerts = () => {
   const context = useContext(AlertContext);
 
   if (!context) {

@@ -5,13 +5,13 @@ import {
   useWriteContract,
 } from "wagmi";
 import { OptimisticTokenVotingPluginAbi } from "../artifacts/OptimisticTokenVotingPlugin.sol";
-import { AlertContextProps, useAlertContext } from "@/context/AlertContext";
+import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
 
 export function useProposalExecute(proposalId: string) {
   const { reload } = useRouter();
-  const { addAlert } = useAlertContext() as AlertContextProps;
+  const { addAlert } = useAlerts() as AlertContextProps;
 
   const {
     data: canExecute,

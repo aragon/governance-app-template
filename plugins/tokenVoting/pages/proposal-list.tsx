@@ -140,7 +140,7 @@ export default function Proposals() {
 
 function MainSection({ children }: { children: ReactNode }) {
   return (
-    <main className="flex flex-col items-center mt-6 w-screen max-w-full">
+    <main className="flex flex-col items-center w-screen max-w-full">
       {children}
     </main>
   );

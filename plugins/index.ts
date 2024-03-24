@@ -35,7 +35,7 @@ export const plugins: PluginItem[] = [
   {
     id: "lock-to-vote",
     folderName: "lockToVote",
-    title: "Morpho Vault Gov",
+    title: "Morpho Vault",
     icon: IconType.BLOCKCHAIN_BLOCK,
     pluginAddress: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
   },

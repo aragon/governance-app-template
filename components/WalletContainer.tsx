@@ -3,7 +3,6 @@ import { Avatar, Card, Link } from "@aragon/ods";
 import { useAccount, useEnsName, useEnsAvatar } from "wagmi";
 import { Address } from "viem"
 import { formatHexString } from "@/utils/evm";
-import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { normalize } from 'viem/ens'
 import { createClient, http } from 'viem'
 import { createConfig } from 'wagmi'
@@ -14,6 +13,7 @@ import {
 
 const config = createConfig({
   chains: [mainnet],
+  ssr: true,
   client({ chain }) {
     return createClient({ chain, transport: http('https://eth-mainnet.g.alchemy.com/v2/' + PUB_ALCHEMY_API_KEY, { batch: true }) })
   },
@@ -33,9 +33,6 @@ const WalletContainer = () => {
     gatewayUrls: ['https://cloudflare-ipfs.com']
   })
   const { open } = useWeb3Modal();
-
-  const skipRender = useSkipFirstRender();
-  if (skipRender) return <></>;
 
   return (
     <Card className="

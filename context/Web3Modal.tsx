@@ -21,6 +21,7 @@ const metadata = {
 
 export const config = createConfig({
   chains: [PUB_CHAIN],
+  ssr: true,
   transports: {
     [PUB_CHAIN.id]: http(PUB_WEB3_ENDPOINT, { batch: true }),
   },
@@ -33,5 +34,4 @@ export const config = createConfig({
     injected({ shimDisconnect: true }),
     // coinbaseWallet({ appName: metadata.name, appLogoUrl: metadata.icons[0] }),
   ],
-  // ssr: false,
 });

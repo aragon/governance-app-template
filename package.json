@@ -12,7 +12,7 @@
     "deploy-dao": "bun ./scripts/deploy.ts"
   },
   "dependencies": {
-    "@aragon/ods": "1.0.15",
+    "@aragon/ods": "1.0.20",
     "@shazow/whatsabi": "0.11.0",
     "@tanstack/query-async-storage-persister": "^5.25.0",
     "@tanstack/react-query": "^5.25.0",
@@ -39,7 +39,7 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
     "dotenv": "^16.4.4",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.0",
     "eslint-config-next": "14.0.2",
     "postcss": "^8",
     "prettier": "^3.2.5",

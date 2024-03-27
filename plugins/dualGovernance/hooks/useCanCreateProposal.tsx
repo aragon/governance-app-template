@@ -1,16 +1,24 @@
 import { Address, keccak256, toHex } from "viem";
 import { useState, useEffect } from "react";
-import { useBalance, useAccount, useReadContracts, useConfig } from "wagmi";
+import {
+  useBalance,
+  useAccount,
+  useReadContracts,
+  useReadContract,
+} from "wagmi";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { DaoAbi } from "@/artifacts/DAO.sol";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
 export function useCanCreateProposal() {
   const { address } = useAccount();
+  if (!address) return false;
+
   const [minProposerVotingPower, setMinProposerVotingPower] =
     useState<bigint>();
-  const [votingToken, setVotingToken] = useState<Address>();
-  const [daoAddress, setDaoAddress] = useState<Address>();
+    const [votingToken, setVotingToken] = useState<Address>();
+    const [daoAddress, setDaoAddress] = useState<Address>();
+    const [hasCreatePermission, setHasCreatePermission] = useState(false);
   const { data: balance } = useBalance({
     address,
     token: votingToken,
@@ -36,27 +44,27 @@ export function useCanCreateProposal() {
         address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
         abi: OptimisticTokenVotingPluginAbi,
         functionName: "dao",
-      }
+      },
       // TODO: This needs to be checking as well if address has the DAO permission to create props
     ],
   });
 
   // Check if PROPOSER_PERMISSION is granted to the current wallet
-  const { data: hasCreatePermission, refetch: hasCreatePermissionRefetch } = useReadContracts({
-    contracts: [
-      {
-        chainId: PUB_CHAIN.id,
-        address: daoAddress,
-        abi: DaoAbi,
-        functionName: "hasPermission",
-        // where, who, permissionId, data
-        args: [
-          PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-          address,
-          keccak256(toHex("PROPOSER_PERMISSION")),
-          "0x",
-        ],
-      },
+  const {
+    data: hasCreatePermissionData,
+    refetch: hasCreatePermissionRefetch,
+    status: hasCreatePermissionStatus,
+  } = useReadContract({
+    chainId: PUB_CHAIN.id,
+    address: daoAddress,
+    abi: DaoAbi,
+    functionName: "hasPermission",
+    // where, who, permissionId, data
+    args: [
+      PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+      address,
+      keccak256(toHex("PROPOSER_PERMISSION")),
+      "0x",
     ],
   });
 
@@ -71,6 +79,10 @@ export function useCanCreateProposal() {
     contractReads?.[1]?.status,
     contractReads?.[2]?.status,
   ]);
+
+  useEffect(() => {
+    setHasCreatePermission(!!hasCreatePermissionData);
+  }, [hasCreatePermissionStatus]);
 
   // Check if PROPOSER_PERMISSION is granted to the current wallet
   useEffect(() => {

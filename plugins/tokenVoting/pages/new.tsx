@@ -69,6 +69,7 @@ export default function Create() {
           timeout: 4 * 1000,
         });
       } else {
+        console.error(error);
         addAlert("Could not create the proposal", { type: "error" });
       }
       return;

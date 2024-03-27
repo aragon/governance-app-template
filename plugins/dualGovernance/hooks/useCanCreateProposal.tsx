@@ -79,7 +79,7 @@ export function useCanCreateProposal() {
   }, [daoAddress, address]);
 
   if (!address) return false;
-  else if (!!hasCreatePermission) return false;
+  else if (!hasCreatePermission) return false;
   else if (!balance) return false;
   else if (minProposerVotingPower) {
     if (balance?.value < minProposerVotingPower) return false;

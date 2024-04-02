@@ -12,7 +12,6 @@ import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
 export function useCanCreateProposal() {
   const { address } = useAccount();
-  if (!address) return false;
 
   const [minProposerVotingPower, setMinProposerVotingPower] =
     useState<bigint>();
@@ -23,6 +22,9 @@ export function useCanCreateProposal() {
     address,
     token: votingToken,
     chainId: PUB_CHAIN.id,
+    query: {
+      enabled: !!address,
+    },
   });
 
   const { data: contractReads } = useReadContracts({
@@ -66,6 +68,9 @@ export function useCanCreateProposal() {
       keccak256(toHex("PROPOSER_PERMISSION")),
       "0x",
     ],
+    query: {
+      enabled: !!daoAddress && !!address,
+    },
   });
 
   useEffect(() => {
@@ -84,9 +89,7 @@ export function useCanCreateProposal() {
     setHasCreatePermission(!!hasCreatePermissionData);
   }, [hasCreatePermissionStatus]);
 
-  // Check if PROPOSER_PERMISSION is granted to the current wallet
   useEffect(() => {
-    if (!address || !daoAddress) return;
     hasCreatePermissionRefetch();
   }, [daoAddress, address]);
 

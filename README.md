@@ -40,6 +40,16 @@ Aragonette is built to work seamlessly with Aragon OSx primitives, such as `IPro
 
 Got ideas on how to make Aragonette even better? We're all ears! Whether it's a bug fix, a new feature, or a plugin that could benefit everyone, we welcome your contributions. Check out our [contributing guidelines](CONTRIBUTING.md) for more information on how to get involved.
 
+### You can configure your repository to pull changes from this repository with:
+```
+git remote add upstream git@github.com:aragon/aragonette.git
+git remote set-url --push upstream DISABLE
+
+# Then you can do
+git pull
+git push upstream <your branch>
+```
+
 ## Need Help? 🆘
 
 Stuck on something? Our community is here to help! Join our [Discord channel](https://discord.com/invite/eqQJkdp) for support, advice, or just to share your awesome plugin creations with fellow Aragon enthusiasts.

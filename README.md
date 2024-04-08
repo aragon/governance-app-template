@@ -44,10 +44,6 @@ Got ideas on how to make Aragonette even better? We're all ears! Whether it's a 
 ```bash
 git remote add upstream git@github.com:aragon/aragonette.git
 git remote set-url --push upstream DISABLE
-
-# Then you can do
-git pull
-git push upstream <your branch>
 ```
 
 ## Need Help? 🆘

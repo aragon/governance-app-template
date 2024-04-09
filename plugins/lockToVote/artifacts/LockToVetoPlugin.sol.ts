@@ -1,5 +1,4 @@
-import { Abi } from "viem";
-export const LockToVetoPluginAbi: Abi = [
+export const LockToVetoPluginAbi = [
   {
     inputs: [
       { internalType: "uint256", name: "proposalId", type: "uint256" },

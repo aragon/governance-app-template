@@ -72,12 +72,13 @@ export function useProposalVeto(proposalId: string) {
 
     signPermit(dest, value, deadline).then((sig) => {
       if (!sig) return;
+      if (!sig.yParity) throw new Error("Invalid signature");
 
       vetoWrite({
         abi: LockToVetoPluginAbi,
         address: dest,
         functionName: "vetoPermit",
-        args: [proposalId, value, deadline, sig.v, sig.r, sig.s],
+        args: [BigInt(proposalId), value, deadline, sig.yParity, sig.r, sig.s],
       });
     });
   };

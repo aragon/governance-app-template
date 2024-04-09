@@ -1,5 +1,4 @@
-import { Abi } from "viem";
-export const ERC20PermitAbi: Abi = [
+export const ERC20PermitAbi = [
   {
     inputs: [],
     stateMutability: "nonpayable",
@@ -523,4 +522,17 @@ export const ERC20PermitAbi: Abi = [
     stateMutability: "nonpayable",
     type: "function",
   },
-];
+  {
+    inputs: [],
+    name: "version",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+] as const;

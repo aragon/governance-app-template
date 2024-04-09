@@ -3,7 +3,12 @@ import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { Hex, fromHex, getAbiItem } from "viem";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { Action } from "@/utils/types";
-import { Proposal, ProposalMetadata, ProposalParameters } from "@/plugins/dualGovernance/utils/types";
+import {
+  Proposal,
+  ProposalMetadata,
+  ProposalParameters,
+  ProposalResultType,
+} from "@/plugins/dualGovernance/utils/types";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 
@@ -36,14 +41,15 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     error: proposalError,
     fetchStatus: proposalFetchStatus,
     refetch: proposalRefetch,
-  } = useReadContract<typeof OptimisticTokenVotingPluginAbi, "getProposal", any[]>({
+  } = useReadContract({
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     abi: OptimisticTokenVotingPluginAbi,
     functionName: "getProposal",
-    args: [proposalId],
+    args: [BigInt(proposalId)],
     chainId: PUB_CHAIN.id,
   });
-  const proposalData = decodeProposalResultData(proposalResult as any);
+
+  const proposalData = decodeProposalResultData(proposalResult);
 
   useEffect(() => {
     if (autoRefresh) proposalRefetch();
@@ -101,7 +107,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
 // Helpers
 
-function decodeProposalResultData(data?: Array<any>) {
+function decodeProposalResultData(data: ProposalResultType) {
   if (!data?.length || data.length < 6) return null;
 
   return {

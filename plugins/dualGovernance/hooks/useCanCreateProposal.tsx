@@ -56,7 +56,7 @@ export function useCanCreateProposal() {
     abi: DaoAbi,
     functionName: "hasPermission",
     // where, who, permissionId, data
-    args: [PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, address, keccak256(toHex("PROPOSER_PERMISSION")), "0x"],
+    args: [PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, address!, keccak256(toHex("PROPOSER_PERMISSION")), "0x"],
     query: {
       enabled: !!daoAddress && !!address,
     },

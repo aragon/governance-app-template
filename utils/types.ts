@@ -1,7 +1,9 @@
+import { Address, Hex } from "viem";
+
 export type Action = {
-  to: string;
+  to: Address;
   value: bigint;
-  data: string;
+  data: Hex;
 };
 
 export interface IAlert {

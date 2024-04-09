@@ -1,5 +1,4 @@
-import { Abi } from "viem";
-export const DaoAbi: Abi = [
+export const DaoAbi = [
   {
     inputs: [],
     stateMutability: "nonpayable",
@@ -1135,4 +1134,4 @@ export const DaoAbi: Abi = [
     stateMutability: "payable",
     type: "receive",
   },
-];
+] as const;

@@ -1,5 +1,5 @@
 import { type FC, useState } from "react";
-import { type Address, type Hex } from "viem";
+import { type Address, type Hex, getAddress } from "viem";
 import { AlertInline, InputText } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { isAddress } from "@/utils/evm";
@@ -13,16 +13,17 @@ interface FunctionCallFormProps {
   onAddAction: (action: Action) => any;
 }
 export const FunctionCallForm: FC<FunctionCallFormProps> = ({ onAddAction }) => {
-  const [targetContract, setTargetContract] = useState<string>("");
+  const [targetContract, setTargetContract] = useState<Address>();
   const { abi, isLoading: loadingAbi, isProxy, implementation } = useAbi(targetContract as Address);
 
   const actionEntered = (data: Hex, value: bigint) => {
+    if (!targetContract) return;
     onAddAction({
       to: targetContract,
       value,
       data,
     });
-    setTargetContract("");
+    setTargetContract(undefined);
   };
 
   return (
@@ -33,7 +34,14 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({ onAddAction }) => 
           placeholder="0x1234..."
           variant={!targetContract || isAddress(targetContract) ? "default" : "critical"}
           value={targetContract}
-          onChange={(e) => setTargetContract(e.target.value || "")}
+          onChange={(e) => {
+            try {
+              const address = getAddress(e.target.value);
+              setTargetContract(address);
+            } catch (e) {
+              setTargetContract(undefined);
+            }
+          }}
         />
       </div>
       <If condition={loadingAbi}>

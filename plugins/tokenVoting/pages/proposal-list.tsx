@@ -91,7 +91,7 @@ export default function Proposals() {
         </ElseIf>
         <ElseIf condition={isConnected}>
           <SectionView>
-            <Card>
+            <Card className="w-full">
               <EmptyState
                 className="w-full md:w-full lg:w-full xl:w-full"
                 heading="There are no proposals yet"

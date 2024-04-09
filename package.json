@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prettier": "prettier -c ./components ./context ./hooks ./pages ./plugins ./scripts ./utils ./constants.ts ; echo 'To write the changes: npm run prettier:write'",
-    "prettier:write": "prettier -w ./components ./context ./hooks ./pages ./plugins ./scripts ./utils ./constants.ts",
+    "format": "prettier --check .; echo 'To write the changes: bun run format:fix'",
+    "format:fix": "prettier -w . --list-different",
     "deploy-dao": "bun ./scripts/deploy.ts"
   },
   "dependencies": {
@@ -48,12 +48,15 @@
     "typescript": "^5.4.3"
   },
   "prettier": {
-    "printWidth": 80,
+    "printWidth": 120,
     "semi": true,
     "singleQuote": false,
     "trailingComma": "es5",
     "tabWidth": 2,
     "arrowParens": "always",
-    "useTabs": false
+    "useTabs": false,
+    "plugins": [
+      "prettier-plugin-tailwindcss"
+    ]
   }
 }

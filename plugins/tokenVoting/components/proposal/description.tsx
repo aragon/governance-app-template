@@ -11,14 +11,10 @@ export default function ProposalDescription(proposal: Proposal) {
       <div
         className="pb-6"
         dangerouslySetInnerHTML={{
-          __html: proposal.summary
-            ? DOMPurify.sanitize(proposal.summary)
-            : DEFAULT_PROPOSAL_METADATA_SUMMARY,
+          __html: proposal.summary ? DOMPurify.sanitize(proposal.summary) : DEFAULT_PROPOSAL_METADATA_SUMMARY,
         }}
       />
-      <h2 className="flex-grow text-2xl text-neutral-900 font-semibold pt-10 pb-3">
-        Actions
-      </h2>
+      <h2 className="flex-grow pb-3 pt-10 text-2xl font-semibold text-neutral-900">Actions</h2>
       <div className="">
         <If not={proposal.actions.length}>
           <p className="pt-2">The proposal has no actions</p>

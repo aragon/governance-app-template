@@ -103,9 +103,7 @@ export const LockToVetoPluginAbi: Abi = [
   },
   {
     anonymous: false,
-    inputs: [
-      { indexed: false, internalType: "uint8", name: "version", type: "uint8" },
-    ],
+    inputs: [{ indexed: false, internalType: "uint8", name: "version", type: "uint8" }],
     name: "Initialized",
     type: "event",
   },
@@ -434,9 +432,7 @@ export const LockToVetoPluginAbi: Abi = [
   {
     inputs: [],
     name: "getVotingToken",
-    outputs: [
-      { internalType: "contract IERC20Upgradeable", name: "", type: "address" },
-    ],
+    outputs: [{ internalType: "contract IERC20Upgradeable", name: "", type: "address" }],
     stateMutability: "view",
     type: "function",
   },
@@ -533,9 +529,7 @@ export const LockToVetoPluginAbi: Abi = [
   {
     inputs: [],
     name: "pluginType",
-    outputs: [
-      { internalType: "enum IPlugin.PluginType", name: "", type: "uint8" },
-    ],
+    outputs: [{ internalType: "enum IPlugin.PluginType", name: "", type: "uint8" }],
     stateMutability: "pure",
     type: "function",
   },
@@ -590,9 +584,7 @@ export const LockToVetoPluginAbi: Abi = [
     type: "function",
   },
   {
-    inputs: [
-      { internalType: "address", name: "newImplementation", type: "address" },
-    ],
+    inputs: [{ internalType: "address", name: "newImplementation", type: "address" }],
     name: "upgradeTo",
     outputs: [],
     stateMutability: "nonpayable",

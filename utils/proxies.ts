@@ -1,13 +1,4 @@
-import {
-  Address,
-  BaseError,
-  ContractFunctionRevertedError,
-  Hex,
-  PublicClient,
-  keccak256,
-  parseAbi,
-  toHex,
-} from "viem";
+import { Address, BaseError, ContractFunctionRevertedError, Hex, PublicClient, keccak256, parseAbi, toHex } from "viem";
 import { PUB_CHAIN } from "@/constants";
 
 const proxyAbi1 = parseAbi([
@@ -19,10 +10,7 @@ const STORAGE_SLOTS = [
   toFallbackEip1967Hash("org.zeppelinos.proxy.implementation"),
 ];
 
-export function isProxyContract(
-  publicClient: PublicClient,
-  contractAddress: Address
-) {
+export function isProxyContract(publicClient: PublicClient, contractAddress: Address) {
   return publicClient
     .simulateContract({
       address: contractAddress,
@@ -34,16 +22,12 @@ export function isProxyContract(
     .then(() => true)
     .catch((e: any) => {
       if (!(e instanceof BaseError)) return false;
-      else if (!(e.cause instanceof ContractFunctionRevertedError))
-        return false;
+      else if (!(e.cause instanceof ContractFunctionRevertedError)) return false;
       return true;
     });
 }
 
-export async function getImplementation(
-  publicClient: PublicClient,
-  proxyAddress: Address
-): Promise<Address> {
+export async function getImplementation(publicClient: PublicClient, proxyAddress: Address): Promise<Address> {
   for (const slot of STORAGE_SLOTS) {
     const res = await publicClient.getStorageAt({
       address: proxyAddress,

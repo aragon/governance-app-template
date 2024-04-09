@@ -2,11 +2,7 @@ import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { getAbiItem } from "viem";
 import { Action } from "@/utils/types";
-import {
-  Proposal,
-  ProposalMetadata,
-  ProposalParameters,
-} from "@/plugins/lockToVote/utils/types";
+import { Proposal, ProposalMetadata, ProposalParameters } from "@/plugins/lockToVote/utils/types";
 import { PUB_CHAIN, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 import { LockToVetoPluginAbi } from "../artifacts/LockToVetoPlugin.sol";
@@ -30,8 +26,7 @@ const ProposalCreatedEvent = getAbiItem({
 
 export function useProposal(proposalId: string, autoRefresh = false) {
   const publicClient = usePublicClient();
-  const [proposalCreationEvent, setProposalCreationEvent] =
-    useState<ProposalCreatedLogResponse["args"]>();
+  const [proposalCreationEvent, setProposalCreationEvent] = useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
@@ -88,11 +83,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     error: metadataError,
   } = useMetadata<ProposalMetadata>(metadataUri);
 
-  const proposal = arrangeProposalData(
-    proposalData,
-    proposalCreationEvent,
-    metadataContent
-  );
+  const proposal = arrangeProposalData(proposalData, proposalCreationEvent, metadataContent);
 
   return {
     proposal,

@@ -23,12 +23,17 @@ export const deploymentWalletClient = createWalletClient({
 });
 
 function resolveNetwork(): Chain {
-  switch(TARGET_CHAIN_ID) {
-    case "sepolia": return sepolia;
-    case "mainnet": return mainnet;
-    case "polygon": return polygon;
-    case "arbitrum": return arbitrum;
-    case "base": return base;
+  switch (TARGET_CHAIN_ID) {
+    case "sepolia":
+      return sepolia;
+    case "mainnet":
+      return mainnet;
+    case "polygon":
+      return polygon;
+    case "arbitrum":
+      return arbitrum;
+    case "base":
+      return base;
   }
   throw new Error("Unsupported network");
 }

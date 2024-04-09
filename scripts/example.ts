@@ -1,8 +1,5 @@
 import { toHex } from "viem";
-import {
-  deploymentPublicClient as publicClient,
-  deploymentWalletClient as walletClient,
-} from "./lib/util/client";
+import { deploymentPublicClient as publicClient, deploymentWalletClient as walletClient } from "./lib/util/client";
 import { deploymentAccount as account } from "./lib/util/account";
 import { DelegateAnnouncerAbi } from "../plugins/delegateAnnouncer/artifacts/DelegateAnnouncer.sol";
 
@@ -24,9 +21,7 @@ async function main() {
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash });
   if (!receipt) {
-    throw new Error(
-      "The Dual Governance plugin repository could not be created"
-    );
+    throw new Error("The Dual Governance plugin repository could not be created");
   }
 
   console.log("Done");

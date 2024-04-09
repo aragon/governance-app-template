@@ -7,9 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prettier": "prettier -c ./components ./context ./hooks ./pages ./plugins ./scripts ./utils ./constants.ts ; echo 'To write the changes: npm run prettier:write'",
-    "prettier:write": "prettier -w ./components ./context ./hooks ./pages ./plugins ./scripts ./utils ./constants.ts",
-    "deploy-dao": "bun ./scripts/deploy.ts"
+    "format": "prettier --check .; echo 'To write the changes: bun run format:fix'",
+    "format:fix": "prettier -w . --list-different",
+    "deploy-dao": "bun ./scripts/deploy.ts",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js, jsx,ts,tsx}": [
+      "eslint --quiet --fix"
+    ],
+    "*.{json,js,ts,jsx,tsx,html}": [
+      "prettier --write --ignore-unknown"
+    ]
   },
   "dependencies": {
     "@aragon/ods": "1.0.20",
@@ -41,18 +50,25 @@
     "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.1.4",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
     "postcss": "^8.4.38",
     "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.13",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.4.3"
   },
   "prettier": {
-    "printWidth": 80,
+    "printWidth": 120,
     "semi": true,
     "singleQuote": false,
     "trailingComma": "es5",
     "tabWidth": 2,
     "arrowParens": "always",
-    "useTabs": false
+    "useTabs": false,
+    "plugins": [
+      "prettier-plugin-tailwindcss"
+    ]
   }
 }

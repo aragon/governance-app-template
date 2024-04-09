@@ -1,12 +1,6 @@
-import {
-  deploymentPublicClient as publicClient,
-  deploymentWalletClient as walletClient,
-} from "../lib/util/client";
+import { deploymentPublicClient as publicClient, deploymentWalletClient as walletClient } from "../lib/util/client";
 import { deploymentAccount as account } from "../lib/util/account";
-import {
-  ABI as GovernanceErc20ABI,
-  BYTECODE as GovernanceErc20Bytecode,
-} from "../lib/artifacts/governance-erc20";
+import { ABI as GovernanceErc20ABI, BYTECODE as GovernanceErc20Bytecode } from "../lib/artifacts/governance-erc20";
 import {
   ABI as GovernanceWrappedErc20ABI,
   BYTECODE as GovernanceWrappedErc20Bytecode,
@@ -68,9 +62,7 @@ async function deployGovernanceErc20Base(): Promise<Address> {
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash });
   if (!receipt.contractAddress) {
-    throw new Error(
-      "The base contract for GovernanceErc20 could not be deployed"
-    );
+    throw new Error("The base contract for GovernanceErc20 could not be deployed");
   }
   console.log("  - GovernanceErc20:", receipt.contractAddress);
 
@@ -90,9 +82,7 @@ async function deployGovernanceWrappedErc20Base(): Promise<Address> {
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash });
   if (!receipt.contractAddress) {
-    throw new Error(
-      "The base contract for GovernanceWrappedErc20 could not be deployed"
-    );
+    throw new Error("The base contract for GovernanceWrappedErc20 could not be deployed");
   }
   console.log("  - GovernanceWrappedErc20:", receipt.contractAddress);
 

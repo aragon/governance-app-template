@@ -41,17 +41,12 @@ export default function Proposals() {
   if (skipRender) return <></>;
 
   const proposalCount = Number(proposalCountResponse);
-  const { visibleProposalIds, showNext, showPrev } = digestPagination(
-    proposalCount,
-    currentPage
-  );
+  const { visibleProposalIds, showNext, showPrev } = digestPagination(proposalCount, currentPage);
 
   return (
     <MainSection>
       <SectionView>
-        <h1 className="justify-self-start text-3xl font-semibold align-middle">
-          Proposals
-        </h1>
+        <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
         <div className="justify-self-end">
           <If condition={canCreate && proposalCount}>
             <Link href="#/new">
@@ -67,7 +62,7 @@ export default function Proposals() {
           {visibleProposalIds.map((id) => (
             <ProposalCard key={id} proposalId={BigInt(id)} />
           ))}
-          <div className="w-full flex flex-row justify-end gap-2 mt-4 mb-10">
+          <div className="mb-10 mt-4 flex w-full flex-row justify-end gap-2">
             <Button
               variant="tertiary"
               size="sm"
@@ -133,17 +128,9 @@ export default function Proposals() {
 }
 
 function MainSection({ children }: { children: ReactNode }) {
-  return (
-    <main className="flex flex-col items-center mt-6 w-screen max-w-full">
-      {children}
-    </main>
-  );
+  return <main className="mt-6 flex w-screen max-w-full flex-col items-center">{children}</main>;
 }
 
 function SectionView({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex flex-row justify-between content-center w-full mb-6">
-      {children}
-    </div>
-  );
+  return <div className="mb-6 flex w-full flex-row content-center justify-between">{children}</div>;
 }

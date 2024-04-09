@@ -6,8 +6,7 @@ import { PUB_CHAIN, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
 
 export function useCanCreateProposal() {
   const [isCreator, setIsCreator] = useState<boolean>(false);
-  const [minProposerVotingPower, setMinProposerVotingPower] =
-    useState<bigint>();
+  const [minProposerVotingPower, setMinProposerVotingPower] = useState<bigint>();
   const [votingToken, setVotingToken] = useState<Address>();
   const { address, isConnecting, isDisconnected } = useAccount();
   const { data: balance } = useBalance({
@@ -43,11 +42,7 @@ export function useCanCreateProposal() {
   }, [contractReads]);
 
   useEffect(() => {
-    if (
-      balance !== undefined &&
-      minProposerVotingPower !== undefined &&
-      balance?.value >= minProposerVotingPower
-    )
+    if (balance !== undefined && minProposerVotingPower !== undefined && balance?.value >= minProposerVotingPower)
       setIsCreator(true);
   }, [balance]);
 

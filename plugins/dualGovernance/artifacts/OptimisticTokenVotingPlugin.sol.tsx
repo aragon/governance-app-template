@@ -694,8 +694,7 @@ export const OptimisticTokenVotingPluginAbi: Abi = [
             type: "uint256",
           },
         ],
-        internalType:
-          "struct OptimisticTokenVotingPlugin.OptimisticGovernanceSettings",
+        internalType: "struct OptimisticTokenVotingPlugin.OptimisticGovernanceSettings",
         name: "_governanceSettings",
         type: "tuple",
       },
@@ -884,8 +883,7 @@ export const OptimisticTokenVotingPluginAbi: Abi = [
             type: "uint256",
           },
         ],
-        internalType:
-          "struct OptimisticTokenVotingPlugin.OptimisticGovernanceSettings",
+        internalType: "struct OptimisticTokenVotingPlugin.OptimisticGovernanceSettings",
         name: "_governanceSettings",
         type: "tuple",
       },

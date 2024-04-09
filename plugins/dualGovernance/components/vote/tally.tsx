@@ -9,19 +9,12 @@ interface VoteTallyProps {
 
 const VetoTally: FC<VoteTallyProps> = ({ voteCount, votePercentage }) => (
   <Card>
-    <div className="flex flex-row space-between pb-2">
-      <p className={`flex-grow text-xl text-primary-500 font-semibold`}>
-        Vetoed
-      </p>
-      <p className="text-xl font-semibold">
-        {compactNumber(formatUnits(voteCount || BigInt(0), 18))}
-      </p>
+    <div className="space-between flex flex-row pb-2">
+      <p className={`flex-grow text-xl font-semibold text-primary-500`}>Vetoed</p>
+      <p className="text-xl font-semibold">{compactNumber(formatUnits(voteCount || BigInt(0), 18))}</p>
     </div>
-    <div className={`h-4 w-full bg-primary-100 rounded`}>
-      <div
-        className={`h-4 bg-primary-700 rounded`}
-        style={{ width: `${Math.min(votePercentage, 100)}%` }}
-      />
+    <div className={`h-4 w-full rounded bg-primary-100`}>
+      <div className={`h-4 rounded bg-primary-700`} style={{ width: `${Math.min(votePercentage, 100)}%` }} />
     </div>
   </Card>
 );
@@ -30,9 +23,9 @@ const VetoTally: FC<VoteTallyProps> = ({ voteCount, votePercentage }) => (
 const Card = function ({ children }: { children: ReactNode }) {
   return (
     <div
-      className="p-4 xl:p-6 w-full flex flex-col space-y-6
-    box-border border border-neutral-100
-    bg-neutral-0 rounded-xl"
+      className="box-border flex w-full flex-col space-y-6 rounded-xl
+    border border-neutral-100 bg-neutral-0
+    p-4 xl:p-6"
     >
       {children}
     </div>

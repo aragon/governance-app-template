@@ -16,8 +16,7 @@ type BottomSection = "description" | "vetoes";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const skipRender = useSkipFirstRender();
-  const [bottomSection, setBottomSection] =
-    useState<BottomSection>("description");
+  const [bottomSection, setBottomSection] = useState<BottomSection>("description");
 
   const {
     proposal,
@@ -28,28 +27,21 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     vetoProposal,
   } = useProposalVeto(proposalId);
 
-  const showProposalLoading = getShowProposalLoading(
-    proposal,
-    proposalFetchStatus
-  );
+  const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
 
-  const {
-    executeProposal,
-    canExecute,
-    isConfirming: isConfirmingExecution,
-  } = useProposalExecute(proposalId);
+  const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
 
   if (skipRender || !proposal || showProposalLoading) {
     return (
-      <section className="flex justify-left items-left w-screen max-w-full min-w-full">
+      <section className="justify-left items-left flex w-screen min-w-full max-w-full">
         <PleaseWaitSpinner />
       </section>
     );
   }
 
   return (
-    <section className="flex flex-col items-center w-screen max-w-full min-w-full">
-      <div className="flex justify-between py-5 w-full">
+    <section className="flex w-screen min-w-full max-w-full flex-col items-center">
+      <div className="flex w-full justify-between py-5">
         <ProposalHeader
           proposalNumber={Number(proposalId) + 1}
           proposal={proposal}
@@ -61,32 +53,26 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         />
       </div>
 
-      <div className="grid xl:grid-cols-3 lg:grid-cols-2 my-10 gap-10 w-full">
+      <div className="my-10 grid w-full gap-10 lg:grid-cols-2 xl:grid-cols-3">
         <VetoTally
           voteCount={proposal?.vetoTally}
-          votePercentage={
-            Number(
-              proposal?.vetoTally / proposal?.parameters?.minVetoVotingPower
-            ) * 100
-          }
+          votePercentage={Number(proposal?.vetoTally / proposal?.parameters?.minVetoVotingPower) * 100}
         />
         <ProposalDetails
           minVetoVotingPower={proposal?.parameters?.minVetoVotingPower}
           snapshotBlock={proposal?.parameters?.snapshotBlock}
         />
       </div>
-      <div className="py-12 w-full">
-        <div className="flex flex-row space-between">
-          <h2 className="flex-grow text-3xl text-neutral-900 font-semibold">
+      <div className="w-full py-12">
+        <div className="space-between flex flex-row">
+          <h2 className="flex-grow text-3xl font-semibold text-neutral-900">
             {bottomSection === "description" ? "Description" : "Vetoes"}
           </h2>
           <ToggleGroup
             className="justify-end"
             value={bottomSection}
             isMultiSelect={false}
-            onChange={(val: string | undefined) =>
-              val ? setBottomSection(val as BottomSection) : ""
-            }
+            onChange={(val: string | undefined) => (val ? setBottomSection(val as BottomSection) : "")}
           >
             <Toggle label="Description" value="description" />
             <Toggle label="Vetoes" value="vetoes" />

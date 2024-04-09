@@ -1,11 +1,5 @@
 import { useEffect } from "react";
-import {
-  usePublicClient,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-  useReadContract,
-  useAccount,
-} from "wagmi";
+import { usePublicClient, useWaitForTransactionReceipt, useWriteContract, useReadContract, useAccount } from "wagmi";
 import { Address } from "viem";
 import { ERC20PermitAbi } from "@/artifacts/ERC20Permit.sol";
 import { useProposal } from "./useProposal";
@@ -19,40 +13,23 @@ import { PUB_CHAIN, PUB_TOKEN_ADDRESS, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@
 export function useProposalVeto(proposalId: string) {
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
 
-  const {
-    proposal,
-    status: proposalFetchStatus,
-    refetch: refetchProposal,
-  } = useProposal(proposalId, true);
-  const vetoes = useProposalVetoes(
-    publicClient!,
-    PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
-    proposalId,
-    proposal
-  );
+  const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
+  const vetoes = useProposalVetoes(publicClient!, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS, proposalId, proposal);
   const { signPermit, refetchPermitData } = usePermit();
 
   const { addAlert } = useAlerts() as AlertContextProps;
   const account_address = useAccount().address!;
 
-  const { data: balanceData } = useReadContract({    
+  const { data: balanceData } = useReadContract({
     address: PUB_TOKEN_ADDRESS,
     abi: ERC20PermitAbi,
     functionName: "balanceOf",
     args: [account_address],
   });
 
-  const {
-    writeContract: vetoWrite,
-    data: vetoTxHash,
-    error: vetoingError,
-    status: vetoingStatus,
-  } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash: vetoTxHash });
-  const { canVeto, refetch: refetchCanVeto } = useUserCanVeto(
-    BigInt(proposalId)
-  );
+  const { writeContract: vetoWrite, data: vetoTxHash, error: vetoingError, status: vetoingStatus } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: vetoTxHash });
+  const { canVeto, refetch: refetchCanVeto } = useUserCanVeto(BigInt(proposalId));
 
   useEffect(() => {
     if (vetoingStatus === "idle" || vetoingStatus === "pending") return;
@@ -89,9 +66,9 @@ export function useProposalVeto(proposalId: string) {
   }, [vetoingStatus, vetoTxHash, isConfirming, isConfirmed]);
 
   const vetoProposal = () => {
-    let dest: Address = PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS;
-    let value = BigInt(Number(balanceData));
-    let deadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 60); // 1 hour from now
+    const dest: Address = PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS;
+    const value = BigInt(Number(balanceData));
+    const deadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 60); // 1 hour from now
 
     signPermit(dest, value, deadline).then((sig) => {
       if (!sig) return;

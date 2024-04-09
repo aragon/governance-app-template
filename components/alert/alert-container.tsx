@@ -1,16 +1,16 @@
-import { FC } from "react";
+import { type FC } from "react";
 import { useAlerts } from "@/context/Alerts";
-import { AlertCard, AlertVariant, Icon, IconType } from "@aragon/ods";
-import { IAlert } from "@/utils/types";
+import { AlertCard, type AlertVariant, Icon, IconType } from "@aragon/ods";
+import { type IAlert } from "@/utils/types";
 
 const AlertContainer: FC = () => {
   const { alerts } = useAlerts();
 
   return (
-    <div className="fixed top-0 right-0 w-72 md:w-96 m-4 z-50">
+    <div className="fixed right-0 top-0 z-50 m-4 w-72 md:w-96">
       {alerts.map((alert: IAlert) => (
         <AlertCard
-          className="drop-shadow-lg mb-4"
+          className="mb-4 drop-shadow-lg"
           key={alert.id}
           message={alert.message}
           description={resolveDescription(alert)}
@@ -35,21 +35,17 @@ function resolveVariant(type: IAlert["type"]) {
 
 function resolveDescription(alert: IAlert) {
   if (!alert.explorerLink) {
-    return <span className="block text-sm mt-1">{alert.description}</span>;
+    return <span className="mt-1 block text-sm">{alert.description}</span>;
   }
 
   return (
     <>
-      <span className="block text-sm mt-1">{alert.description}</span>
+      <span className="mt-1 block text-sm">{alert.description}</span>
       <a href={alert.explorerLink} target="_blank">
-        <div className="flex flex-row text-xs underline text-primary-200">
+        <div className="flex flex-row text-xs text-primary-200 underline">
           <div className="">Show transaction</div>
           <div>
-            <Icon
-              className="ml-2 mt-1"
-              size="sm"
-              icon={IconType.LINK_EXTERNAL}
-            />
+            <Icon className="ml-2 mt-1" size="sm" icon={IconType.LINK_EXTERNAL} />
           </div>
         </div>
       </a>

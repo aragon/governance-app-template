@@ -8,14 +8,8 @@ import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 export function useProposalVoting(proposalId: string) {
   const { reload } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
-  const {
-    writeContract: voteWrite,
-    data: votingTxHash,
-    error: votingError,
-    status: votingStatus,
-  } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash: votingTxHash });
+  const { writeContract: voteWrite, data: votingTxHash, error: votingError, status: votingStatus } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: votingTxHash });
 
   // Loading status and errors
   useEffect(() => {

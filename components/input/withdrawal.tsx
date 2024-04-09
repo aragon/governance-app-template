@@ -1,7 +1,7 @@
-import { Action } from "@/utils/types";
-import { FC, useEffect, useState } from "react";
+import { type Action } from "@/utils/types";
+import { type FC, useEffect, useState } from "react";
 import { InputText, InputNumber, AlertInline } from "@aragon/ods";
-import { Address, parseEther } from "viem";
+import { type Address, parseEther } from "viem";
 import { isAddress } from "@/utils/evm";
 import { ElseIf, If, Then } from "../if";
 
@@ -18,7 +18,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
     else if (!isNumeric(value)) return;
 
     setActions([{ to, value: BigInt(value), data: "" } as unknown as Action]);
-  }, [to, value]);
+  }, [setActions, to, value]);
 
   const handleTo = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTo(event?.target?.value as Address);
@@ -39,11 +39,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
             <p className="mt-3">Enter the address to transfer to</p>
           </Then>
           <ElseIf not={isAddress(to)}>
-            <AlertInline
-              className="mt-3"
-              message="The address of the contract is not valid"
-              variant="critical"
-            />
+            <AlertInline className="mt-3" message="The address of the contract is not valid" variant="critical" />
           </ElseIf>
         </If>
       </div>
@@ -52,11 +48,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
           label="Amount"
           placeholder="1.234 ETH"
           min={0}
-          variant={
-            typeof value === "undefined" || isNumeric(value)
-              ? "default"
-              : "critical"
-          }
+          variant={typeof value === "undefined" || isNumeric(value) ? "default" : "critical"}
           onChange={(val: string) => setValue(parseEther(val).toString())}
         />
       </div>

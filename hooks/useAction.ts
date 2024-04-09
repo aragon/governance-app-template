@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
 import { Action } from "@/utils/types";
-import {
-  AbiFunction,
-  Address,
-  Hex,
-  decodeFunctionData,
-  toFunctionSelector,
-} from "viem";
+import { AbiFunction, Address, Hex, decodeFunctionData, toFunctionSelector } from "viem";
 import { useAbi } from "./useAbi";
 
 type EvmValue = string | Hex | Address | number | bigint | boolean;
@@ -19,10 +13,7 @@ export function useAction(action: Action) {
 
   useEffect(() => {
     const hexSelector = action.data.slice(0, 10) as Hex;
-    const func = abi.find(
-      (item) =>
-        item.type === "function" && hexSelector === toFunctionSelector(item)
-    );
+    const func = abi.find((item) => item.type === "function" && hexSelector === toFunctionSelector(item));
     if (!func || func.type !== "function") return;
 
     const { args, functionName } = decodeFunctionData({

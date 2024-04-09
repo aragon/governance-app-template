@@ -1,20 +1,13 @@
 import { useState, useEffect } from "react";
 import { getAbiItem } from "viem";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
-import {
-  Proposal,
-  VoteCastEvent,
-  VoteCastResponse,
-} from "@/plugins/tokenVoting/utils/types";
+import { Proposal, VoteCastEvent, VoteCastResponse } from "@/plugins/tokenVoting/utils/types";
 import { usePublicClient } from "wagmi";
 import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 const event = getAbiItem({ abi: TokenVotingAbi, name: "VoteCast" });
 
-export function useProposalVoteList(
-  proposalId: string,
-  proposal: Proposal | null
-) {
+export function useProposalVoteList(proposalId: string, proposal: Proposal | null) {
   const publicClient = usePublicClient();
   const [proposalLogs, setLogs] = useState<VoteCastEvent[]>([]);
 

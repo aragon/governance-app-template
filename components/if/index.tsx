@@ -1,9 +1,7 @@
-import React, { ReactElement, ReactNode } from "react";
+import React, { type ReactElement, type ReactNode } from "react";
 
 type Booleanish = any;
-type IfProps =
-  | { condition: Booleanish; children?: ReactNode }
-  | { not: Booleanish; children?: ReactNode };
+type IfProps = { condition: Booleanish; children?: ReactNode } | { not: Booleanish; children?: ReactNode };
 
 /**
  * Renders the block where the condition evaluates to true
@@ -178,13 +176,8 @@ export const Else = ({ children }: { children?: ReactNode }) => {
 // Helpers
 
 function resolveCondition(props: IfProps): boolean {
-  if (
-    typeof (props as any).condition !== "undefined" &&
-    typeof (props as any).not !== "undefined"
-  ) {
-    throw new Error(
-      "Either 'condition' or 'not' are required as an <If> prop, but not both"
-    );
+  if (typeof (props as any).condition !== "undefined" && typeof (props as any).not !== "undefined") {
+    throw new Error("Either 'condition' or 'not' are required as an <If> prop, but not both");
   } else if (typeof (props as any).condition !== "undefined") {
     return (props as any).condition;
   }

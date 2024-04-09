@@ -26,55 +26,38 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
   }
   let minTurnoutRatio;
   if (minVotingPower && tokenSupply) {
-    minTurnoutRatio =
-      Number((minVotingPower * BigInt(10000)) / tokenSupply) / 10000;
+    minTurnoutRatio = Number((minVotingPower * BigInt(10000)) / tokenSupply) / 10000;
   }
 
   return (
     <>
       <Card>
-        <h2 className="text-xl flex-grow font-semibold text-neutral-600 pr-6">
-          Support threshold
-        </h2>
-        <div className="items-right text-right flex-wrap">
-          <span className="text-xl font-semibold">
-            {compactNumber(formatEther(threshold))}
-          </span>{" "}
+        <h2 className="flex-grow pr-6 text-xl font-semibold text-neutral-600">Support threshold</h2>
+        <div className="items-right flex-wrap text-right">
+          <span className="text-xl font-semibold">{compactNumber(formatEther(threshold))}</span>{" "}
           <span>{symbol ?? ""}</span>
           <p className="text-neutral-600">
-            &gt;{" "}
-            {(((supportThreshold ?? 0) * 100) / Number(PERCENT_BASE)).toFixed(
-              1
-            )}
-            %
+            &gt; {(((supportThreshold ?? 0) * 100) / Number(PERCENT_BASE)).toFixed(1)}%
           </p>
         </div>
       </Card>
       <Card>
-        <h2 className="text-xl flex-grow font-semibold pr-6 text-neutral-600">
-          Minimum turnout
-        </h2>
-        <div className="items-right text-right flex-wrap">
+        <h2 className="flex-grow pr-6 text-xl font-semibold text-neutral-600">Minimum turnout</h2>
+        <div className="items-right flex-wrap text-right">
           <span className="text-xl font-semibold">
             {minVotingPower ? compactNumber(formatEther(minVotingPower)) : null}
           </span>{" "}
           <span>{symbol ?? ""}</span>
           <p className="text-neutral-600">
-            {minTurnoutRatio
-              ? (minTurnoutRatio * 100).toFixed(1) + "% of the supply"
-              : "-"}
+            {minTurnoutRatio ? (minTurnoutRatio * 100).toFixed(1) + "% of the supply" : "-"}
           </p>
         </div>
       </Card>
       <Card>
-        <h2 className="text-xl flex-grow font-semibold text-neutral-600 pr-6">
-          Snapshot
-        </h2>
-        <div className="items-right text-right flex-wrap">
+        <h2 className="flex-grow pr-6 text-xl font-semibold text-neutral-600">Snapshot</h2>
+        <div className="items-right flex-wrap text-right">
           <p className="text-neutral-600">Taken at block</p>
-          <span className="text-xl mr-2 font-semibold">
-            {snapshotBlock?.toLocaleString()}
-          </span>
+          <span className="mr-2 text-xl font-semibold">{snapshotBlock?.toLocaleString()}</span>
         </div>
       </Card>
     </>
@@ -85,10 +68,10 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
 const Card = function ({ children }: { children: ReactNode }) {
   return (
     <div
-      className="p-4 xl:p-6 w-full flex flex-col space-y-6
-    box-border border border-neutral-100
-    focus:outline-none focus:ring focus:ring-primary
-    bg-neutral-0 rounded-xl"
+      className="box-border flex w-full flex-col space-y-6 rounded-xl
+    border border-neutral-100 bg-neutral-0
+    p-4 focus:outline-none focus:ring
+    focus:ring-primary xl:p-6"
     >
       {children}
     </div>

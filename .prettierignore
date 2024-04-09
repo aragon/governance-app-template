@@ -1,0 +1,9 @@
+.next
+.cache
+.vscode
+package-lock.json
+public
+node_modules
+next-env.d.ts
+next.config.ts
+bun.lockb

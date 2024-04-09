@@ -3,12 +3,7 @@ import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { Hex, fromHex, getAbiItem } from "viem";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import { Action } from "@/utils/types";
-import {
-  Proposal,
-  ProposalMetadata,
-  ProposalParameters,
-  Tally,
-} from "@/plugins/tokenVoting/utils/types";
+import { Proposal, ProposalMetadata, ProposalParameters, Tally } from "@/plugins/tokenVoting/utils/types";
 import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 
@@ -31,8 +26,7 @@ const ProposalCreatedEvent = getAbiItem({
 
 export function useProposal(proposalId: string, autoRefresh = false) {
   const publicClient = usePublicClient();
-  const [proposalCreationEvent, setProposalCreationEvent] =
-    useState<ProposalCreatedLogResponse["args"]>();
+  const [proposalCreationEvent, setProposalCreationEvent] = useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();
   const { data: blockNumber } = useBlockNumber();
 
@@ -78,12 +72,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
       .catch((err) => {
         console.error("Could not fetch the proposal details", err);
       });
-  }, [
-    proposalData?.tally.yes,
-    proposalData?.tally.no,
-    proposalData?.tally.abstain,
-    !!publicClient,
-  ]);
+  }, [proposalData?.tally.yes, proposalData?.tally.no, proposalData?.tally.abstain, !!publicClient]);
 
   // JSON metadata
   const {
@@ -92,11 +81,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     error: metadataError,
   } = useMetadata<ProposalMetadata>(metadataUri);
 
-  const proposal = arrangeProposalData(
-    proposalData,
-    proposalCreationEvent,
-    metadataContent
-  );
+  const proposal = arrangeProposalData(proposalData, proposalCreationEvent, metadataContent);
 
   return {
     proposal,

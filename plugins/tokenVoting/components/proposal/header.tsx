@@ -38,7 +38,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
 
   return (
     <div className="w-full">
-      <div className="flex flex-row pb-2 h-16 items-center">
+      <div className="flex h-16 flex-row items-center pb-2">
         <div className="flex flex-grow justify-between">
           <div className="flex-col text-center">
             {/** bg-info-200 bg-success-200 bg-critical-200
@@ -55,9 +55,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 )}
               </div>
             </If>
-            <span className="text-xl font-semibold text-neutral-700 pt-1">
-              Proposal {proposalNumber}
-            </span>
+            <span className="pt-1 text-xl font-semibold text-neutral-700">Proposal {proposalNumber}</span>
           </div>
         </div>
         <div className="flex">
@@ -68,27 +66,17 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
               </div>
             </Then>
             <ElseIf condition={canVote}>
-              <Button
-                className="flex h-5 items-center"
-                size="lg"
-                variant="primary"
-                onClick={() => onShowVotingModal()}
-              >
+              <Button className="flex h-5 items-center" size="lg" variant="primary" onClick={() => onShowVotingModal()}>
                 Submit vote
               </Button>
             </ElseIf>
             <ElseIf condition={canExecute}>
-              <Button
-                className="flex h-5 items-center"
-                size="lg"
-                variant="success"
-                onClick={() => onExecute()}
-              >
+              <Button className="flex h-5 items-center" size="lg" variant="success" onClick={() => onExecute()}>
                 Execute
               </Button>
             </ElseIf>
             <ElseIf condition={userVote && userVoteInfo.label}>
-              <div className="flex items-center align-center">
+              <div className="align-center flex items-center">
                 {userVoteInfo?.variant && (
                   <AlertInline
                     className="flex h-5 items-center"
@@ -102,26 +90,14 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
         </div>
       </div>
 
-      <h4 className="flex-grow mb-1 text-3xl text-neutral-900 font-semibold">
+      <h4 className="mb-1 flex-grow text-3xl font-semibold text-neutral-900">
         {proposal.title || DEFAULT_PROPOSAL_TITLE}
       </h4>
-      <p className="text-base text-l text-body-color dark:text-dark-6">
+      <p className="text-l text-body-color dark:text-dark-6 text-base">
         Proposed by <AddressText>{proposal?.creator}</AddressText>,{" "}
         <If condition={ended}>
-          <Then>
-            ended on{" "}
-            {dayjs(Number(proposal.parameters.endDate) * 1000).format(
-              "D MMM YYYY HH:mm"
-            )}
-            h
-          </Then>
-          <Else>
-            ending on{" "}
-            {dayjs(Number(proposal.parameters.endDate) * 1000).format(
-              "D MMM YYYY HH:mm"
-            )}
-            h
-          </Else>
+          <Then>ended on {dayjs(Number(proposal.parameters.endDate) * 1000).format("D MMM YYYY HH:mm")}h</Then>
+          <Else>ending on {dayjs(Number(proposal.parameters.endDate) * 1000).format("D MMM YYYY HH:mm")}h</Else>
         </If>
       </p>
     </div>

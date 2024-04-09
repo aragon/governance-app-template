@@ -1,10 +1,7 @@
 import { Proposal, VotingMode } from "@/plugins/tokenVoting/utils/types";
 export const RATIO_BASE = 1_000_000;
 
-export function getProposalStatusVariant(
-  proposal: Proposal,
-  tokenSupply: bigint
-) {
+export function getProposalStatusVariant(proposal: Proposal, tokenSupply: bigint) {
   // Terminal cases
   if (!proposal?.tally) return { variant: "info", label: "(Loading)" };
   else if (proposal.executed) return { variant: "primary", label: "Executed" };
@@ -30,13 +27,11 @@ export function getProposalStatusVariant(
   }
 
   // Active or early execution?
-  const noVotesWorstCase =
-    tokenSupply - proposal.tally.yes - proposal.tally.abstain;
+  const noVotesWorstCase = tokenSupply - proposal.tally.yes - proposal.tally.abstain;
   const totalYesNoWc = proposal.tally.yes + noVotesWorstCase;
 
   if (proposal.parameters.votingMode == VotingMode.EarlyExecution) {
-    const currentRatio =
-      (BigInt(RATIO_BASE) * proposal.tally.yes) / totalYesNoWc;
+    const currentRatio = (BigInt(RATIO_BASE) * proposal.tally.yes) / totalYesNoWc;
     if (currentRatio > BigInt(supportThreshold)) {
       return { variant: "success", label: "Executable" };
     }

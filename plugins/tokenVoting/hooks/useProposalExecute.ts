@@ -1,9 +1,5 @@
 import { useEffect } from "react";
-import {
-  useWaitForTransactionReceipt,
-  useWriteContract,
-  useReadContract,
-} from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract, useReadContract } from "wagmi";
 import { TokenVotingAbi } from "../artifacts/TokenVoting.sol";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
@@ -30,8 +26,7 @@ export function useProposalExecute(proposalId: string) {
     error: executingError,
     status: executingStatus,
   } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash: executeTxHash });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: executeTxHash });
 
   const executeProposal = () => {
     if (!canExecute) return;
@@ -56,8 +51,7 @@ export function useProposalExecute(proposalId: string) {
         console.error(executingError);
         addAlert("Could not execute the proposal", {
           type: "error",
-          description:
-            "The proposal may contain actions with invalid operations",
+          description: "The proposal may contain actions with invalid operations",
         });
       }
       return;
@@ -85,8 +79,7 @@ export function useProposalExecute(proposalId: string) {
 
   return {
     executeProposal,
-    canExecute:
-      !isCanVoteError && !isCanVoteLoading && !isConfirmed && !!canExecute,
+    canExecute: !isCanVoteError && !isCanVoteLoading && !isConfirmed && !!canExecute,
     isConfirming,
     isConfirmed,
   };

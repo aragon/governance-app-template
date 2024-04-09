@@ -1,7 +1,4 @@
-import {
-  deploymentPublicClient as publicClient,
-  deploymentWalletClient as walletClient,
-} from "../lib/util/client";
+import { deploymentPublicClient as publicClient, deploymentWalletClient as walletClient } from "../lib/util/client";
 
 export async function checkDependencies() {
   const [address] = await walletClient.getAddresses();

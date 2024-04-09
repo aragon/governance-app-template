@@ -20,16 +20,12 @@ async function main() {
 
     // Deployment
     console.log("Token contracts");
-    const { daoToken, governanceErc20Base, governanceWrappedErc20Base } =
-      await deployTokenContracts();
+    const { daoToken, governanceErc20Base, governanceWrappedErc20Base } = await deployTokenContracts();
 
     console.log("\nPlugins and helpers");
     tokenVotingPluginRepo = await ensureTokenVoting();
     delegationAnnouncer = await deployDelegationAnnouncer();
-    dualGovernancePluginRepo = await deployDualGovernance(
-      governanceErc20Base,
-      governanceWrappedErc20Base
-    );
+    dualGovernancePluginRepo = await deployDualGovernance(governanceErc20Base, governanceWrappedErc20Base);
 
     const { daoAddress, subdomain, installedPlugins } = await deployDao(
       daoToken,

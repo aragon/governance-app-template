@@ -6,8 +6,7 @@ import { PUB_CHAIN, PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 export function useCanCreateProposal() {
   const { address } = useAccount();
-  const [minProposerVotingPower, setMinProposerVotingPower] =
-    useState<bigint>();
+  const [minProposerVotingPower, setMinProposerVotingPower] = useState<bigint>();
   const [votingToken, setVotingToken] = useState<Address>();
   const { data: balance } = useBalance({
     address,

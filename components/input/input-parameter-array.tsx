@@ -1,13 +1,8 @@
 import { useEffect, useState } from "react";
 import { Button, InputText } from "@aragon/ods";
-import { AbiParameter } from "viem";
+import { type AbiParameter } from "viem";
 import { decodeCamelCase } from "@/utils/case";
-import {
-  InputValue,
-  handleStringValue,
-  isValidStringValue,
-  readableTypeName,
-} from "@/utils/input-values";
+import { type InputValue, handleStringValue, isValidStringValue, readableTypeName } from "@/utils/input-values";
 
 interface IInputParameterArrayProps {
   abi: AbiParameter;
@@ -15,11 +10,7 @@ interface IInputParameterArrayProps {
   onChange: (paramIdx: number, value: InputValue) => any;
 }
 
-export const InputParameterArray = ({
-  abi,
-  idx,
-  onChange,
-}: IInputParameterArrayProps) => {
+export const InputParameterArray = ({ abi, idx, onChange }: IInputParameterArrayProps) => {
   const [value, setValue] = useState<Array<string | null>>([null]);
   const baseType = abi.type.replace(/\[\]$/, "");
 
@@ -33,9 +24,7 @@ export const InputParameterArray = ({
     newArray[i] = newVal;
     setValue(newArray);
 
-    const transformedItems = newArray.map((item) =>
-      handleStringValue(item || "", baseType)
-    );
+    const transformedItems = newArray.map((item) => handleStringValue(item ?? "", baseType));
     if (transformedItems.some((item) => item === null)) return;
 
     onChange(idx, transformedItems as InputValue[]);
@@ -48,30 +37,22 @@ export const InputParameterArray = ({
 
   return (
     <div className="mt-6">
-      <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg mb-3">
-        {abi.name ? decodeCamelCase(abi.name) : "Parameter " + (idx + 1)}
+      <p className="mb-3 text-base font-normal leading-tight text-neutral-800 md:text-lg">
+        {abi.name ? decodeCamelCase(abi.name) : `Parameter ${idx + 1}`}
       </p>
       {value.map((item, i) => (
         <div key={i} className="flex">
           <InputText
             className={i > 0 ? "mt-3" : ""}
             addon={(i + 1).toString()}
-            placeholder={
-              baseType
-                ? readableTypeName(baseType)
-                : decodeCamelCase(abi.name) || ""
-            }
-            variant={
-              item === null || isValidStringValue(item, baseType)
-                ? "default"
-                : "critical"
-            }
-            value={item || ""}
+            placeholder={baseType ? readableTypeName(baseType) : decodeCamelCase(abi.name) || ""}
+            variant={item === null || isValidStringValue(item, baseType) ? "default" : "critical"}
+            value={item ?? ""}
             onChange={(e) => onItemChange(i, e.target.value)}
           />
         </div>
       ))}
-      <div className="flex justify-end mt-3">
+      <div className="mt-3 flex justify-end">
         <Button size="sm" variant="secondary" onClick={addMore}>
           Add more {!abi.name ? "" : decodeCamelCase(abi.name).toLowerCase()}
         </Button>

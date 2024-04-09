@@ -28,6 +28,7 @@
     "@tanstack/react-query-persist-client": "^5.28.8",
     "@typescript-eslint/eslint-plugin": "latest",
     "@web3modal/wagmi": "^4.1.1",
+    "classnames": "^2.5.1",
     "dayjs": "^1.11.10",
     "dompurify": "^3.0.11",
     "ipfs-http-client": "^60.0.1",

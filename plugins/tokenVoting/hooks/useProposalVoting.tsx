@@ -26,6 +26,7 @@ export function useProposalVoting(proposalId: string) {
           timeout: 4 * 1000,
         });
       } else {
+        console.error(votingError);
         addAlert("Could not create the proposal", { type: "error" });
       }
       return;

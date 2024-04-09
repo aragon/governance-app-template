@@ -1,8 +1,8 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
-import { ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import ProposalCard from "@/plugins/lockToVote/components/proposal";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
-import { Button, CardEmptyState, IconType } from "@aragon/ods";
+import { Button, Card, EmptyState, IconType } from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/dualGovernance/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
@@ -90,36 +90,41 @@ export default function Proposals() {
         </ElseIf>
         <ElseIf condition={isConnected}>
           <SectionView>
-            <CardEmptyState
-              heading="There are no proposals yet"
-              humanIllustration={{
-                body: "VOTING",
-                expression: "SMILE",
-                hairs: "CURLY",
-              }}
-              primaryButton={{
-                label: "Submit the first one",
-                iconLeft: IconType.PLUS,
-                onClick: () => push("#/new"),
-              }}
-            />
+            <Card>
+              <EmptyState
+                className="w-full md:w-full lg:w-full xl:w-full"
+                heading="There are no proposals yet"
+                humanIllustration={{
+                  body: "VOTING",
+                  expression: "SMILE",
+                  hairs: "CURLY",
+                }}
+                primaryButton={{
+                  label: "Submit the first one",
+                  iconLeft: IconType.PLUS,
+                  onClick: () => push("#/new"),
+                }}
+              />
+            </Card>
           </SectionView>
         </ElseIf>
         <Else>
           <SectionView>
-            <CardEmptyState
-              className="w-full"
-              heading="There are no proposals yet"
-              humanIllustration={{
-                body: "VOTING",
-                expression: "SMILE",
-                hairs: "CURLY",
-              }}
-              primaryButton={{
-                label: "Connect your wallet",
-                onClick: () => open(),
-              }}
-            />
+            <Card>
+              <EmptyState
+                className="w-full md:w-full lg:w-full xl:w-full"
+                heading="There are no proposals yet"
+                humanIllustration={{
+                  body: "VOTING",
+                  expression: "SMILE",
+                  hairs: "CURLY",
+                }}
+                primaryButton={{
+                  label: "Connect your wallet",
+                  onClick: () => open(),
+                }}
+              />
+            </Card>
           </SectionView>
         </Else>
       </If>
@@ -128,7 +133,7 @@ export default function Proposals() {
 }
 
 function MainSection({ children }: { children: ReactNode }) {
-  return <main className="mt-6 flex w-screen max-w-full flex-col items-center">{children}</main>;
+  return <main className="flex w-screen max-w-full flex-col items-center pt-6">{children}</main>;
 }
 
 function SectionView({ children }: { children: ReactNode }) {

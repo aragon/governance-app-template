@@ -1,13 +1,13 @@
-import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { Avatar, Card, Link } from "@aragon/ods";
-import { useAccount, useEnsName, useEnsAvatar } from "wagmi";
-import { type Address } from "viem";
-import { formatHexString } from "@/utils/evm";
-import { normalize } from "viem/ens";
-import { createClient, http } from "viem";
-import { createConfig } from "wagmi";
-import { mainnet } from "wagmi/chains";
 import { PUB_ALCHEMY_API_KEY } from "@/constants";
+import { formatHexString } from "@/utils/evm";
+import { Avatar } from "@aragon/ods";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import classNames from "classnames";
+import Blockies from "react-blockies";
+import { createClient, http } from "viem";
+import { normalize } from "viem/ens";
+import { createConfig, useAccount, useEnsAvatar, useEnsName } from "wagmi";
+import { mainnet } from "wagmi/chains";
 
 const config = createConfig({
   chains: [mainnet],
@@ -20,34 +20,44 @@ const config = createConfig({
   },
 });
 
+// TODO: update with ODS wallet module - [https://linear.app/aragon/issue/RD-198/create-ods-walletmodule]
 const WalletContainer = () => {
-  const { address } = useAccount();
-  const result = useEnsName({
+  const { open } = useWeb3Modal();
+  const { address, isConnected } = useAccount();
+
+  const { data: ensName } = useEnsName({
     config,
     chainId: mainnet.id,
     address: address,
   });
-  const avatarResult = useEnsAvatar({
+
+  const { data: ensAvatar } = useEnsAvatar({
     config,
-    name: normalize(result.data!),
+    name: normalize(ensName!),
     chainId: mainnet.id,
     gatewayUrls: ["https://cloudflare-ipfs.com"],
+    query: { enabled: !!ensName },
   });
-  const { open } = useWeb3Modal();
 
   return (
-    <Card
-      className="
-        absolute right-0 top-0 m-2 flex cursor-pointer items-center !rounded-full border
-        border-neutral-200 px-1 py-1 hover:drop-shadow md:relative md:right-auto md:top-auto md:m-0 
-    "
+    <button
+      className={classNames(
+        "shrink-none flex h-12 items-center rounded-full border border-neutral-100 bg-neutral-0 leading-tight text-neutral-500",
+        { "px-1 md:px-0 md:pl-4 md:pr-1": isConnected },
+        { "px-4": !isConnected }
+      )}
       onClick={() => open()}
     >
-      <Link className="mx-3 !text-sm" variant="neutral">
-        {result.data ? result.data : formatHexString(address as Address)}
-      </Link>
-      <Avatar src={avatarResult.data ? avatarResult.data : "/profile.jpg"} size="md" alt="Profile picture" />
-    </Card>
+      {isConnected && address && (
+        <div className="flex items-center gap-3">
+          <span className="hidden md:block">{ensName ?? formatHexString(address)}</span>
+          {!!ensAvatar && <Avatar src={ensAvatar ?? "/profile.jpg"} alt="Profile picture" size="md" />}
+          {ensAvatar == null && <Blockies className="rounded-full" size={10} seed={address} />}
+        </div>
+      )}
+
+      {!isConnected && <span>Connect</span>}
+    </button>
   );
 };
 

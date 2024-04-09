@@ -1,12 +1,7 @@
 import { InputText } from "@aragon/ods";
-import { AbiParameter } from "viem";
+import { type AbiParameter } from "viem";
 import { decodeCamelCase } from "@/utils/case";
-import {
-  InputValue,
-  isValidStringValue,
-  handleStringValue,
-  readableTypeName,
-} from "@/utils/input-values";
+import { type InputValue, isValidStringValue, handleStringValue, readableTypeName } from "@/utils/input-values";
 import { useEffect, useState } from "react";
 
 interface IInputParameterTextProps {
@@ -15,11 +10,7 @@ interface IInputParameterTextProps {
   onChange: (paramIdx: number, value: InputValue) => any;
 }
 
-export const InputParameterText = ({
-  abi,
-  idx,
-  onChange,
-}: IInputParameterTextProps) => {
+export const InputParameterText = ({ abi, idx, onChange }: IInputParameterTextProps) => {
   const [value, setValue] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,21 +30,11 @@ export const InputParameterText = ({
   return (
     <div className="flex">
       <InputText
-        name={
-          "abi-input-" + idx + "-" + (abi.name || abi.internalType || abi.type)
-        }
-        addon={abi.name ? decodeCamelCase(abi.name) : "Parameter " + (idx + 1)}
-        placeholder={
-          abi.type
-            ? readableTypeName(abi.type)
-            : decodeCamelCase(abi.name) || ""
-        }
-        variant={
-          value === null || isValidStringValue(value, abi.type)
-            ? "default"
-            : "critical"
-        }
-        value={value || ""}
+        name={`abi-input-${idx}-${abi.name ?? abi.internalType ?? abi.type}`}
+        addon={abi.name ? decodeCamelCase(abi.name) : `Parameter ${idx + 1}`}
+        placeholder={abi.type ? readableTypeName(abi.type) : decodeCamelCase(abi.name) || ""}
+        variant={value === null || isValidStringValue(value, abi.type) ? "default" : "critical"}
+        value={value ?? ""}
         onChange={(e) => handleValue(e.target.value)}
       />
     </div>

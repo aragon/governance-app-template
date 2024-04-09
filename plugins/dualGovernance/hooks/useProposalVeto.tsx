@@ -1,9 +1,5 @@
 import { useEffect } from "react";
-import {
-  usePublicClient,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useProposal } from "./useProposal";
 import { useProposalVetoes } from "@/plugins/dualGovernance/hooks/useProposalVetoes";
 import { useUserCanVeto } from "@/plugins/dualGovernance/hooks/useUserCanVeto";
@@ -14,30 +10,13 @@ import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 export function useProposalVeto(proposalId: string) {
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
 
-  const {
-    proposal,
-    status: proposalFetchStatus,
-    refetch: refetchProposal,
-  } = useProposal(proposalId, true);
-  const vetoes = useProposalVetoes(
-    publicClient!,
-    PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-    proposalId,
-    proposal
-  );
+  const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
+  const vetoes = useProposalVetoes(publicClient!, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, proposalId, proposal);
 
   const { addAlert } = useAlerts() as AlertContextProps;
-  const {
-    writeContract: vetoWrite,
-    data: vetoTxHash,
-    error: vetoingError,
-    status: vetoingStatus,
-  } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash: vetoTxHash });
-  const { canVeto, refetch: refetchCanVeto } = useUserCanVeto(
-    BigInt(proposalId)
-  );
+  const { writeContract: vetoWrite, data: vetoTxHash, error: vetoingError, status: vetoingStatus } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: vetoTxHash });
+  const { canVeto, refetch: refetchCanVeto } = useUserCanVeto(BigInt(proposalId));
 
   useEffect(() => {
     if (vetoingStatus === "idle" || vetoingStatus === "pending") return;

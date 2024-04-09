@@ -3,9 +3,7 @@ import { useEffect, useState } from "react";
 
 export function useUrl() {
   const router = useRouter();
-  const [url, setUrl] = useState(
-    typeof window != "undefined" ? window.location.href : ""
-  );
+  const [url, setUrl] = useState(typeof window != "undefined" ? window.location.href : "");
 
   useEffect(() => {
     const urlChanged = (path: string) => {

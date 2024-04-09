@@ -38,8 +38,7 @@ export const PREPARE_INSTALLATION_ABI = [
     internalType: "struct MajorityVotingBase.VotingSettings",
     name: "votingSettings",
     type: "tuple",
-    description:
-      "The voting settings that will be enforced when proposals are created.",
+    description: "The voting settings that will be enforced when proposals are created.",
   },
   {
     components: [
@@ -54,15 +53,13 @@ export const PREPARE_INSTALLATION_ABI = [
         internalType: "string",
         name: "name",
         type: "string",
-        description:
-          "The token name. This parameter is only relevant if the token address is `address(0)`.",
+        description: "The token name. This parameter is only relevant if the token address is `address(0)`.",
       },
       {
         internalType: "string",
         name: "symbol",
         type: "string",
-        description:
-          "The token symbol. This parameter is only relevant if the token address is `address(0)`.",
+        description: "The token symbol. This parameter is only relevant if the token address is `address(0)`.",
       },
     ],
     internalType: "struct TokenVotingSetup.TokenSettings",
@@ -89,7 +86,6 @@ export const PREPARE_INSTALLATION_ABI = [
     internalType: "struct GovernanceERC20.MintSettings",
     name: "mintSettings",
     type: "tuple",
-    description:
-      "The token mint settings struct containing the `receivers` and `amounts`.",
+    description: "The token mint settings struct containing the `receivers` and `amounts`.",
   },
 ] as const;

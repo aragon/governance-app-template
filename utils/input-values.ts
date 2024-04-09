@@ -1,12 +1,6 @@
 import { decodeCamelCase } from "./case";
 
-export type InputValue =
-  | string
-  | boolean
-  | number
-  | bigint
-  | Array<InputValue>
-  | { [k: string]: InputValue };
+export type InputValue = string | boolean | number | bigint | Array<InputValue> | { [k: string]: InputValue };
 
 export function isValidStringValue(value: string, paramType: string): boolean {
   if (!value || !paramType) return false;
@@ -19,16 +13,7 @@ export function isValidStringValue(value: string, paramType: string): boolean {
     case "string":
       return typeof value === "string";
     case "bool":
-      return [
-        "True",
-        "true",
-        "Yes",
-        "yes",
-        "False",
-        "false",
-        "No",
-        "no",
-      ].includes(value);
+      return ["True", "true", "Yes", "yes", "False", "false", "No", "no"].includes(value);
   }
 
   if (paramType.match(/^bytes[0-9]{1,2}$/)) {
@@ -40,16 +25,10 @@ export function isValidStringValue(value: string, paramType: string): boolean {
   } else if (paramType.match(/^int[0-9]+$/)) {
     return /^-?[0-9]*$/.test(value);
   }
-  throw new Error(
-    "Complex types need to be checked in a higher order function. Got: " +
-      paramType
-  );
+  throw new Error("Complex types need to be checked in a higher order function. Got: " + paramType);
 }
 
-export function handleStringValue(
-  value: string,
-  paramType: string
-): InputValue | null {
+export function handleStringValue(value: string, paramType: string): InputValue | null {
   if (!isValidStringValue(value, paramType)) return null;
 
   switch (paramType) {
@@ -63,20 +42,12 @@ export function handleStringValue(
 
   if (paramType.match(/^bytes[0-9]{1,2}$/)) {
     return value;
-  } else if (
-    ["uint8", "uint16", "uint32", "int8", "int16", "int32"].includes(paramType)
-  ) {
+  } else if (["uint8", "uint16", "uint32", "int8", "int16", "int32"].includes(paramType)) {
     return parseInt(value);
-  } else if (
-    paramType.match(/^uint[0-9]+$/) ||
-    paramType.match(/^int[0-9]+$/)
-  ) {
+  } else if (paramType.match(/^uint[0-9]+$/) || paramType.match(/^int[0-9]+$/)) {
     return BigInt(value);
   }
-  throw new Error(
-    "Complex types need to be checked in a higher order function. Got: " +
-      paramType
-  );
+  throw new Error("Complex types need to be checked in a higher order function. Got: " + paramType);
 }
 
 export function readableTypeName(paramType: string): string {

@@ -1,11 +1,5 @@
 export const CloseIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className ?? ""}
-    height="24"
-    viewBox="0 0 48 48"
-    width="24"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg className={className ?? ""} height="24" viewBox="0 0 48 48" width="24" xmlns="http://www.w3.org/2000/svg">
     <path
       fill="#414C58"
       d="M38 12.83l-2.83-2.83-11.17 11.17-11.17-11.17-2.83 2.83 11.17 11.17-11.17 11.17 2.83 2.83 11.17-11.17 11.17 11.17 2.83-2.83-11.17-11.17z"

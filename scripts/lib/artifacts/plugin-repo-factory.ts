@@ -37,7 +37,7 @@ export const ABI = [
   {
     inputs: [
       {
-        internalType: "string", 
+        internalType: "string",
         name: "_subdomain",
         type: "string",
       },

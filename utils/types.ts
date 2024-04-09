@@ -16,7 +16,4 @@ export interface IAlert {
 // General types
 
 type JsonLiteral = string | number | boolean;
-export type JsonValue =
-  | JsonLiteral
-  | Record<string, JsonLiteral>
-  | Array<JsonLiteral>;
+export type JsonValue = JsonLiteral | Record<string, JsonLiteral> | Array<JsonLiteral>;

@@ -9,7 +9,7 @@ const Header = () => {
   const { open } = useWeb3Modal();
 
   return (
-    <div className="flex flex-row-reverse w-full mt-5 h-14 md:h-24">
+    <div className="mt-5 flex h-14 w-full flex-row-reverse md:h-24">
       <If condition={isConnected}>
         <Then>
           <div>

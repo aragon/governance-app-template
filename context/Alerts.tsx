@@ -16,13 +16,9 @@ export interface AlertContextProps {
   addAlert: (message: string, alertOptions?: AlertOptions) => void;
 }
 
-export const AlertContext = createContext<AlertContextProps | undefined>(
-  undefined
-);
+export const AlertContext = createContext<AlertContextProps | undefined>(undefined);
 
-export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [alerts, setAlerts] = useState<IAlert[]>([]);
   const client = usePublicClient();
 
@@ -41,10 +37,7 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
         const [prevAlert] = curAlerts.splice(idx, 1);
         clearTimeout(prevAlert.dismissTimeout);
         const timeout = alertOptions?.timeout ?? DEFAULT_ALERT_TIMEOUT;
-        prevAlert.dismissTimeout = setTimeout(
-          () => removeAlert(prevAlert.id),
-          timeout
-        );
+        prevAlert.dismissTimeout = setTimeout(() => removeAlert(prevAlert.id), timeout);
         return curAlerts.concat(prevAlert);
       });
       return;
@@ -57,14 +50,10 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
       type: alertOptions?.type ?? "info",
     };
     if (alertOptions?.txHash && client) {
-      newAlert.explorerLink =
-        client.chain.blockExplorers?.default.url + "/tx/" + alertOptions.txHash;
+      newAlert.explorerLink = client.chain.blockExplorers?.default.url + "/tx/" + alertOptions.txHash;
     }
     const timeout = alertOptions?.timeout ?? DEFAULT_ALERT_TIMEOUT;
-    newAlert.dismissTimeout = setTimeout(
-      () => removeAlert(newAlert.id),
-      timeout
-    );
+    newAlert.dismissTimeout = setTimeout(() => removeAlert(newAlert.id), timeout);
     setAlerts((curAlerts) => curAlerts.concat(newAlert));
   };
 
@@ -73,11 +62,7 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
     setAlerts((prevAlerts) => prevAlerts.filter((alert) => alert.id !== id));
   };
 
-  return (
-    <AlertContext.Provider value={{ alerts, addAlert }}>
-      {children}
-    </AlertContext.Provider>
-  );
+  return <AlertContext.Provider value={{ alerts, addAlert }}>{children}</AlertContext.Provider>;
 };
 
 export const useAlerts = () => {

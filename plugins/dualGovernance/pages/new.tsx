@@ -1,11 +1,5 @@
 import { create } from "ipfs-http-client";
-import {
-  Button,
-  IconType,
-  Icon,
-  InputText,
-  TextAreaRichText,
-} from "@aragon/ods";
+import { Button, IconType, Icon, InputText, TextAreaRichText } from "@aragon/ods";
 import React, { useEffect, useState } from "react";
 import { uploadToIPFS } from "@/utils/ipfs";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
@@ -19,12 +13,7 @@ import { getPlainText } from "@/utils/html";
 import { useRouter } from "next/router";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import {
-  PUB_IPFS_ENDPOINT,
-  PUB_IPFS_API_KEY,
-  PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-  PUB_CHAIN,
-} from "@/constants";
+import { PUB_IPFS_ENDPOINT, PUB_IPFS_API_KEY, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { ActionCard } from "@/components/actions/action";
 
 enum ActionType {
@@ -44,17 +33,9 @@ export default function Create() {
   const [summary, setSummary] = useState<string>("");
   const [actions, setActions] = useState<Action[]>([]);
   const { addAlert } = useAlerts();
-  const {
-    writeContract: createProposalWrite,
-    data: createTxHash,
-    error,
-    status,
-  } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash: createTxHash });
-  const [actionType, setActionType] = useState<ActionType>(
-    ActionType.Signaling
-  );
+  const { writeContract: createProposalWrite, data: createTxHash, error, status } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: createTxHash });
+  const [actionType, setActionType] = useState<ActionType>(ActionType.Signaling);
 
   const changeActionType = (actionType: ActionType) => {
     setActions([]);
@@ -117,8 +98,7 @@ export default function Create() {
       case ActionType.Withdrawal:
         if (!actions.length) {
           return addAlert("Invalid proposal details", {
-            description:
-              "Please ensure that the withdrawal address and the amount to transfer are valid",
+            description: "Please ensure that the withdrawal address and the amount to transfer are valid",
             type: "error",
           });
         }
@@ -126,8 +106,7 @@ export default function Create() {
       default:
         if (!actions.length || !actions[0].data || actions[0].data === "0x") {
           return addAlert("Invalid proposal details", {
-            description:
-              "Please ensure that the values of the action to execute are complete and correct",
+            description: "Please ensure that the values of the action to execute are complete and correct",
             type: "error",
           });
         }
@@ -155,11 +134,9 @@ export default function Create() {
   const showLoading = status === "pending" || isConfirming;
 
   return (
-    <section className="flex flex-col items-center w-screen max-w-full min-w-full">
-      <div className="justify-between py-5 w-full">
-        <h1 className="font-semibold text-neutral-900 text-3xl mb-10">
-          Create Proposal
-        </h1>
+    <section className="flex w-screen min-w-full max-w-full flex-col items-center">
+      <div className="w-full justify-between py-5">
+        <h1 className="mb-10 text-3xl font-semibold text-neutral-900">Create Proposal</h1>
         <div className="mb-6">
           <InputText
             className=""
@@ -181,123 +158,88 @@ export default function Create() {
           />
         </div>
         <div className="mb-6">
-          <span className="font-normal block mb-2 text-lg text-neutral-900 ">
-            Select the type of proposal
-          </span>
-          <div className="grid grid-cols-3 gap-5 h-24 mt-2">
+          <span className="mb-2 block text-lg font-normal text-neutral-900 ">Select the type of proposal</span>
+          <div className="mt-2 grid h-24 grid-cols-3 gap-5">
             <div
               onClick={() => {
                 changeActionType(ActionType.Signaling);
               }}
-              className={`rounded-xl border border-solid border-2 bg-neutral-0 hover:bg-neutral-50 flex flex-col items-center cursor-pointer ${
-                actionType === ActionType.Signaling
-                  ? "border-primary-300"
-                  : "border-neutral-100"
+              className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
+                actionType === ActionType.Signaling ? "border-primary-300" : "border-neutral-100"
               }`}
             >
               <Icon
                 className={
-                  "mt-2 p-2 !h-12 !w-10 " +
-                  (actionType === ActionType.Signaling
-                    ? "text-primary-400"
-                    : "text-neutral-400")
+                  "mt-2 !h-12 !w-10 p-2 " +
+                  (actionType === ActionType.Signaling ? "text-primary-400" : "text-neutral-400")
                 }
                 icon={IconType.INFO}
                 size="lg"
               />
-              <span className="text-sm text-neutral-400 text-center">
-                Signaling
-              </span>
+              <span className="text-center text-sm text-neutral-400">Signaling</span>
             </div>
             <div
               onClick={() => changeActionType(ActionType.Withdrawal)}
-              className={`rounded-xl border border-solid border-2 bg-neutral-0 hover:bg-neutral-50 flex flex-col items-center cursor-pointer ${
-                actionType === ActionType.Withdrawal
-                  ? "border-primary-300"
-                  : "border-neutral-100"
+              className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
+                actionType === ActionType.Withdrawal ? "border-primary-300" : "border-neutral-100"
               }`}
             >
               <Icon
                 className={
-                  "mt-2 p-2 !h-12 !w-10 " +
-                  (actionType === ActionType.Withdrawal
-                    ? "text-primary-400"
-                    : "text-neutral-400")
+                  "mt-2 !h-12 !w-10 p-2 " +
+                  (actionType === ActionType.Withdrawal ? "text-primary-400" : "text-neutral-400")
                 }
                 icon={IconType.WITHDRAW}
                 size="lg"
               />
-              <span className="text-sm text-neutral-400 text-center">
-                DAO Payment
-              </span>
+              <span className="text-center text-sm text-neutral-400">DAO Payment</span>
             </div>
             <div
               onClick={() => changeActionType(ActionType.Custom)}
-              className={`rounded-xl border border-solid border-2 bg-neutral-0 hover:bg-neutral-50 flex flex-col items-center cursor-pointer ${
-                actionType === ActionType.Custom
-                  ? "border-primary-300"
-                  : "border-neutral-100"
+              className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
+                actionType === ActionType.Custom ? "border-primary-300" : "border-neutral-100"
               }`}
             >
               <Icon
                 className={
-                  "mt-2 p-2 !h-12 !w-10 " +
-                  (actionType === ActionType.Custom
-                    ? "text-primary-400"
-                    : "text-neutral-400")
+                  "mt-2 !h-12 !w-10 p-2 " + (actionType === ActionType.Custom ? "text-primary-400" : "text-neutral-400")
                 }
                 icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
                 size="lg"
               />
-              <span className="text-sm text-neutral-400 text-center">
-                Custom action
-              </span>
+              <span className="text-center text-sm text-neutral-400">Custom action</span>
             </div>
           </div>
           <div className="mb-6">
-            {actionType === ActionType.Withdrawal && (
-              <WithdrawalInput setActions={setActions} />
-            )}
+            {actionType === ActionType.Withdrawal && <WithdrawalInput setActions={setActions} />}
             {actionType === ActionType.Custom && (
-              <FunctionCallForm
-                onAddAction={(action) => setActions(actions.concat([action]))}
-              />
+              <FunctionCallForm onAddAction={(action) => setActions(actions.concat([action]))} />
             )}
           </div>
         </div>
 
         <If condition={showLoading}>
           <Then>
-            <div className="mt-14 mb-6">
+            <div className="mb-6 mt-14">
               <PleaseWaitSpinner fullMessage="Confirming transaction..." />
             </div>
           </Then>
           <ElseIf condition={actionType !== ActionType.Custom}>
-            <Button
-              className="mt-14 mb-6"
-              size="lg"
-              variant="primary"
-              onClick={() => submitProposal()}
-            >
+            <Button className="mb-6 mt-14" size="lg" variant="primary" onClick={() => submitProposal()}>
               Submit proposal
             </Button>
           </ElseIf>
           <Else>
-            <div className="mt-14 mb-6">
+            <div className="mb-6 mt-14">
               <If not={actions.length}>
                 <Then>
                   <p>Add the first action to continue</p>
                 </Then>
                 <Else>
-                  <p className="flex-grow text-lg text-neutral-900 font-semibold pb-3">
-                    Actions
-                  </p>
+                  <p className="flex-grow pb-3 text-lg font-semibold text-neutral-900">Actions</p>
                   <div className="mb-10">
                     {actions?.map?.((action, i) => (
-                      <div
-                        className="mb-3"
-                        key={`${i}-${action.to}-${action.data}`}
-                      >
+                      <div className="mb-3" key={`${i}-${action.to}-${action.data}`}>
                         <ActionCard action={action} idx={i} />
                       </div>
                     ))}

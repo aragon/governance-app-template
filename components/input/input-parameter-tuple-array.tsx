@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { AlertInline, Button, Tag } from "@aragon/ods";
-import { AbiParameter } from "viem";
-import { InputValue } from "@/utils/input-values";
+import { type AbiParameter } from "viem";
+import { type InputValue } from "@/utils/input-values";
 import { InputParameterTuple } from "./input-parameter-tuple";
 import { decodeCamelCase } from "@/utils/case";
 import { Else, If, Then } from "../if";
@@ -12,14 +12,8 @@ interface IInputParameterTupleArrayProps {
   onChange: (paramIdx: number, value: Array<Record<string, InputValue>>) => any;
 }
 
-export const InputParameterTupleArray = ({
-  abi,
-  idx,
-  onChange,
-}: IInputParameterTupleArrayProps) => {
-  const [values, setValues] = useState<
-    Array<Record<string, InputValue> | undefined>
-  >([undefined]);
+export const InputParameterTupleArray = ({ abi, idx, onChange }: IInputParameterTupleArrayProps) => {
+  const [values, setValues] = useState<Array<Record<string, InputValue> | undefined>>([undefined]);
 
   useEffect(() => {
     // Clean up if another function is selected
@@ -51,41 +45,29 @@ export const InputParameterTupleArray = ({
           {values.map((_, i) => (
             <div key={i} className="mt-6">
               <div className="flex justify-between">
-                <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg mb-3">
-                  {abi.name
-                    ? decodeCamelCase(abi.name)
-                    : "Parameter " + (idx + 1)}
+                <p className="mb-3 text-base font-normal leading-tight text-neutral-800 md:text-lg">
+                  {abi.name ? decodeCamelCase(abi.name) : `Parameter ${idx + 1}`}
                 </p>
                 <Tag label={(i + 1).toString()} variant="primary" />
               </div>
 
-              <InputParameterTuple
-                abi={abi}
-                idx={i}
-                onChange={onItemChange}
-                hideTitle
-              />
+              <InputParameterTuple abi={abi} idx={i} onChange={onItemChange} hideTitle={true} />
             </div>
           ))}
-          <div className="flex justify-end mt-3">
+          <div className="mt-3 flex justify-end">
             <Button size="sm" variant="secondary" onClick={addMore}>
-              Add more{" "}
-              {!abi.name ? "" : decodeCamelCase(abi.name).toLowerCase()}
+              Add more {!abi.name ? "" : decodeCamelCase(abi.name).toLowerCase()}
             </Button>
           </div>
         </Then>
         <Else>
-          <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg mb-3">
-            {abi.name ? decodeCamelCase(abi.name) : "Parameter " + (idx + 1)}
+          <p className="mb-3 text-base font-normal leading-tight text-neutral-800 md:text-lg">
+            {abi.name ? decodeCamelCase(abi.name) : `Parameter ${idx + 1}`}
           </p>
           <AlertInline
-            message={
-              "Cannot display the input fields" +
-              (!abi.name
-                ? ""
-                : " for " + decodeCamelCase(abi.name).toLowerCase()) +
-              ". The function definition is incomplete."
-            }
+            message={`Cannot display the input fields${
+              !abi.name ? "" : ` for ${decodeCamelCase(abi.name).toLowerCase()}`
+            }. The function definition is incomplete.`}
             variant="critical"
           />
         </Else>

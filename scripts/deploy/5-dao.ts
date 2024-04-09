@@ -7,11 +7,8 @@ import {
   DEPLOYMENT_TARGET_CHAIN_ID,
   DEPLOYMENT_TOKEN_RECEIVERS,
 } from "./priv-constants";
-import { Address, Hex, Log, decodeEventLog, toHex } from "viem";
-import {
-  deploymentPublicClient as publicClient,
-  deploymentWalletClient as walletClient,
-} from "../lib/util/client";
+import { type Address, type Hex, type Log, decodeEventLog, toHex } from "viem";
+import { deploymentPublicClient as publicClient, deploymentWalletClient as walletClient } from "../lib/util/client";
 import { deploymentAccount as account } from "../lib/util/account";
 import { uploadToIPFS } from "@/utils/ipfs";
 import { deploymentIpfsClient as ipfsClient } from "../lib/util/ipfs";
@@ -24,11 +21,7 @@ import { encodeAbiParameters } from "viem";
 
 const EXPECTED_PLUGIN_COUNT = 2;
 
-export async function deployDao(
-  daoToken: Address,
-  tokenVotingPluginRepo: Address,
-  dualGovernancePluginRepo: Address
-) {
+export async function deployDao(daoToken: Address, tokenVotingPluginRepo: Address, dualGovernancePluginRepo: Address) {
   const daoFactoryAddr = getDaoFactoryAddress();
 
   console.log("\nUsing the DAO factory at", daoFactoryAddr);
@@ -54,13 +47,11 @@ export async function deployDao(
   });
   const hash = await walletClient.writeContract(request);
 
-  console.log("  - Waiting for transaction (" + hash + ")");
+  console.log(`  - Waiting for transaction (${hash})`);
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash });
   if (!receipt) {
-    throw new Error(
-      "The Dual Governance plugin repository could not be created"
-    );
+    throw new Error("The Dual Governance plugin repository could not be created");
   }
 
   const { daoAddress, subdomain } = resolveDaoRegisteredEvent(receipt.logs);
@@ -94,32 +85,26 @@ function pinDaoMetadata(): Promise<Hex> {
     });
 }
 
-function getTokenVotingInstallSettings(
-  daoToken: Address,
-  tokenVotingPluginRepo: Address
-): PluginInstallSettings {
+function getTokenVotingInstallSettings(daoToken: Address, tokenVotingPluginRepo: Address): PluginInstallSettings {
   // Encode prepareInstallation(_, data)
-  const encodedPrepareInstallationData = encodeAbiParameters(
-    TokenVotingPrepareInstallationAbi,
-    [
-      {
-        minDuration: BigInt(60 * 60 * 24 * 3),
-        minParticipation: 100_000, // 10%
-        minProposerVotingPower: BigInt(0), // 0 tokens
-        supportThreshold: 500_000, // 50%
-        votingMode: 1, // Standard, EarlyExecution, VoteReplacement
-      },
-      {
-        name: "",
-        symbol: "",
-        token: daoToken,
-      },
-      {
-        amounts: [],
-        receivers: [],
-      },
-    ]
-  );
+  const encodedPrepareInstallationData = encodeAbiParameters(TokenVotingPrepareInstallationAbi, [
+    {
+      minDuration: BigInt(60 * 60 * 24 * 3),
+      minParticipation: 100_000, // 10%
+      minProposerVotingPower: BigInt(0), // 0 tokens
+      supportThreshold: 500_000, // 50%
+      votingMode: 1, // Standard, EarlyExecution, VoteReplacement
+    },
+    {
+      name: "",
+      symbol: "",
+      token: daoToken,
+    },
+    {
+      amounts: [],
+      receivers: [],
+    },
+  ]);
 
   return {
     data: encodedPrepareInstallationData,
@@ -133,25 +118,19 @@ function getTokenVotingInstallSettings(
   };
 }
 
-function getDualGovernanceInstallSettings(
-  daoToken: Address,
-  dualGovernancePluginRepo: Address
-): PluginInstallSettings {
+function getDualGovernanceInstallSettings(daoToken: Address, dualGovernancePluginRepo: Address): PluginInstallSettings {
   const creatorAddresses = DEPLOYMENT_TOKEN_RECEIVERS;
 
-  const encodedPrepareInstallationData = encodeAbiParameters(
-    DualGovernancePrepareInstallationAbi,
-    [
-      {
-        minDuration: BigInt(60 * 60 * 24 * 6),
-        minProposerVotingPower: BigInt(0),
-        minVetoRatio: 200_000,
-      },
-      { token: daoToken, name: "", symbol: "" },
-      { receivers: [], amounts: [] },
-      creatorAddresses,
-    ]
-  );
+  const encodedPrepareInstallationData = encodeAbiParameters(DualGovernancePrepareInstallationAbi, [
+    {
+      minDuration: BigInt(60 * 60 * 24 * 6),
+      minProposerVotingPower: BigInt(0),
+      minVetoRatio: 200_000,
+    },
+    { token: daoToken, name: "", symbol: "" },
+    { receivers: [], amounts: [] },
+    creatorAddresses,
+  ]);
 
   return {
     data: encodedPrepareInstallationData,
@@ -167,19 +146,12 @@ function getDualGovernanceInstallSettings(
 
 function getDaoFactoryAddress(): Address {
   if (!contracts[DEPLOYMENT_TARGET_CHAIN_ID]) {
-    throw new Error(
-      "The DAO Factory address is not available for " +
-        DEPLOYMENT_TARGET_CHAIN_ID
-    );
+    throw new Error(`The DAO Factory address is not available for ${DEPLOYMENT_TARGET_CHAIN_ID}`);
   }
 
-  const result =
-    contracts[DEPLOYMENT_TARGET_CHAIN_ID]["v1.3.0"]?.DAOFactory.address;
+  const result = contracts[DEPLOYMENT_TARGET_CHAIN_ID]["v1.3.0"]?.DAOFactory.address;
   if (!result) {
-    throw new Error(
-      "The DAO Factory address is not available for " +
-        DEPLOYMENT_TARGET_CHAIN_ID
-    );
+    throw new Error(`The DAO Factory address is not available for ${DEPLOYMENT_TARGET_CHAIN_ID}`);
   }
   return result as Address;
 }
@@ -197,13 +169,13 @@ function resolveDaoRegisteredEvent(logs: Log<bigint, number, false>[]) {
           strict: false,
         })
       );
-    } catch (err) {}
+    } catch (err) {
+      /* empty */
+    }
   }
 
   // Search for DAORegistered(dao, creator, subdomain)
-  const creationEvent = decodedEvents.find(
-    (e) => e.eventName === "DAORegistered"
-  );
+  const creationEvent = decodedEvents.find((e) => e.eventName === "DAORegistered");
   if (!creationEvent) {
     throw new Error("The DAO couldn't be deployed");
   }
@@ -227,13 +199,13 @@ function resolveInstallationAppliedEvent(logs: Log<bigint, number, false>[]) {
           strict: false,
         })
       );
-    } catch (err) {}
+    } catch (err) {
+      /* empty */
+    }
   }
 
   // Search for InstallationApplied(dao, plugin, setupId, appliedSetupId)
-  const installEvents = decodedEvents.filter(
-    (e) => e.eventName === "InstallationApplied"
-  );
+  const installEvents = decodedEvents.filter((e) => e.eventName === "InstallationApplied");
   if (installEvents.length !== EXPECTED_PLUGIN_COUNT) {
     throw new Error("The DAO plugins couldn't be installed");
   }

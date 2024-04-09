@@ -1,21 +1,14 @@
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { ElseIf, If, Then } from "@/components/if";
 import { InputText, Tag } from "@aragon/ods";
 import { AddressText } from "@/components/text/address";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { Action } from "@/utils/types";
+import { type Action } from "@/utils/types";
 import { useAction } from "@/hooks/useAction";
-import {
-  AbiFunction,
-  AbiParameter,
-  Address,
-  Hex,
-  formatEther,
-  toFunctionSignature,
-} from "viem";
+import { type AbiFunction, type AbiParameter, type Address, type Hex, formatEther, toFunctionSignature } from "viem";
 import { compactNumber } from "@/utils/numbers";
 import { decodeCamelCase } from "@/utils/case";
-import { InputValue } from "@/utils/input-values";
+import { type InputValue } from "@/utils/input-values";
 
 type ActionCardProps = {
   action: Action;
@@ -39,8 +32,8 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
   if (isEthTransfer) {
     return (
       <Card>
-        <div className="w-full flex flex-row space-x-10 justify-between">
-          <div className="w-full flex flex-row space-x-10">
+        <div className="flex w-full flex-row justify-between space-x-10">
+          <div className="flex w-full flex-row space-x-10">
             <div>
               <h3 className="font-semibold">Recipient</h3>
               <p>
@@ -58,15 +51,13 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
     );
   }
 
-  const functionSignature = functionAbi
-    ? toFunctionSignature(functionAbi).replace(/,/g, ", ")
-    : "";
+  const functionSignature = functionAbi ? toFunctionSignature(functionAbi).replace(/,/g, ", ") : "";
 
   return (
     <Card>
-      <div className="w-full flex flex-row space-x-10 justify-between">
+      <div className="flex w-full flex-row justify-between space-x-10">
         <div>
-          <div className="w-full flex flex-row space-x-10">
+          <div className="flex w-full flex-row space-x-10">
             <div>
               <h3 className="font-semibold">Contract</h3>
               <p>
@@ -76,7 +67,7 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
             <If condition={!isLoading && functionName}>
               <div>
                 <h3 className="font-semibold">Action</h3>
-                <p className="text-sm text-ellipsis">
+                <p className="text-ellipsis text-sm">
                   <code>{functionSignature}</code>
                 </p>
               </div>
@@ -85,10 +76,7 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
               <div>
                 <h3 className="font-semibold">Transfer</h3>
                 <p>
-                  <span className="font-semibold">
-                    {compactNumber(formatEther(action.value))}
-                  </span>{" "}
-                  ETH{" "}
+                  <span className="font-semibold">{compactNumber(formatEther(action.value))}</span> ETH{" "}
                 </p>
               </div>
             </If>
@@ -106,14 +94,9 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
           <div className="mt-3">
             <div>
               <h3 className="font-semibold">Action parameters</h3>
-              <div className="grid gap-3 mt-3">
+              <div className="mt-3 grid gap-3">
                 {args.map((arg, i) => (
-                  <CallParameterField
-                    value={arg}
-                    idx={i}
-                    key={i}
-                    functionAbi={functionAbi}
-                  />
+                  <CallParameterField value={arg} idx={i} key={i} functionAbi={functionAbi} />
                 ))}
               </div>
             </div>
@@ -130,10 +113,10 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
 const Card = function ({ children }: { children: ReactNode }) {
   return (
     <div
-      className="p-4 lg:p-6 w-full flex flex-col space-y-6
-      box-border border border-neutral-100
-      focus:outline-none focus:ring focus:ring-primary
-      bg-neutral-0 rounded-xl"
+      className="box-border flex w-full flex-col space-y-6 rounded-xl
+      border border-neutral-100 bg-neutral-0
+      p-4 focus:outline-none focus:ring
+      focus:ring-primary lg:p-6"
     >
       {children}
     </div>
@@ -151,27 +134,20 @@ const CallParameterField = ({
 }) => {
   if (functionAbi?.type !== "function") return <></>;
 
-  const addon = resolveAddon(
-    functionAbi.inputs?.[idx].name ?? "",
-    functionAbi.inputs?.[idx].type,
-    idx
-  );
+  const addon = resolveAddon(functionAbi.inputs?.[idx].name ?? "", functionAbi.inputs?.[idx].type, idx);
 
   return (
     <InputText
       className="w-full"
       addon={decodeCamelCase(addon)}
       value={resolveValue(value, functionAbi.inputs?.[idx])}
-      readOnly
+      readOnly={true}
       addonPosition="left"
     />
   );
 };
 
-function resolveValue(
-  value: CallParameterFieldType,
-  abi?: AbiParameter
-): string {
+function resolveValue(value: CallParameterFieldType, abi?: AbiParameter): string {
   if (!abi?.type) {
     if (Array.isArray(value)) return value.join(", ");
     return value.toString();
@@ -179,9 +155,7 @@ function resolveValue(
     const abiClone = Object.assign({}, { ...abi });
     abiClone.type = abiClone.type.replace(/\[\]$/, "");
 
-    const items = (value as any as any[]).map((item) =>
-      resolveValue(item, abiClone)
-    );
+    const items = (value as any as any[]).map((item) => resolveValue(item, abiClone));
     return items.join(", ");
   } else if (abi.type === "tuple") {
     const result = {} as Record<string, string>;
@@ -207,11 +181,7 @@ function resolveValue(
   return value.toString();
 }
 
-function resolveAddon(
-  name: string,
-  abiType: string | undefined,
-  idx: number
-): string {
+function resolveAddon(name: string, abiType: string | undefined, idx: number): string {
   if (name) return name;
   else if (abiType) {
     if (abiType === "address") {
@@ -232,7 +202,7 @@ function resolveAddon(
 }
 
 function getReadableJson(value: Record<string, InputValue>): string {
-  const items = Object.keys(value).map((k) => k + ": " + value[k]);
+  const items = Object.keys(value).map((k) => `${k}: ${value[k]}`);
 
-  return "{ " + items.join(", ") + " }";
+  return `{ ${items.join(", ")} }`;
 }

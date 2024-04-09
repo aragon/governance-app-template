@@ -1,10 +1,5 @@
 import { useEffect } from "react";
-import {
-  useAccount,
-  useReadContract,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
@@ -32,8 +27,7 @@ export function useProposalClaimLock(proposalId: string) {
     error: executingError,
     status: claimingStatus,
   } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash: executeTxHash });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: executeTxHash });
 
   const claimLockProposal = () => {
     if (hasClaimed) return;
@@ -59,8 +53,7 @@ export function useProposalClaimLock(proposalId: string) {
         console.error(executingError);
         addAlert("Could not claim locked tokens", {
           type: "error",
-          description:
-            "The proposal may contain actions with invalid operations. Please get in contact with us.",
+          description: "The proposal may contain actions with invalid operations. Please get in contact with us.",
         });
       }
       return;

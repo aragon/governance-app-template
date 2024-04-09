@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { AbiParameter } from "viem";
+import { type AbiParameter } from "viem";
 import { decodeCamelCase } from "@/utils/case";
 import { InputParameter } from "./input-parameter";
-import { InputValue } from "@/utils/input-values";
+import { type InputValue } from "@/utils/input-values";
 import { Else, If, Then } from "../if";
 import { AlertInline } from "@aragon/ods";
 
@@ -13,12 +13,7 @@ interface IInputParameterTupleProps {
   hideTitle?: boolean;
 }
 
-export const InputParameterTuple = ({
-  abi,
-  idx,
-  onChange,
-  hideTitle,
-}: IInputParameterTupleProps) => {
+export const InputParameterTuple = ({ abi, idx, onChange, hideTitle }: IInputParameterTupleProps) => {
   const [values, setValues] = useState<Array<InputValue | undefined>>([]);
 
   useEffect(() => {
@@ -50,8 +45,8 @@ export const InputParameterTuple = ({
   return (
     <div>
       <If not={hideTitle}>
-        <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg mb-3">
-          {abi.name ? decodeCamelCase(abi.name) : "Parameter " + (idx + 1)}
+        <p className="mb-3 text-base font-normal leading-tight text-neutral-800 md:text-lg">
+          {abi.name ? decodeCamelCase(abi.name) : `Parameter ${idx + 1}`}
         </p>
       </If>
 
@@ -67,13 +62,9 @@ export const InputParameterTuple = ({
         </Then>
         <Else>
           <AlertInline
-            message={
-              "Cannot display the input fields" +
-              (!abi.name
-                ? ""
-                : " for " + decodeCamelCase(abi.name).toLowerCase()) +
-              ". The function definition is incomplete."
-            }
+            message={`Cannot display the input fields${
+              !abi.name ? "" : ` for ${decodeCamelCase(abi.name).toLowerCase()}`
+            }. The function definition is incomplete.`}
             variant="critical"
           />
         </Else>

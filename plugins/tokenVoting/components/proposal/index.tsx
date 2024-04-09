@@ -7,8 +7,7 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import { If } from "@/components/if";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
-const DEFAULT_PROPOSAL_METADATA_SUMMARY =
-  "(The metadata of the proposal is not available)";
+const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(The metadata of the proposal is not available)";
 
 type ProposalInputs = {
   proposalId: bigint;
@@ -22,9 +21,9 @@ export default function ProposalCard(props: ProposalInputs) {
 
   if (!proposal || showLoading) {
     return (
-      <section className="w-full mb-4">
+      <section className="mb-4 w-full">
         <Card className="p-4">
-          <span className="px-4 py-5 xs:px-10 md:px-6 lg:px-7">
+          <span className="xs:px-10 px-4 py-5 md:px-6 lg:px-7">
             <PleaseWaitSpinner fullMessage="Loading proposal..." />
           </span>
         </Card>
@@ -33,9 +32,9 @@ export default function ProposalCard(props: ProposalInputs) {
   } else if (!proposal?.title && !proposal?.summary) {
     // We have the proposal but no metadata yet
     return (
-      <Link href={`#/proposals/${props.proposalId}`} className="w-full mb-4">
+      <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full">
         <Card className="p-4">
-          <span className="px-4 py-5 xs:px-10 md:px-6 lg:px-7">
+          <span className="xs:px-10 px-4 py-5 md:px-6 lg:px-7">
             <PleaseWaitSpinner fullMessage="Loading metadata..." />
           </span>
         </Card>
@@ -43,44 +42,39 @@ export default function ProposalCard(props: ProposalInputs) {
     );
   } else if (status.metadataReady && !proposal?.title) {
     return (
-      <Link href={`#/proposals/${props.proposalId}`} className="w-full mb-4">
+      <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full">
         <Card className="p-4">
-          <div className="md:w-7/12 lg:w-3/4 xl:4/5 pr-4 text-nowrap text-ellipsis overflow-hidden">
-            <h4 className="mb-1 text-lg text-neutral-300 line-clamp-1">
+          <div className="xl:4/5 overflow-hidden text-ellipsis text-nowrap pr-4 md:w-7/12 lg:w-3/4">
+            <h4 className="mb-1 line-clamp-1 text-lg text-neutral-300">
               {Number(props.proposalId) + 1} - {DEFAULT_PROPOSAL_METADATA_TITLE}
             </h4>
-            <p className="text-base text-neutral-300 line-clamp-3">
-              {DEFAULT_PROPOSAL_METADATA_SUMMARY}
-            </p>
+            <p className="line-clamp-3 text-base text-neutral-300">{DEFAULT_PROPOSAL_METADATA_SUMMARY}</p>
           </div>
         </Card>
       </Link>
     );
   }
 
-  const { variant: statusVariant, label: statusLabel } =
-    getProposalStatusVariant(proposal, props.tokenSupply);
+  const { variant: statusVariant, label: statusLabel } = getProposalStatusVariant(proposal, props.tokenSupply);
 
   return (
     <Link href={`#/proposals/${props.proposalId}`} className="w-full">
-      <Card className="w-full mb-4 p-5">
+      <Card className="mb-4 w-full p-5">
         <div className="w-full">
           <If condition={proposal.tally}>
-            <div className="flex mb-2">
+            <div className="mb-2 flex">
               <Tag variant={statusVariant as any} label={statusLabel} />
             </div>
           </If>
 
-          <div className="text-ellipsis overflow-hidden">
-            <h4 className=" mb-1 text-lg font-semibold text-dark line-clamp-1">
+          <div className="overflow-hidden text-ellipsis">
+            <h4 className=" text-dark mb-1 line-clamp-1 text-lg font-semibold">
               {Number(props.proposalId) + 1} - {proposal.title}
             </h4>
             <div
-              className="text-ellipsis overflow-hidden box line-clamp-2"
+              className="box line-clamp-2 overflow-hidden text-ellipsis"
               dangerouslySetInnerHTML={{
-                __html: proposal.summary
-                  ? DOMPurify.sanitize(proposal.summary)
-                  : DEFAULT_PROPOSAL_METADATA_SUMMARY,
+                __html: proposal.summary ? DOMPurify.sanitize(proposal.summary) : DEFAULT_PROPOSAL_METADATA_SUMMARY,
               }}
             />
           </div>

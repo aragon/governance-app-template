@@ -19,10 +19,7 @@ export function digestPagination(proposalCount: number, page: number) {
   }
 
   const showPrev = page > 0;
-  const showNext =
-    (visibleProposalIds.length &&
-      visibleProposalIds[visibleProposalIds.length - 1] > 0) ||
-    false;
+  const showNext = (visibleProposalIds.length && visibleProposalIds[visibleProposalIds.length - 1] > 0) || false;
 
   return {
     visibleProposalIds,

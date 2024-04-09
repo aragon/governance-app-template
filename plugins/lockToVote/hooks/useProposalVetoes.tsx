@@ -2,11 +2,7 @@ import { useState, useEffect } from "react";
 import { Address, getAbiItem } from "viem";
 import { PublicClient } from "viem";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/lockToVote/artifacts/OptimisticTokenVotingPlugin.sol";
-import {
-  Proposal,
-  VetoCastEvent,
-  VoteCastResponse,
-} from "@/plugins/lockToVote/utils/types";
+import { Proposal, VetoCastEvent, VoteCastResponse } from "@/plugins/lockToVote/utils/types";
 
 const event = getAbiItem({
   abi: OptimisticTokenVotingPluginAbi,

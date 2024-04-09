@@ -1,11 +1,6 @@
 import { Address, keccak256, toHex } from "viem";
 import { useState, useEffect } from "react";
-import {
-  useBalance,
-  useAccount,
-  useReadContracts,
-  useReadContract,
-} from "wagmi";
+import { useBalance, useAccount, useReadContracts, useReadContract } from "wagmi";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { DaoAbi } from "@/artifacts/DAO.sol";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
@@ -13,11 +8,10 @@ import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 export function useCanCreateProposal() {
   const { address } = useAccount();
 
-  const [minProposerVotingPower, setMinProposerVotingPower] =
-    useState<bigint>();
-    const [votingToken, setVotingToken] = useState<Address>();
-    const [daoAddress, setDaoAddress] = useState<Address>();
-    const [hasCreatePermission, setHasCreatePermission] = useState(false);
+  const [minProposerVotingPower, setMinProposerVotingPower] = useState<bigint>();
+  const [votingToken, setVotingToken] = useState<Address>();
+  const [daoAddress, setDaoAddress] = useState<Address>();
+  const [hasCreatePermission, setHasCreatePermission] = useState(false);
   const { data: balance } = useBalance({
     address,
     token: votingToken,
@@ -62,12 +56,7 @@ export function useCanCreateProposal() {
     abi: DaoAbi,
     functionName: "hasPermission",
     // where, who, permissionId, data
-    args: [
-      PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-      address,
-      keccak256(toHex("PROPOSER_PERMISSION")),
-      "0x",
-    ],
+    args: [PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, address, keccak256(toHex("PROPOSER_PERMISSION")), "0x"],
     query: {
       enabled: !!daoAddress && !!address,
     },
@@ -79,11 +68,7 @@ export function useCanCreateProposal() {
     setMinProposerVotingPower(contractReads[0].result as bigint);
     setVotingToken(contractReads[1].result as Address);
     setDaoAddress(contractReads[2].result as Address);
-  }, [
-    contractReads?.[0]?.status,
-    contractReads?.[1]?.status,
-    contractReads?.[2]?.status,
-  ]);
+  }, [contractReads?.[0]?.status, contractReads?.[1]?.status, contractReads?.[2]?.status]);
 
   useEffect(() => {
     setHasCreatePermission(!!hasCreatePermissionData);

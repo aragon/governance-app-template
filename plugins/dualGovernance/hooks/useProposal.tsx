@@ -3,11 +3,7 @@ import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { Hex, fromHex, getAbiItem } from "viem";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { Action } from "@/utils/types";
-import {
-  Proposal,
-  ProposalMetadata,
-  ProposalParameters,
-} from "@/plugins/dualGovernance/utils/types";
+import { Proposal, ProposalMetadata, ProposalParameters } from "@/plugins/dualGovernance/utils/types";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 
@@ -30,8 +26,7 @@ const ProposalCreatedEvent = getAbiItem({
 
 export function useProposal(proposalId: string, autoRefresh = false) {
   const publicClient = usePublicClient();
-  const [proposalCreationEvent, setProposalCreationEvent] =
-    useState<ProposalCreatedLogResponse["args"]>();
+  const [proposalCreationEvent, setProposalCreationEvent] = useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
@@ -41,11 +36,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     error: proposalError,
     fetchStatus: proposalFetchStatus,
     refetch: proposalRefetch,
-  } = useReadContract<
-    typeof OptimisticTokenVotingPluginAbi,
-    "getProposal",
-    any[]
-  >({
+  } = useReadContract<typeof OptimisticTokenVotingPluginAbi, "getProposal", any[]>({
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     abi: OptimisticTokenVotingPluginAbi,
     functionName: "getProposal",
@@ -92,11 +83,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     error: metadataError,
   } = useMetadata<ProposalMetadata>(metadataUri);
 
-  const proposal = arrangeProposalData(
-    proposalData,
-    proposalCreationEvent,
-    metadataContent
-  );
+  const proposal = arrangeProposalData(proposalData, proposalCreationEvent, metadataContent);
 
   return {
     proposal,

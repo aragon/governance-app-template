@@ -1,7 +1,4 @@
-export function compactNumber(
-  input: number | string,
-  decimalPlaces: number = 2
-): string {
+export function compactNumber(input: number | string, decimalPlaces: number = 2): string {
   const num = typeof input === "string" ? parseFloat(input) : input;
 
   if (isNaN(num)) return "-";

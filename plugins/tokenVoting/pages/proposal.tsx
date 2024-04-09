@@ -23,21 +23,10 @@ type BottomSection = "description" | "votes";
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const skipRender = useSkipFirstRender();
 
-  const { proposal, status: proposalFetchStatus } = useProposal(
-    proposalId,
-    true
-  );
+  const { proposal, status: proposalFetchStatus } = useProposal(proposalId, true);
   const { tokenSupply } = useVotingToken();
-  const {
-    voteProposal,
-    votingStatus,
-    isConfirming: isVoteConfirming,
-  } = useProposalVoting(proposalId);
-  const {
-    canExecute,
-    executeProposal,
-    isConfirming: isExecuteConfirming,
-  } = useProposalExecute(proposalId);
+  const { voteProposal, votingStatus, isConfirming: isVoteConfirming } = useProposalVoting(proposalId);
+  const { canExecute, executeProposal, isConfirming: isExecuteConfirming } = useProposalExecute(proposalId);
   const votes = useProposalVoteList(proposalId, proposal);
   const userCanVote = useUserCanVote(BigInt(proposalId));
   const [votingPercentages, setVotingPercentages] = useState({
@@ -45,8 +34,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     no: 0,
     abstain: 0,
   });
-  const [bottomSection, setBottomSection] =
-    useState<BottomSection>("description");
+  const [bottomSection, setBottomSection] = useState<BottomSection>("description");
   const [votedOption, setVotedOption] = useState<number | undefined>(undefined);
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [selectedVoteOption, setSelectedVoteOption] = useState<number>();
@@ -64,9 +52,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
 
     const yesVotes = Number(formatUnits(proposal.tally.yes || BigInt(0), 18));
     const noVotes = Number(formatUnits(proposal.tally.no || BigInt(0), 18));
-    const abstainVotes = Number(
-      formatUnits(proposal.tally.abstain || BigInt(0), 18)
-    );
+    const abstainVotes = Number(formatUnits(proposal.tally.abstain || BigInt(0), 18));
     const totalVotes = yesVotes + noVotes + abstainVotes;
 
     setVotingPercentages({
@@ -90,24 +76,20 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     setShowVotingModal(false);
   };
 
-  const showProposalLoading = getShowProposalLoading(
-    proposal,
-    proposalFetchStatus
-  );
-  const showTransactionConfirming =
-    votingStatus === "pending" || isVoteConfirming || isExecuteConfirming;
+  const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
+  const showTransactionConfirming = votingStatus === "pending" || isVoteConfirming || isExecuteConfirming;
 
   if (skipRender || !proposal || showProposalLoading) {
     return (
-      <section className="flex justify-left items-left w-screen max-w-full min-w-full">
+      <section className="justify-left items-left flex w-screen min-w-full max-w-full">
         <PleaseWaitSpinner />
       </section>
     );
   }
 
   return (
-    <section className="flex flex-col items-center w-screen max-w-full min-w-full">
-      <div className="flex justify-between py-5 w-full">
+    <section className="flex w-screen min-w-full max-w-full flex-col items-center">
+      <div className="flex w-full justify-between py-5">
         <ProposalHeader
           proposalNumber={Number(proposalId) + 1}
           proposal={proposal}
@@ -121,7 +103,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         />
       </div>
 
-      <div className="grid xl:grid-cols-3 lg:grid-cols-2 my-10 gap-10 w-full">
+      <div className="my-10 grid w-full gap-10 lg:grid-cols-2 xl:grid-cols-3">
         <VoteTally
           voteType="Yes"
           voteCount={proposal?.tally?.yes}
@@ -146,18 +128,16 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           snapshotBlock={proposal?.parameters?.snapshotBlock}
         />
       </div>
-      <div className="py-12 w-full">
-        <div className="flex flex-row space-between">
-          <h2 className="flex-grow text-3xl text-neutral-900 font-semibold">
+      <div className="w-full py-12">
+        <div className="space-between flex flex-row">
+          <h2 className="flex-grow text-3xl font-semibold text-neutral-900">
             {bottomSection === "description" ? "Description" : "Votes"}
           </h2>
           <ToggleGroup
             className="justify-end"
             value={bottomSection}
             isMultiSelect={false}
-            onChange={(val: string | undefined) =>
-              val ? setBottomSection(val as BottomSection) : ""
-            }
+            onChange={(val: string | undefined) => (val ? setBottomSection(val as BottomSection) : "")}
           >
             <Toggle label="Description" value="description" />
             <Toggle label="Votes" value="votes" />
@@ -175,10 +155,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       </div>
 
       <If condition={showVotingModal}>
-        <VotingModal
-          onDismissModal={onDismissModal}
-          selectedVote={onSelectVoteOption}
-        />
+        <VotingModal onDismissModal={onDismissModal} selectedVote={onSelectVoteOption} />
       </If>
     </section>
   );

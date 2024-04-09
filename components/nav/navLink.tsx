@@ -15,7 +15,7 @@ export const NavLink: React.FC<INavLinkProps> = (props) => {
   const { pathname, query } = useRouter();
   const pluginId = resolvePluginId(pathname, query);
 
-  const isHome = pathname === "/";
+  const isHome = path === "/";
   const isPluginPathname = pathname === "/plugins/[id]";
 
   let selected;

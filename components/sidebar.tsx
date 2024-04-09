@@ -1,9 +1,11 @@
+'use client';
+
 import Image from "next/image";
 import Link from "next/link";
 import { Icon, IconType, Button } from "@aragon/ods";
-import { useRouter } from "next/router";
+import { useSearchParams, usePathname, ReadonlyURLSearchParams } from "next/navigation";
 import { useState } from "react";
-import { plugins } from "@/plugins";
+import { plugins } from "@/components/sidebar-routes";
 import { ParsedUrlQuery } from "querystring";
 import { resolveQueryParam } from "@/utils/query";
 import { PUB_DISCORD_URL } from "@/constants";
@@ -11,7 +13,11 @@ import { Else, If, Then } from "./if";
 import { CloseIcon, MenuIcon } from "./icons";
 
 const Sidebar = () => {
-  const { pathname, query } = useRouter();
+  const query = useSearchParams();
+  const pathname = usePathname();
+  if (!pathname) return null;
+  if (!query) return null;
+  
   const isHome = pathname === "/";
   const pluginId = resolvePluginId(pathname, query);
   const [isOpen, setIsOpen] = useState(false);
@@ -125,7 +131,7 @@ const MenuList = ({
           } rounded-lg shadow-lg hover:bg-neutral-100 md:hover:bg-neutral-200`}
         >
           <Link
-            href={"/plugins/" + plugin.id + "/#/"}
+            href={"/plugins/" + plugin.id}
             className="flex items-center focus:outline-none focus:ring-2 focus:ring-white w-full p-3"
           >
             <Icon
@@ -188,11 +194,13 @@ const PoweredByAragon = () => {
 
 function resolvePluginId(
   pathname: string,
-  queryParams: ParsedUrlQuery
+  queryParams: ReadonlyURLSearchParams
 ): string | null {
   if (pathname !== "/plugins/[id]") return null;
 
-  return resolveQueryParam(queryParams.id) || null;
+  const pluginId = queryParams.get("id");
+
+  return pluginId;
 }
 
 export default Sidebar;

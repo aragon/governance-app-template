@@ -1,3 +1,5 @@
+'use client';
+
 import { FC } from "react";
 import { useAlerts } from "@/context/Alerts";
 import { AlertCard, AlertVariant, Icon, IconType } from "@aragon/ods";

@@ -1,4 +1,5 @@
-import { http, createConfig } from "wagmi";
+import { http, createConfig, cookieStorage, 
+  createStorage  } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { walletConnect } from "wagmi/connectors";
 import {
@@ -22,6 +23,9 @@ const metadata = {
 export const config = createConfig({
   chains: [PUB_CHAIN],
   ssr: true,
+  storage: createStorage({  
+    storage: cookieStorage, 
+  }),
   transports: {
     [PUB_CHAIN.id]: http(PUB_WEB3_ENDPOINT, { batch: true }),
   },

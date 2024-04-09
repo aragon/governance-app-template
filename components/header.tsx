@@ -1,3 +1,5 @@
+'use client';
+
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Button } from "@aragon/ods";
 import { useAccount } from "wagmi";

@@ -3,15 +3,21 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { type ParsedUrlQuery } from "querystring";
 import { resolveQueryParam } from "@/utils/query";
+import { Icon, type IconType } from "@aragon/ods";
 
-interface INavLinkProps {
-  id: string;
-  label: string;
+export interface INavLink {
   path: string;
+  id: string;
+  name: string;
+  icon?: IconType;
+}
+
+interface INavLinkProps extends INavLink {
+  onClick?: () => void;
 }
 
 export const NavLink: React.FC<INavLinkProps> = (props) => {
-  const { id, label, path } = props;
+  const { icon, id, name, path, onClick } = props;
   const { pathname, query } = useRouter();
   const pluginId = resolvePluginId(pathname, query);
 
@@ -31,22 +37,50 @@ export const NavLink: React.FC<INavLinkProps> = (props) => {
     selected = pathname.startsWith(path);
   }
 
+  const containerClasses = classNames(
+    "group relative md:-mb-0.25 md:border-b md:hover:border-b-neutral-800", // base styles
+    {
+      "md:border-b-transparent md:active:border-b-primary-400": !selected, // unselected link styles
+      "md:border-b-primary-400 md:hover:border-b-primary-400": selected, // base selected link styles
+
+      // using after so that the size of the links don't change when one is selected and active
+      "md:after:bg-primary-400 md:after:content-[attr(aria-current)] md:active:after:hidden": selected,
+      "md:after:absolute md:after:-bottom-0 md:after:left-0 md:after:right-0 md:after:h-[1px]": selected,
+    }
+  );
+
+  const anchorClasses = classNames(
+    "w-full py-3", // base styles
+    "group-hover:text-neutral-800", // hover styles
+    "outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset", // focus styles
+    "flex h-12 flex-1 items-center justify-between gap-3 rounded-xl px-4 leading-tight", // mobile styles
+    "md:h-11 md:rounded-none md:px-0 md:leading-normal", // desktop nav styles
+    {
+      "bg-neutral-50 md:bg-neutral-0": selected,
+    }
+  );
+
   return (
-    <Link href={path} aria-current={selected ? "page" : undefined}>
-      <div
-        className={classNames("py-3", {
-          "border-b-2 border-b-primary-400": selected,
-        })}
-      >
+    <li key={id} className={containerClasses}>
+      <Link href={path} onClick={onClick} aria-current={selected ? "page" : undefined} className={anchorClasses}>
+        {icon != null && (
+          <Icon
+            icon={icon}
+            size="md"
+            className={classNames("text-neutral-300 lg:hidden", {
+              "text-neutral-800": selected,
+            })}
+          />
+        )}
         <span
-          className={classNames("text-neutral-500", {
+          className={classNames("flex-1 truncate text-neutral-500 group-hover:text-neutral-800", {
             "text-neutral-800": selected,
           })}
         >
-          {label}
+          {name}
         </span>
-      </div>
-    </Link>
+      </Link>
+    </li>
   );
 };
 

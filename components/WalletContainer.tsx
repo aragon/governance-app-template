@@ -43,6 +43,7 @@ const WalletContainer = () => {
     <button
       className={classNames(
         "shrink-none flex h-12 items-center rounded-full border border-neutral-100 bg-neutral-0 leading-tight text-neutral-500",
+        "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset", // focus styles
         { "px-1 md:px-0 md:pl-4 md:pr-1": isConnected },
         { "px-4": !isConnected }
       )}

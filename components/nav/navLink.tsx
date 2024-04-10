@@ -67,7 +67,7 @@ export const NavLink: React.FC<INavLinkProps> = (props) => {
           <Icon
             icon={icon}
             size="md"
-            className={classNames("text-neutral-300 lg:hidden", {
+            className={classNames("text-neutral-300 group-hover:text-neutral-800 lg:hidden", {
               "text-neutral-800": selected,
             })}
           />

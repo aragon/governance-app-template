@@ -107,7 +107,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
 // Helpers
 
-function decodeProposalResultData(data: ProposalResultType) {
+function decodeProposalResultData(data?: ProposalResultType) {
   if (!data?.length || data.length < 6) return null;
 
   return {

@@ -1,9 +1,8 @@
 import { PUB_ALCHEMY_API_KEY } from "@/constants";
 import { formatHexString } from "@/utils/evm";
-import { Avatar } from "@aragon/ods";
+import { MemberAvatar } from "@aragon/ods";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import classNames from "classnames";
-import Blockies from "react-blockies";
 import { createClient, http } from "viem";
 import { normalize } from "viem/ens";
 import { createConfig, useAccount, useEnsAvatar, useEnsName } from "wagmi";
@@ -52,8 +51,7 @@ const WalletContainer = () => {
       {isConnected && address && (
         <div className="flex items-center gap-3">
           <span className="hidden md:block">{ensName ?? formatHexString(address)}</span>
-          {!!ensAvatar && <Avatar src={ensAvatar ?? "/profile.jpg"} alt="Profile picture" size="md" />}
-          {ensAvatar == null && <Blockies className="rounded-full" size={10} seed={address} />}
+          <MemberAvatar src={ensAvatar ?? ""} address={address} alt="Profile picture" size="md" />
         </div>
       )}
 

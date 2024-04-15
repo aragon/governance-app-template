@@ -7,7 +7,6 @@ import { useCanCreateProposal } from "@/plugins/dualGovernance/hooks/useCanCreat
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { digestPagination } from "@/utils/pagination";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
@@ -36,9 +35,6 @@ export default function Proposals() {
   useEffect(() => {
     refetch();
   }, [blockNumber]);
-
-  const skipRender = useSkipFirstRender();
-  if (skipRender) return <></>;
 
   const proposalCount = Number(proposalCountResponse);
   const { visibleProposalIds, showNext, showPrev } = digestPagination(proposalCount, currentPage);

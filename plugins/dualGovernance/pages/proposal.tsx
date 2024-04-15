@@ -7,7 +7,6 @@ import VetoTally from "@/plugins/dualGovernance/components/vote/tally";
 import ProposalDetails from "@/plugins/dualGovernance/components/proposal/details";
 import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useState } from "react";
 import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/dualGovernance/hooks/useProposalExecute";
@@ -15,7 +14,6 @@ import { useProposalExecute } from "@/plugins/dualGovernance/hooks/useProposalEx
 type BottomSection = "description" | "vetoes";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
-  const skipRender = useSkipFirstRender();
   const [bottomSection, setBottomSection] = useState<BottomSection>("description");
 
   const {
@@ -31,7 +29,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
 
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
 
-  if (skipRender || !proposal || showProposalLoading) {
+  if (!proposal || showProposalLoading) {
     return (
       <section className="justify-left items-left flex w-screen min-w-full max-w-full">
         <PleaseWaitSpinner />

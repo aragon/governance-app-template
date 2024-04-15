@@ -4,7 +4,6 @@ import { PublicClient, parseAbi } from "viem";
 import { ReactNode } from "react";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useDelegateAnnouncements } from "../hooks/useDelegateAnnouncements";
 import { DelegateCard } from "@/plugins/delegateAnnouncer/components/DelegateCard";
 import { SelfDelegationProfileCard } from "../components/UserDelegateCard";
@@ -24,9 +23,6 @@ export default function DelegateAnnouncements() {
     PUB_DELEGATION_CONTRACT_ADDRESS,
     PUB_DAO_ADDRESS
   );
-
-  const skipRender = useSkipFirstRender();
-  if (skipRender) return <></>;
 
   return (
     <MainSection>

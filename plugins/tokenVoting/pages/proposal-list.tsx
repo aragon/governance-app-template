@@ -7,7 +7,6 @@ import { useCanCreateProposal } from "@/plugins/tokenVoting/hooks/useCanCreatePr
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 import { digestPagination } from "@/utils/pagination";
 import { useVotingToken } from "@/plugins/tokenVoting/hooks/useVotingToken";
@@ -37,9 +36,6 @@ export default function Proposals() {
   useEffect(() => {
     refetch();
   }, [blockNumber]);
-
-  const skipRender = useSkipFirstRender();
-  if (skipRender) return <></>;
 
   const proposalCount = Number(proposalCountResponse);
   const { visibleProposalIds, showNext, showPrev } = digestPagination(proposalCount, currentPage);

@@ -13,7 +13,6 @@ import VotingModal from "@/plugins/tokenVoting/components/vote/voting-modal";
 import ProposalDetails from "@/plugins/tokenVoting/components/proposal/details";
 import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useProposalVoting } from "../hooks/useProposalVoting";
 import { useVotingToken } from "../hooks/useVotingToken";
 import { useProposalExecute } from "../hooks/useProposalExecute";
@@ -21,8 +20,6 @@ import { useProposalExecute } from "../hooks/useProposalExecute";
 type BottomSection = "description" | "votes";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
-  const skipRender = useSkipFirstRender();
-
   const { proposal, status: proposalFetchStatus } = useProposal(proposalId, true);
   const { tokenSupply } = useVotingToken();
   const { voteProposal, votingStatus, isConfirming: isVoteConfirming } = useProposalVoting(proposalId);
@@ -79,7 +76,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const showTransactionConfirming = votingStatus === "pending" || isVoteConfirming || isExecuteConfirming;
 
-  if (skipRender || !proposal || showProposalLoading) {
+  if (!proposal || showProposalLoading) {
     return (
       <section className="justify-left items-left flex w-screen min-w-full max-w-full">
         <PleaseWaitSpinner />

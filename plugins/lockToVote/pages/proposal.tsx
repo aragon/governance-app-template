@@ -7,7 +7,6 @@ import VetoTally from "@/plugins/lockToVote/components/vote/tally";
 import ProposalDetails from "@/plugins/lockToVote/components/proposal/details";
 import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { useState } from "react";
 import { useProposalVeto } from "@/plugins/lockToVote/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/lockToVote/hooks/useProposalExecute";
@@ -17,7 +16,6 @@ import { useAccount } from "wagmi";
 type BottomSection = "description" | "vetoes";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
-  const skipRender = useSkipFirstRender();
   const account = useAccount();
   const [bottomSection, setBottomSection] = useState<BottomSection>("description");
 
@@ -36,7 +34,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
 
   const { claimLockProposal, isConfirming: isConfirmingClaimLock, hasClaimed } = useProposalClaimLock(proposalId);
 
-  if (skipRender || !proposal || showProposalLoading) {
+  if (!proposal || showProposalLoading) {
     return (
       <section className="justify-left items-left flex w-screen min-w-full max-w-full">
         <PleaseWaitSpinner />

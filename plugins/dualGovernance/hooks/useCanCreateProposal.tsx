@@ -4,6 +4,7 @@ import { useBalance, useAccount, useReadContracts, useReadContract } from "wagmi
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { DaoAbi } from "@/artifacts/DAO.sol";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { ADDRESS_ZERO } from "@/utils/evm";
 
 export function useCanCreateProposal() {
   const { address } = useAccount();
@@ -56,7 +57,7 @@ export function useCanCreateProposal() {
     abi: DaoAbi,
     functionName: "hasPermission",
     // where, who, permissionId, data
-    args: [PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, address, keccak256(toHex("PROPOSER_PERMISSION")), "0x"],
+    args: [PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, address ?? ADDRESS_ZERO, keccak256(toHex("PROPOSER_PERMISSION")), "0x"],
     query: {
       enabled: !!daoAddress && !!address,
     },

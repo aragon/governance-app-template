@@ -12,3 +12,5 @@ export function formatHexString(address: string): string {
   // Take the first 5 characters (including '0x') and the last 4 characters
   return `${address.substring(0, 5)}...${address.substring(address.length - 4)}`;
 }
+
+export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";

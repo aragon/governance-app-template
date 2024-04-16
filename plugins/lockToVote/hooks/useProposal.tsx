@@ -36,11 +36,11 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     error: proposalError,
     fetchStatus: proposalFetchStatus,
     refetch: proposalRefetch,
-  } = useReadContract<typeof LockToVetoPluginAbi, "getProposal", any[]>({
+  } = useReadContract({
     address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
     abi: LockToVetoPluginAbi,
     functionName: "getProposal",
-    args: [proposalId],
+    args: [BigInt(proposalId)],
     chainId: PUB_CHAIN.id,
   });
   const proposalData = decodeProposalResultData(proposalResult as any);

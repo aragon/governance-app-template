@@ -1,5 +1,4 @@
-import { Abi } from "viem";
-export const OptimisticTokenVotingPluginAbi: Abi = [
+export const OptimisticTokenVotingPluginAbi = [
   {
     inputs: [
       {

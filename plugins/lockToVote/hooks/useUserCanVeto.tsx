@@ -12,7 +12,10 @@ export function useUserCanVeto(proposalId: bigint) {
     address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
     abi: LockToVetoPluginAbi,
     functionName: "canVeto",
-    args: [proposalId, address],
+    args: [proposalId, address!],
+    query: {
+      enabled: !!address,
+    },
   });
 
   useEffect(() => {

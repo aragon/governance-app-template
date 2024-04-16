@@ -17,8 +17,9 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({ onAddAction }) => 
   const { abi, isLoading: loadingAbi, isProxy, implementation } = useAbi(targetContract as Address);
 
   const actionEntered = (data: Hex, value: bigint) => {
+    if (!targetContract) return;
     onAddAction({
-      to: targetContract,
+      to: targetContract as Address,
       value,
       data,
     });
@@ -33,7 +34,9 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({ onAddAction }) => 
           placeholder="0x1234..."
           variant={!targetContract || isAddress(targetContract) ? "default" : "critical"}
           value={targetContract}
-          onChange={(e) => setTargetContract(e.target.value || "")}
+          onChange={(e) => {
+            setTargetContract(e.target.value || "");
+          }}
         />
       </div>
       <If condition={loadingAbi}>
@@ -45,7 +48,7 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({ onAddAction }) => 
         <ElseIf not={targetContract}>
           <p>Enter the address of the contract to call in a new action</p>
         </ElseIf>
-        <ElseIf not={isAddress(targetContract)}>
+        <ElseIf not={isAddress(targetContract || "")}>
           <AlertInline message="The address of the contract is not valid" variant="critical" />
         </ElseIf>
         <ElseIf not={abi?.length}>

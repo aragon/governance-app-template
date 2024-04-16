@@ -18,7 +18,7 @@ export function useProposalExecute(proposalId: string) {
     abi: OptimisticTokenVotingPluginAbi,
     chainId: PUB_CHAIN.id,
     functionName: "canExecute",
-    args: [proposalId],
+    args: [BigInt(proposalId)],
   });
   const {
     writeContract: executeWrite,
@@ -36,7 +36,7 @@ export function useProposalExecute(proposalId: string) {
       abi: OptimisticTokenVotingPluginAbi,
       address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
       functionName: "execute",
-      args: [proposalId],
+      args: [BigInt(proposalId)],
     });
   };
 

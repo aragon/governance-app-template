@@ -8,7 +8,7 @@ export function useCanCreateProposal() {
   const [isCreator, setIsCreator] = useState<boolean>(false);
   const [minProposerVotingPower, setMinProposerVotingPower] = useState<bigint>();
   const [votingToken, setVotingToken] = useState<Address>();
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
   const { data: balance } = useBalance({
     address,
     token: votingToken,

@@ -14,12 +14,15 @@ export function useProposalClaimLock(proposalId: string) {
     data: hasClaimed,
     isError: isCanVoteError,
     isLoading: isCanVoteLoading,
-  } = useReadContract<typeof LockToVetoPluginAbi, "hasClaimedLock", any[]>({
+  } = useReadContract({
     address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
     abi: LockToVetoPluginAbi,
     chainId: PUB_CHAIN.id,
     functionName: "hasClaimedLock",
-    args: [proposalId, account.address],
+    args: [BigInt(proposalId), account.address!],
+    query: {
+      enabled: !!account.address,
+    },
   });
   const {
     writeContract: claimLockWrite,
@@ -38,7 +41,7 @@ export function useProposalClaimLock(proposalId: string) {
       abi: LockToVetoPluginAbi,
       address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
       functionName: "claimLock",
-      args: [proposalId, account.address],
+      args: [BigInt(proposalId), account.address!],
     });
   };
 

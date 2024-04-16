@@ -123,7 +123,7 @@ export default function Create() {
       abi: OptimisticTokenVotingPluginAbi,
       address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
       functionName: "createProposal",
-      args: [toHex(ipfsPin), actions, 0, 0, 0],
+      args: [toHex(ipfsPin), actions, BigInt(0), BigInt(0), BigInt(0)],
     });
   };
 

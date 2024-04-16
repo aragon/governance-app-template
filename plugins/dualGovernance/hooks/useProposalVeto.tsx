@@ -56,7 +56,7 @@ export function useProposalVeto(proposalId: string) {
       abi: OptimisticTokenVotingPluginAbi,
       address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
       functionName: "veto",
-      args: [proposalId],
+      args: [BigInt(proposalId)],
     });
   };
 

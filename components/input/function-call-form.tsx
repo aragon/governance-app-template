@@ -1,5 +1,5 @@
 import { type FC, useState } from "react";
-import { type Address, type Hex, getAddress } from "viem";
+import { type Address, type Hex } from "viem";
 import { AlertInline, InputText } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { isAddress } from "@/utils/evm";
@@ -13,17 +13,17 @@ interface FunctionCallFormProps {
   onAddAction: (action: Action) => any;
 }
 export const FunctionCallForm: FC<FunctionCallFormProps> = ({ onAddAction }) => {
-  const [targetContract, setTargetContract] = useState<Address>();
+  const [targetContract, setTargetContract] = useState<string>("");
   const { abi, isLoading: loadingAbi, isProxy, implementation } = useAbi(targetContract as Address);
 
   const actionEntered = (data: Hex, value: bigint) => {
     if (!targetContract) return;
     onAddAction({
-      to: targetContract,
+      to: targetContract as Address,
       value,
       data,
     });
-    setTargetContract(undefined);
+    setTargetContract("");
   };
 
   return (
@@ -35,12 +35,7 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({ onAddAction }) => 
           variant={!targetContract || isAddress(targetContract) ? "default" : "critical"}
           value={targetContract}
           onChange={(e) => {
-            try {
-              const address = getAddress(e.target.value);
-              setTargetContract(address);
-            } catch (e) {
-              setTargetContract(undefined);
-            }
+            setTargetContract(e.target.value || "");
           }}
         />
       </div>
@@ -53,7 +48,7 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({ onAddAction }) => 
         <ElseIf not={targetContract}>
           <p>Enter the address of the contract to call in a new action</p>
         </ElseIf>
-        <ElseIf not={isAddress(targetContract)}>
+        <ElseIf not={isAddress(targetContract || "")}>
           <AlertInline message="The address of the contract is not valid" variant="critical" />
         </ElseIf>
         <ElseIf not={abi?.length}>

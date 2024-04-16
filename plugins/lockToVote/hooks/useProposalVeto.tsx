@@ -71,8 +71,7 @@ export function useProposalVeto(proposalId: string) {
     const deadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 60); // 1 hour from now
 
     signPermit(dest, value, deadline).then((sig) => {
-      if (!sig) return;
-      if (!sig.yParity) throw new Error("Invalid signature");
+      if (!sig?.yParity) throw new Error("Invalid signature");
 
       vetoWrite({
         abi: LockToVetoPluginAbi,

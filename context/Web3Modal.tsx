@@ -1,6 +1,6 @@
 import { http, createConfig } from "wagmi";
 import { injected } from "wagmi/connectors";
-import { walletConnect } from "wagmi/connectors";
+import { walletConnect, coinbaseWallet } from "wagmi/connectors";
 import {
   PUB_APP_DESCRIPTION,
   PUB_APP_NAME,
@@ -10,6 +10,7 @@ import {
   PUB_WALLET_ICON,
   PUB_WEB3_ENDPOINT,
 } from "@/constants";
+import { mainnet } from "viem/chains";
 
 // wagmi config
 const metadata = {
@@ -20,10 +21,11 @@ const metadata = {
 };
 
 export const config = createConfig({
-  chains: [PUB_CHAIN],
+  chains: [PUB_CHAIN, mainnet],
   ssr: true,
   transports: {
     [PUB_CHAIN.id]: http(PUB_WEB3_ENDPOINT, { batch: true }),
+    [mainnet.id]: http(PUB_WEB3_ENDPOINT, { batch: true }),
   },
   connectors: [
     walletConnect({
@@ -31,7 +33,6 @@ export const config = createConfig({
       metadata,
       showQrModal: false,
     }),
-    injected({ shimDisconnect: true }),
-    // coinbaseWallet({ appName: metadata.name, appLogoUrl: metadata.icons[0] }),
+    coinbaseWallet({ appName: metadata.name, appLogoUrl: metadata.icons[0] }),
   ],
 });

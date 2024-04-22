@@ -11,7 +11,8 @@ export function useUserCanVote(proposalId: bigint) {
     address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
     abi: TokenVotingAbi,
     functionName: "canVote",
-    args: [proposalId, address, 1],
+    args: [proposalId, address!, 1],
+    query: { enabled: !!address },
   });
 
   useEffect(() => {

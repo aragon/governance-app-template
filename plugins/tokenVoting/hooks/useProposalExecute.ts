@@ -18,7 +18,7 @@ export function useProposalExecute(proposalId: string) {
     abi: TokenVotingAbi,
     chainId: PUB_CHAIN.id,
     functionName: "canExecute",
-    args: [proposalId],
+    args: [BigInt(proposalId)],
   });
   const {
     writeContract: executeWrite,
@@ -36,7 +36,7 @@ export function useProposalExecute(proposalId: string) {
       abi: TokenVotingAbi,
       address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
       functionName: "execute",
-      args: [proposalId],
+      args: [BigInt(proposalId)],
     });
   };
 

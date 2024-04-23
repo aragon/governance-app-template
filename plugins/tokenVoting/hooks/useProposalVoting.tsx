@@ -50,7 +50,7 @@ export function useProposalVoting(proposalId: string) {
       abi: TokenVotingAbi,
       address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
       functionName: "vote",
-      args: [proposalId, votingOption, autoExecute],
+      args: [BigInt(proposalId), votingOption, autoExecute],
     });
   };
 

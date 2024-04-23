@@ -1,5 +1,4 @@
-import { Abi } from "viem";
-export const OptimisticLzVotingPluginAbi: Abi = [
+export const OptimisticLzVotingPluginAbi = [
   {
     type: "function",
     name: "DEFAULT_PAYLOAD_SIZE_LIMIT",

@@ -36,11 +36,11 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     error: proposalError,
     fetchStatus: proposalFetchStatus,
     refetch: proposalRefetch,
-  } = useReadContract<typeof TokenVotingAbi, "getProposal", any[]>({
+  } = useReadContract({
     address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
     abi: TokenVotingAbi,
     functionName: "getProposal",
-    args: [proposalId],
+    args: [BigInt(proposalId)],
   });
   const proposalData = decodeProposalResultData(proposalResult as any);
 

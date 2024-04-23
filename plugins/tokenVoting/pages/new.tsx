@@ -124,7 +124,7 @@ export default function Create() {
       abi: TokenVotingAbi,
       address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
       functionName: "createProposal",
-      args: [toHex(ipfsPin), actions, 0, 0, 0, 0, 0],
+      args: [toHex(ipfsPin), actions, BigInt(0), BigInt(0), BigInt(0), 0, false],
     });
   };
 

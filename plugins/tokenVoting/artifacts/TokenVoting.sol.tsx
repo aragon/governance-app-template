@@ -1,5 +1,4 @@
-import { Abi } from "viem";
-export const TokenVotingAbi: Abi = [
+export const TokenVotingAbi = [
   {
     inputs: [
       { internalType: "address", name: "dao", type: "address" },

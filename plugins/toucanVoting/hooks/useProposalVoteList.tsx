@@ -21,7 +21,7 @@ export function useProposalVoteList(proposalId: string, proposal: Proposal | nul
       args: {
         proposalId,
       } as any,
-      fromBlock: proposal.parameters.snapshotBlock,
+      fromBlock: BigInt(proposal.parameters.snapshotBlock),
       toBlock: "latest", // TODO: Make this variable between 'latest' and proposal last block
     })) as any;
 

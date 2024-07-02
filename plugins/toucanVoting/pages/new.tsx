@@ -9,7 +9,6 @@ import { useAlerts } from "@/context/Alerts";
 import WithdrawalInput from "@/components/input/withdrawal";
 import { FunctionCallForm } from "@/components/input/function-call-form";
 import { Action } from "@/utils/types";
-import { getPlainText } from "@/utils/html";
 import { useRouter } from "next/router";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
@@ -31,6 +30,7 @@ export default function Create() {
   const { push } = useRouter();
   const [title, setTitle] = useState<string>("");
   const [summary, setSummary] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [actions, setActions] = useState<Action[]>([]);
   const { addAlert } = useAlerts();
   const { writeContract: createProposalWrite, data: createTxHash, status, error } = useWriteContract();
@@ -85,8 +85,7 @@ export default function Create() {
         type: "error",
       });
 
-    const plainSummary = getPlainText(summary).trim();
-    if (!plainSummary.trim())
+    if (!summary.trim())
       return addAlert("Invalid proposal details", {
         description: "Please, enter a summary of what the proposal is about",
         type: "error",
@@ -113,7 +112,12 @@ export default function Create() {
         }
     }
 
-    const proposalMetadataJsonObject = { title, summary };
+    const proposalMetadataJsonObject = {
+      title,
+      summary,
+      description,
+      resources: [{ name: "Aragon", url: "https://aragon.org" }],
+    };
     const blob = new Blob([JSON.stringify(proposalMetadataJsonObject)], {
       type: "application/json",
     });
@@ -124,12 +128,16 @@ export default function Create() {
       abi: TokenVotingAbi,
       address: PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
       functionName: "createProposal",
-      args: [toHex(ipfsPin), actions, BigInt(0), BigInt(0), BigInt(0), { abstain: 0n, yes: 0n, no: 0n }, false],
+      args: [toHex(ipfsPin), actions, BigInt(0), 0, 0, { abstain: 0n, yes: 0n, no: 0n }, false],
     });
   };
 
   const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event?.target?.value);
+  };
+
+  const handleSummaryInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSummary(event?.target?.value);
   };
 
   const showLoading = status === "pending" || isConfirming;
@@ -150,11 +158,22 @@ export default function Create() {
           />
         </div>
         <div className="mb-6">
-          <TextAreaRichText
+          <InputText
+            className=""
             label="Summary"
-            className="pt-2"
+            maxLength={240}
+            placeholder="A short summary that describes the main purpose"
+            variant="default"
             value={summary}
-            onChange={setSummary}
+            onChange={handleSummaryInput}
+          />
+        </div>
+        <div className="mb-6">
+          <TextAreaRichText
+            label="Description"
+            className="pt-2"
+            value={description}
+            onChange={setDescription}
             placeholder="A description for what the proposal is all about"
           />
         </div>

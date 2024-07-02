@@ -1,25 +1,30 @@
 import Link from "next/link";
-import { useProposal } from "@/plugins/toucanVoting/hooks/useProposal";
-import { getProposalStatusVariant } from "@/plugins/toucanVoting/utils/proposal-status";
-import { Card, Tag } from "@aragon/ods";
-import * as DOMPurify from "dompurify";
+import { useProposalVoting } from "@/plugins/toucanVoting/hooks/useProposalVoting";
+import { Card } from "@aragon/ods";
+import { ProposalDataListItem } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { If } from "@/components/if";
+import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
+import { useAccount } from "wagmi";
+import { VoteCastEvent } from "../../utils/types";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(The metadata of the proposal is not available)";
 
 type ProposalInputs = {
   proposalId: bigint;
-  tokenSupply: bigint;
 };
 
 export default function ProposalCard(props: ProposalInputs) {
-  const { proposal, status } = useProposal(props.proposalId.toString());
+  const { address } = useAccount();
+  const { proposal, proposalFetchStatus, votes } = useProposalVoting(props.proposalId.toString());
 
-  const showLoading = getShowProposalLoading(proposal, status);
+  const proposalVariant = useProposalStatus(proposal!);
 
-  if (!proposal || showLoading) {
+  const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
+
+  const hasApproved = votes?.some((vote: VoteCastEvent) => vote.voter === address);
+
+  if (!proposal && showLoading) {
     return (
       <section className="mb-4 w-full">
         <Card className="p-4">
@@ -40,7 +45,7 @@ export default function ProposalCard(props: ProposalInputs) {
         </Card>
       </Link>
     );
-  } else if (status.metadataReady && !proposal?.title) {
+  } else if (proposalFetchStatus.metadataReady && !proposal?.title) {
     return (
       <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full">
         <Card className="p-4">
@@ -55,38 +60,27 @@ export default function ProposalCard(props: ProposalInputs) {
     );
   }
 
-  const { variant: statusVariant, label: statusLabel } = getProposalStatusVariant(proposal, props.tokenSupply);
-
   return (
-    <Link href={`#/proposals/${props.proposalId}`} className="w-full">
-      <Card className="mb-4 w-full p-5">
-        <div className="w-full">
-          <If condition={proposal.tally}>
-            <div className="mb-2 flex">
-              <Tag variant={statusVariant as any} label={statusLabel} />
-            </div>
-          </If>
-
-          <div className="overflow-hidden text-ellipsis">
-            <h4 className=" text-dark mb-1 line-clamp-1 text-lg font-semibold">
-              {Number(props.proposalId) + 1} - {proposal.title}
-            </h4>
-            <div
-              className="box line-clamp-2 overflow-hidden text-ellipsis"
-              dangerouslySetInnerHTML={{
-                __html: proposal.summary ? DOMPurify.sanitize(proposal.summary) : DEFAULT_PROPOSAL_METADATA_SUMMARY,
-              }}
-            />
-          </div>
-        </div>
-      </Card>
+    <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full cursor-pointer">
+      <ProposalDataListItem.Structure
+        {...proposal}
+        voted={hasApproved}
+        result={{
+          option: "Yes",
+          voteAmount: proposal?.tally?.yes.toString(),
+          votePercentage: 0,
+        }}
+        publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
+        status={proposalVariant!}
+        type={"majorityVoting"}
+      />
     </Link>
   );
 }
 
 function getShowProposalLoading(
-  proposal: ReturnType<typeof useProposal>["proposal"],
-  status: ReturnType<typeof useProposal>["status"]
+  proposal: ReturnType<typeof useProposalApprove>["proposal"],
+  status: ReturnType<typeof useProposalApprove>["proposalFetchStatus"]
 ) {
   if (!proposal || status.proposalLoading) return true;
   else if (status.metadataLoading && !status.metadataError) return true;

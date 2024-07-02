@@ -52,6 +52,8 @@ export function useProposal(proposalId: string, autoRefresh = false) {
   useEffect(() => {
     if (!proposalData || !publicClient) return;
 
+    console.log("Snapshot block: ", proposalData.parameters.snapshotBlock);
+
     publicClient
       .getLogs({
         address: PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
@@ -59,8 +61,8 @@ export function useProposal(proposalId: string, autoRefresh = false) {
         args: {
           proposalId: proposalId,
         } as any,
-        fromBlock: proposalData.parameters.snapshotBlock,
-        toBlock: proposalData.parameters.startDate,
+        fromBlock: BigInt(proposalData.parameters.snapshotBlock),
+        toBlock: "latest",
       })
       .then((logs) => {
         if (!logs || !logs.length) throw new Error("No creation logs");

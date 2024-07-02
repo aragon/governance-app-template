@@ -1,138 +1,153 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect } from "react";
 import ProposalCard from "@/plugins/toucanVoting/components/proposal";
 import { TokenVotingAbi } from "@/plugins/toucanVoting/artifacts/TokenVoting.sol";
-import { Button, Card, EmptyState, IconType } from "@aragon/ods";
+import {
+  Button,
+  DataList,
+  IconType,
+  IllustrationHuman,
+  ProposalDataListItemSkeleton,
+  type DataListState,
+} from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/toucanVoting/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
-import { PleaseWaitSpinner } from "@/components/please-wait";
-import { PUB_TOUCAN_VOTING_PLUGIN_ADDRESS } from "@/constants";
-import { digestPagination } from "@/utils/pagination";
-import { useVotingToken } from "@/plugins/toucanVoting/hooks/useVotingToken";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { useRouter } from "next/router";
+import { PUB_TOUCAN_VOTING_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
+
+const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
   const { isConnected } = useAccount();
-  const { open } = useWeb3Modal();
-  const { push } = useRouter();
+  const canCreate = useCanCreateProposal();
 
   const { data: blockNumber } = useBlockNumber({ watch: true });
-  const canCreate = useCanCreateProposal();
-  const { tokenSupply } = useVotingToken();
-  const [currentPage, setCurrentPage] = useState(0);
 
   const {
     data: proposalCountResponse,
+    error: isError,
     isLoading,
+    isFetching: isFetchingNextPage,
     refetch,
   } = useReadContract({
     address: PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
     abi: TokenVotingAbi,
     functionName: "proposalCount",
+    chainId: PUB_CHAIN.id,
   });
+  const proposalCount = Number(proposalCountResponse);
 
   useEffect(() => {
     refetch();
   }, [blockNumber]);
 
-  const proposalCount = Number(proposalCountResponse);
-  const { visibleProposalIds, showNext, showPrev } = digestPagination(proposalCount, currentPage);
+  const entityLabel = proposalCount === 1 ? "Proposal" : "Proposals";
+
+  let dataListState: DataListState = "idle";
+  if (isLoading && !proposalCount) {
+    dataListState = "initialLoading";
+  } else if (isError) {
+    dataListState = "error";
+  } else if (isFetchingNextPage) {
+    dataListState = "fetchingNextPage";
+  }
+
+  const emptyFilteredState = {
+    heading: "No proposals found",
+    description: "Your applied filters are not matching with any results. Reset and search with other filters!",
+    secondaryButton: {
+      label: "Reset all filters",
+      iconLeft: IconType.RELOAD,
+    },
+  };
+
+  const errorState = {
+    heading: "Error loading proposals",
+    description: "There was an error loading the proposals. Try again!",
+    secondaryButton: {
+      label: "Reload proposals",
+      iconLeft: IconType.RELOAD,
+      onClick: () => refetch(),
+    },
+  };
 
   return (
     <MainSection>
       <SectionView>
-        <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
-        <div className="justify-self-end">
-          <If condition={canCreate && proposalCount}>
-            <Link href="#/new">
-              <Button iconLeft={IconType.PLUS} size="md" variant="primary">
-                Submit Proposal
-              </Button>
-            </Link>
-          </If>
-        </div>
-      </SectionView>
-      <If condition={proposalCount}>
-        <Then>
-          {visibleProposalIds.map((id) => (
-            <ProposalCard key={id} proposalId={BigInt(id)} tokenSupply={tokenSupply || BigInt("0")} />
-          ))}
-          <div className="mb-10 mt-4 flex w-full flex-row justify-end gap-2">
-            <Button
-              variant="tertiary"
-              size="sm"
-              disabled={!showPrev}
-              onClick={() => setCurrentPage((page) => Math.max(page - 1, 0))}
-              iconLeft={IconType.CHEVRON_LEFT}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="tertiary"
-              size="sm"
-              disabled={!showNext}
-              onClick={() => setCurrentPage((page) => page + 1)}
-              iconRight={IconType.CHEVRON_RIGHT}
-            >
-              Next
-            </Button>
+        <div className="flex w-full justify-between gap-x-10">
+          <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
+          <div className="justify-self-end">
+            <If condition={isConnected && canCreate}>
+              <Link href="#/new">
+                <Button iconLeft={IconType.PLUS} size="md" variant="primary">
+                  Submit Proposal
+                </Button>
+              </Link>
+            </If>
           </div>
-        </Then>
-        <ElseIf condition={isLoading}>
-          <SectionView>
-            <PleaseWaitSpinner />
-          </SectionView>
-        </ElseIf>
-        <ElseIf condition={isConnected}>
-          <SectionView>
-            <Card className="w-full">
-              <EmptyState
-                className="w-full md:w-full lg:w-full xl:w-full"
-                heading="There are no proposals yet"
-                humanIllustration={{
-                  body: "VOTING",
-                  expression: "SMILE",
-                  hairs: "CURLY",
-                }}
-                primaryButton={{
-                  label: "Submit the first one",
-                  iconLeft: IconType.PLUS,
-                  onClick: () => push("#/new"),
-                }}
+        </div>
+        <If condition={proposalCount}>
+          <Then>
+            <DataList.Root
+              entityLabel={entityLabel}
+              itemsCount={proposalCount}
+              pageSize={DEFAULT_PAGE_SIZE}
+              state={dataListState}
+              //onLoadMore={fetchNextPage}
+            >
+              <DataList.Container
+                SkeletonElement={ProposalDataListItemSkeleton}
+                errorState={errorState}
+                emptyFilteredState={emptyFilteredState}
+              >
+                {proposalCount &&
+                  Array.from(Array(proposalCount)?.keys())
+                    .reverse()
+                    ?.map((proposalIndex, index) => (
+                      // TODO: update with router agnostic ODS DataListItem
+                      <ProposalCard key={proposalIndex} proposalId={BigInt(proposalIndex)} />
+                    ))}
+              </DataList.Container>
+              <DataList.Pagination />
+            </DataList.Root>
+          </Then>
+          <Else>
+            <div className="w-full">
+              <p className="text-md text-neutral-400">
+                No proposals have been created yet. Here you will see the proposals created by the Security Council
+                before they can be submitted to the{" "}
+                <Link href="/plugins/community-proposals/#/" className="underline">
+                  community voting stage
+                </Link>
+                .
+              </p>
+              <IllustrationHuman
+                className="mx-auto mb-10 max-w-72"
+                body="BLOCKS"
+                expression="SMILE_WINK"
+                hairs="CURLY"
               />
-            </Card>
-          </SectionView>
-        </ElseIf>
-        <Else>
-          <SectionView>
-            <Card className="w-full">
-              <EmptyState
-                className="w-full md:w-full lg:w-full xl:w-full"
-                heading="There are no proposals yet"
-                humanIllustration={{
-                  body: "VOTING",
-                  expression: "SMILE",
-                  hairs: "CURLY",
-                }}
-                primaryButton={{
-                  label: "Connect your wallet",
-                  onClick: () => open(),
-                }}
-              />
-            </Card>
-          </SectionView>
-        </Else>
-      </If>
+              <If condition={isConnected && canCreate}>
+                <div className="flex justify-center">
+                  <Link href="#/new">
+                    <Button iconLeft={IconType.PLUS} size="md" variant="primary">
+                      Submit Proposal
+                    </Button>
+                  </Link>
+                </div>
+              </If>
+            </div>
+          </Else>
+        </If>
+      </SectionView>
     </MainSection>
   );
 }
 
 function MainSection({ children }: { children: ReactNode }) {
-  return <main className="flex w-screen max-w-full flex-col items-center pt-6">{children}</main>;
+  return <main className="w-full md:px-6 md:pb-20 xl:pt-10">{children}</main>;
 }
 
 function SectionView({ children }: { children: ReactNode }) {
-  return <div className="mb-6 flex w-full flex-row content-center justify-between">{children}</div>;
+  return <div className="mx-auto flex w-full max-w-[768px] flex-col items-center gap-y-6 md:px-6">{children}</div>;
 }

@@ -5,7 +5,7 @@ import { ProposalDataListItem } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
 import { useAccount } from "wagmi";
-import { VoteCastEvent } from "../../utils/types";
+import { Tally, VoteCastEvent } from "../../utils/types";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(The metadata of the proposal is not available)";
@@ -22,7 +22,9 @@ export default function ProposalCard(props: ProposalInputs) {
 
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
 
-  const hasApproved = votes?.some((vote: VoteCastEvent) => vote.voter === address);
+  const hasVoted = votes?.some((vote: VoteCastEvent) => vote.voter === address);
+
+  const winningOption = getWinningOption(proposal?.tally as Tally);
 
   if (!proposal && showLoading) {
     return (
@@ -64,11 +66,11 @@ export default function ProposalCard(props: ProposalInputs) {
     <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full cursor-pointer">
       <ProposalDataListItem.Structure
         {...proposal}
-        voted={hasApproved}
+        voted={hasVoted}
         result={{
-          option: "Yes",
-          voteAmount: proposal?.tally?.yes.toString(),
-          votePercentage: 0,
+          option: winningOption?.option,
+          voteAmount: winningOption?.voteAmount.toString(),
+          votePercentage: winningOption?.votePercentage,
         }}
         publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
         status={proposalVariant!}
@@ -78,9 +80,24 @@ export default function ProposalCard(props: ProposalInputs) {
   );
 }
 
+function getWinningOption(tally: Tally) {
+  if (!tally) return { option: "Yes", voteAmount: "0", votePercentage: 0 };
+  const totalVotes = tally.yes + tally.no + tally.abstain;
+
+  if (totalVotes === BigInt(0)) return { option: "Yes", voteAmount: "0", votePercentage: 0 };
+  const winningOption = tally.yes >= tally.no ? (tally.yes >= tally.abstain ? "Yes" : "Abstain") : "No";
+  const winningVotes = tally.yes >= tally.no ? (tally.yes >= tally.abstain ? tally.yes : tally.abstain) : tally.no;
+
+  return {
+    option: winningOption,
+    voteAmount: winningVotes.toString(),
+    votePercentage: Number((winningVotes / totalVotes) * BigInt(100)),
+  };
+}
+
 function getShowProposalLoading(
-  proposal: ReturnType<typeof useProposalApprove>["proposal"],
-  status: ReturnType<typeof useProposalApprove>["proposalFetchStatus"]
+  proposal: ReturnType<typeof useProposalVoting>["proposal"],
+  status: ReturnType<typeof useProposalVoting>["proposalFetchStatus"]
 ) {
   if (!proposal || status.proposalLoading) return true;
   else if (status.metadataLoading && !status.metadataError) return true;

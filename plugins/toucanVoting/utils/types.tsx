@@ -36,6 +36,7 @@ export type Proposal = {
   creator: string;
   title: string;
   summary: string;
+  description: string;
   resources: string[];
 };
 

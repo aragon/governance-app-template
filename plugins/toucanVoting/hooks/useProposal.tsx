@@ -130,6 +130,7 @@ function arrangeProposalData(
     creator: creationEvent?.creator || "",
     title: metadata?.title || "",
     summary: metadata?.summary || "",
+    description: metadata?.description || "",
     resources: metadata?.resources || [],
   };
 }

@@ -13,6 +13,8 @@ import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
 import { CardResources } from "@/components/proposal/cardResources";
 import { getWinningOption } from "../utils/proposal-status";
+import { compactNumber } from "@/utils/numbers";
+import { formatEther } from "viem";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const router = useRouter();
@@ -31,6 +33,8 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
+
+  const totalVotes = proposal?.tally.yes + proposal?.tally.no + proposal?.tally.abstain;
 
   // TODO: This is not revelant anymore
   const proposalStage: ITransformedStage[] = [
@@ -61,7 +65,26 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
                 label: "Vote",
                 onClick: voteProposal,
               },
-        votingScores: [{ ...getWinningOption(proposal?.tally), tokenSymbol: "HLO" }],
+        votingScores: [
+          {
+            option: "Yes",
+            voteAmount: compactNumber(formatEther(proposal?.tally.yes), 2),
+            votePercentage: Number((proposal?.tally.yes / totalVotes) * 100n),
+            tokenSymbol: "HLO",
+          },
+          {
+            option: "No",
+            voteAmount: compactNumber(formatEther(proposal?.tally.yes), 2),
+            votePercentage: Number((proposal?.tally.no / totalVotes) * 100n),
+            tokenSymbol: "HLO",
+          },
+          {
+            option: "Abstain",
+            voteAmount: compactNumber(formatEther(proposal?.tally.abstain), 2),
+            votePercentage: Number((proposal?.tally.abstain / totalVotes) * 100n),
+            tokenSymbol: "HLO",
+          },
+        ],
       },
       details: {
         censusBlock: Number(proposal?.parameters.snapshotBlock),
@@ -88,7 +111,6 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         proposalNumber={Number(proposalId) + 1}
         proposal={proposal}
         breadcrumbs={breadcrumbs}
-        tokenSupply={BigInt(0)}
         transactionConfirming={isConfirmingApproval || isConfirmingExecution}
         canExecute={canExecute}
         onExecutePressed={() => executeProposal()}

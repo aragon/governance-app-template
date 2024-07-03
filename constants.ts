@@ -16,6 +16,7 @@ export const PUB_TOUCAN_VOTING_PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_TOUCAN_
 export const PUB_OFT_ADAPTER_ADDRESSS = (process.env.NEXT_PUBLIC_OFT_ADAPTER_ADDRESS ?? "") as Address;
 export const PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS = (process.env.NEXT_PUBLIC_TOUCAN_VOTING_PLUGIN_L2_ADDRESS ??
   "") as Address;
+export const PUB_TOKEN_L1_ADDRESS = (process.env.NEXT_PUBLIC_TOKEN_L1_ADDRESS ?? "") as Address;
 export const PUB_TOKEN_L2_ADDRESS = (process.env.NEXT_PUBLIC_TOKEN_L2_ADDRESS ?? "") as Address;
 
 export const PUB_DELEGATION_ANNOUNCEMENTS_START_BLOCK = BigInt(

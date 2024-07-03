@@ -73,9 +73,9 @@ export function useProposalVoting(proposalId: string) {
     }
 
     const votingTally = {
-      abstain: votingOption === 1 ? addressVotes : 0n,
-      yes: votingOption === 2 ? addressVotes : 0n,
-      no: votingOption === 3 ? addressVotes : 0n,
+      yes: votingOption === 1 ? addressVotes : 0n,
+      no: votingOption === 2 ? addressVotes : 0n,
+      abstain: votingOption === 3 ? addressVotes : 0n,
     };
 
     voteWrite({

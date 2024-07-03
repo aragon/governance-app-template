@@ -11,12 +11,13 @@ export function useUserCanVote(proposalId: string) {
     address: PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
     abi: TokenVotingAbi,
     functionName: "canVote",
-    args: [BigInt(proposalId), address!, { abstain: 0n, yes: 0n, no: 0n }],
+    args: [BigInt(proposalId), address!, { abstain: 1n, yes: 0n, no: 0n }],
     query: { enabled: !!address },
   });
 
   useEffect(() => {
     refreshCanVote();
+    console.log("CanVote:", canVote);
   }, [blockNumber]);
 
   return canVote;

@@ -1,4 +1,5 @@
 import { Proposal, VotingMode } from "@/plugins/tokenVoting/utils/types";
+import { Tally } from "./types";
 export const RATIO_BASE = 1_000_000;
 
 export function getProposalStatusVariant(proposal: Proposal, tokenSupply: bigint) {
@@ -37,4 +38,23 @@ export function getProposalStatusVariant(proposal: Proposal, tokenSupply: bigint
     }
   }
   return { variant: "info", label: "Active" };
+}
+
+export function getWinningOption(tally: Tally | undefined): {
+  option: string;
+  voteAmount: string;
+  votePercentage: number;
+} {
+  if (!tally) return { option: "Yes", voteAmount: "0", votePercentage: 0 };
+  const totalVotes = tally.yes + tally.no + tally.abstain;
+
+  if (totalVotes === BigInt(0)) return { option: "Yes", voteAmount: "0", votePercentage: 0 };
+  const winningOption = tally.yes >= tally.no ? (tally.yes >= tally.abstain ? "Yes" : "Abstain") : "No";
+  const winningVotes = tally.yes >= tally.no ? (tally.yes >= tally.abstain ? tally.yes : tally.abstain) : tally.no;
+
+  return {
+    option: winningOption,
+    voteAmount: winningVotes.toString(),
+    votePercentage: Number((winningVotes / totalVotes) * BigInt(100)),
+  };
 }

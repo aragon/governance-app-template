@@ -6,6 +6,7 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
 import { useAccount } from "wagmi";
 import { Tally, VoteCastEvent } from "../../utils/types";
+import { getWinningOption } from "../../utils/proposal-status";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(The metadata of the proposal is not available)";
@@ -78,21 +79,6 @@ export default function ProposalCard(props: ProposalInputs) {
       />
     </Link>
   );
-}
-
-function getWinningOption(tally: Tally) {
-  if (!tally) return { option: "Yes", voteAmount: "0", votePercentage: 0 };
-  const totalVotes = tally.yes + tally.no + tally.abstain;
-
-  if (totalVotes === BigInt(0)) return { option: "Yes", voteAmount: "0", votePercentage: 0 };
-  const winningOption = tally.yes >= tally.no ? (tally.yes >= tally.abstain ? "Yes" : "Abstain") : "No";
-  const winningVotes = tally.yes >= tally.no ? (tally.yes >= tally.abstain ? tally.yes : tally.abstain) : tally.no;
-
-  return {
-    option: winningOption,
-    voteAmount: winningVotes.toString(),
-    votePercentage: Number((winningVotes / totalVotes) * BigInt(100)),
-  };
 }
 
 function getShowProposalLoading(

@@ -7,6 +7,7 @@ import { parseAbi } from "viem";
 import { PUB_TOKEN_ADDRESS, PUB_TOUCAN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 import { useProposal } from "./useProposal";
 import { useProposalVoteList } from "./useProposalVoteList";
+import { useUserCanVote } from "./useUserCanVote";
 
 const erc20VotesAbi = parseAbi(["function getVotes(address owner) view returns (uint256)"]);
 
@@ -15,7 +16,8 @@ export function useProposalVoting(proposalId: string) {
   const { reload } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
   const { proposal, status: proposalFetchStatus } = useProposal(proposalId, true);
-  const { votes } = useProposalVoteList(proposalId, proposal);
+  const votes = useProposalVoteList(proposalId, proposal);
+  const canVote = useUserCanVote(proposalId);
 
   const {
     data: addressVotes,
@@ -88,6 +90,7 @@ export function useProposalVoting(proposalId: string) {
     proposal,
     proposalFetchStatus,
     votes,
+    canVote,
     voteProposal,
     votingStatus,
     isConfirming,

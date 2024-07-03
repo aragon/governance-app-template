@@ -1,4 +1,4 @@
-import { PUB_IPFS_ENDPOINT, PUB_IPFS_API_KEY } from "@/constants";
+import { PUB_IPFS_ENDPOINT, PUB_PINATA_JWT } from "@/constants";
 import { CID, IPFSHTTPClient } from "ipfs-http-client";
 import { Hex, fromHex } from "viem";
 
@@ -27,7 +27,7 @@ async function fetchFromIPFS(ipfsUri: string): Promise<Response> {
   const response = await fetch(`${PUB_IPFS_ENDPOINT}/cat?arg=${path}`, {
     method: "POST",
     headers: {
-      "X-API-KEY": PUB_IPFS_API_KEY,
+      "X-API-KEY": PUB_PINATA_JWT,
       Accept: "application/json",
     },
     signal: controller.signal,

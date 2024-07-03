@@ -13,7 +13,7 @@ import { getPlainText } from "@/utils/html";
 import { useRouter } from "next/router";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { PUB_IPFS_ENDPOINT, PUB_IPFS_API_KEY, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
+import { PUB_IPFS_ENDPOINT, PUB_PINATA_JWT, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { ActionCard } from "@/components/actions/action";
 
 enum ActionType {
@@ -24,7 +24,7 @@ enum ActionType {
 
 const ipfsClient = create({
   url: PUB_IPFS_ENDPOINT,
-  headers: { "X-API-KEY": PUB_IPFS_API_KEY, Accept: "application/json" },
+  headers: { "X-API-KEY": PUB_PINATA_JWT, Accept: "application/json" },
 });
 
 export default function Create() {

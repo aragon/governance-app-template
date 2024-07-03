@@ -25,7 +25,7 @@ jobs:
           NEXT_PUBLIC_WEB3_URL_PREFIX: https://rpc/
           NEXT_PUBLIC_ALCHEMY_API_KEY: x
           NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: x
-          NEXT_PUBLIC_IPFS_ENDPOINT: https://ipfs/
+          NEXT_PUBLIC_IPFS_ENDPOINTS: https://domain1/api,https://domain2/api/v0
           NEXT_PUBLIC_PINATA_JWT: x
           NEXT_PUBLIC_ETHERSCAN_API_KEY: x
           NODE_ENV: production

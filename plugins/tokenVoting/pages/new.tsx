@@ -1,7 +1,6 @@
-import { create } from "ipfs-http-client";
 import { Button, IconType, Icon, InputText, TextAreaRichText } from "@aragon/ods";
 import React, { useEffect, useState } from "react";
-import { uploadToIPFS } from "@/utils/ipfs";
+import { uploadToPinata } from "@/utils/ipfs";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { toHex } from "viem";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
@@ -13,7 +12,7 @@ import { getPlainText } from "@/utils/html";
 import { useRouter } from "next/router";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { PUB_CHAIN, PUB_PINATA_JWT, PUB_IPFS_ENDPOINT, PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_CHAIN, PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 import { ActionCard } from "@/components/actions/action";
 
 enum ActionType {
@@ -21,11 +20,6 @@ enum ActionType {
   Withdrawal,
   Custom,
 }
-
-const ipfsClient = create({
-  url: PUB_IPFS_ENDPOINT,
-  headers: { "X-API-KEY": PUB_PINATA_JWT, Accept: "application/json" },
-});
 
 export default function Create() {
   const { push } = useRouter();
@@ -86,7 +80,7 @@ export default function Create() {
       });
 
     const plainSummary = getPlainText(summary).trim();
-    if (!plainSummary.trim())
+    if (!plainSummary)
       return addAlert("Invalid proposal details", {
         description: "Please, enter a summary of what the proposal is about",
         type: "error",
@@ -114,17 +108,14 @@ export default function Create() {
     }
 
     const proposalMetadataJsonObject = { title, summary };
-    const blob = new Blob([JSON.stringify(proposalMetadataJsonObject)], {
-      type: "application/json",
-    });
+    const ipfsUri = await uploadToPinata(JSON.stringify(proposalMetadataJsonObject));
 
-    const ipfsPin = await uploadToIPFS(ipfsClient, blob);
     createProposalWrite({
       chainId: PUB_CHAIN.id,
       abi: TokenVotingAbi,
       address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
       functionName: "createProposal",
-      args: [toHex(ipfsPin), actions, BigInt(0), BigInt(0), BigInt(0), 0, false],
+      args: [toHex(ipfsUri), actions, BigInt(0), BigInt(0), BigInt(0), 0, false],
     });
   };
 

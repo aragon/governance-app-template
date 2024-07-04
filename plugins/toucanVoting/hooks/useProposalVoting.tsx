@@ -4,7 +4,7 @@ import { TokenVotingAbi } from "@/plugins/toucanVoting/artifacts/TokenVoting.sol
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { parseAbi } from "viem";
-import { PUB_TOKEN_ADDRESS, PUB_TOUCAN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_CHAIN, PUB_TOKEN_ADDRESS, PUB_TOUCAN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 import { useProposal } from "./useProposal";
 import { useProposalVoteList } from "./useProposalVoteList";
 import { useUserCanVote } from "./useUserCanVote";

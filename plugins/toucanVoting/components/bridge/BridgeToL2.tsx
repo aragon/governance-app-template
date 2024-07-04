@@ -8,13 +8,6 @@ import { useCrossChainTransaction } from "../../hooks/useCrossChainTransactions"
 import { formatEther, parseEther } from "viem";
 import { Button, Card, Heading, InputNumber, Spinner } from "@aragon/ods";
 import { Else, If, Then } from "@/components/if";
-import Link from "next/link";
-import { PleaseWaitSpinner } from "@/components/please-wait";
-
-function isNumeric(value: string): boolean {
-  if (!value) return true;
-  return !!value.match(/^[0-9]+$/);
-}
 
 function SplitRow({ left, right }: { left: string; right: string }) {
   return (
@@ -33,17 +26,17 @@ function formatQuote(quote: string): string {
 export default function Bridge() {
   const queryClient = useQueryClient();
 
-  const { balance, status } = useVotingTokenBalance();
+  const { balance } = useVotingTokenBalance();
   const { symbol } = useVotingToken();
   const [tokensToSend, setTokensToSend] = useState("0");
-  const { balance: l2Balance, status: l2Status } = useVotingTokenL2Balance();
-  const { quote, status: quoteStatus } = useBridgeQuote(BigInt(tokensToSend));
-  const { bridgeTokens, bridgingStatus, bridgeTxHash } = useBridge();
+  const { balance: l2Balance } = useVotingTokenL2Balance();
+  const { quote } = useBridgeQuote(BigInt(tokensToSend));
+  const { bridgeTokens, bridgeTxHash } = useBridge();
   const { approveTokens, approveStatus, isConfirmed, isConfirming } = useApproveTokens(PUB_TOKEN_L1_ADDRESS);
   const { allowance, queryKey } = useAllowance(PUB_TOKEN_L1_ADDRESS, PUB_OFT_ADAPTER_ADDRESSS);
 
   const [isAllowanceEnough, setIsAllowanceEnough] = useState(false);
-  const { scanUrl, message } = useCrossChainTransaction(bridgeTxHash, PUB_CHAIN_NAME);
+  useCrossChainTransaction(bridgeTxHash, PUB_CHAIN_NAME);
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey });
@@ -67,15 +60,14 @@ export default function Bridge() {
     <Card className="flex flex-col gap-y-4 p-6 shadow-neutral">
       <Heading size="h3">Bridge Voting Tokens</Heading>
       <Card className="flex flex-col gap-2 p-4 shadow-neutral">
-        <SplitRow left="L1 Token" right={`${compact} ${symbol ?? ""}`} />
-        <SplitRow left="L2 Token" right={`${compactL2} ${symbol ?? ""}`} />
+        <SplitRow left="L1 Balance" right={`${compact} ${symbol ?? ""}`} />
+        <SplitRow left="L2 Balance" right={`${compactL2} ${symbol ?? ""}`} />
       </Card>
       <div className="mt-4">
         <InputNumber
           label="Amount To Bridge"
           placeholder={`1234 ${symbol ?? ""}`}
           min={0}
-          // max={Number(parseEther(String(balance) ?? "0"))}
           onChange={(val) => setTokensToSend(parseEther(val).toString())}
         />
       </div>

@@ -34,7 +34,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
 
-  const totalVotes = proposal?.tally.yes + proposal?.tally.no + proposal?.tally.abstain;
+  const totalVotes = proposal?.tally.yes + proposal?.tally.no + proposal?.tally.abstain || 1n;
 
   // TODO: This is not revelant anymore
   const proposalStage: ITransformedStage[] = [
@@ -68,19 +68,19 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         votingScores: [
           {
             option: "Yes",
-            voteAmount: compactNumber(formatEther(proposal?.tally.yes), 2),
+            voteAmount: compactNumber(formatEther(proposal?.tally.yes || 0n), 2),
             votePercentage: Number((proposal?.tally.yes / totalVotes) * 100n),
             tokenSymbol: "HLO",
           },
           {
             option: "No",
-            voteAmount: compactNumber(formatEther(proposal?.tally.yes), 2),
+            voteAmount: compactNumber(formatEther(proposal?.tally.yes || 0n), 2),
             votePercentage: Number((proposal?.tally.no / totalVotes) * 100n),
             tokenSymbol: "HLO",
           },
           {
             option: "Abstain",
-            voteAmount: compactNumber(formatEther(proposal?.tally.abstain), 2),
+            voteAmount: compactNumber(formatEther(proposal?.tally.abstain || 0n), 2),
             votePercentage: Number((proposal?.tally.abstain / totalVotes) * 100n),
             tokenSymbol: "HLO",
           },

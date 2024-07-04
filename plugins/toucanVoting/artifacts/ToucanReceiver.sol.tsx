@@ -1,18 +1,9 @@
-export const ToucanRelayAbi = [
+export const ToucanReceiverAbi = [
   { inputs: [], stateMutability: "nonpayable", type: "constructor" },
   {
     inputs: [
-      { internalType: "uint256", name: "proposalRef", type: "uint256" },
-      { internalType: "enum ToucanRelay.ErrReason", name: "reason", type: "uint8" },
-    ],
-    name: "CannotDispatch",
-    type: "error",
-  },
-  { inputs: [], name: "CannotReceive", type: "error" },
-  {
-    inputs: [
-      { internalType: "uint256", name: "proposalRef", type: "uint256" },
-      { internalType: "address", name: "voter", type: "address" },
+      { internalType: "uint256", name: "proposalId", type: "uint256" },
+      { internalType: "uint256", name: "votingChainId", type: "uint256" },
       {
         components: [
           { internalType: "uint256", name: "abstain", type: "uint256" },
@@ -20,12 +11,12 @@ export const ToucanRelayAbi = [
           { internalType: "uint256", name: "no", type: "uint256" },
         ],
         internalType: "struct IVoteContainer.Tally",
-        name: "voteOptions",
+        name: "votes",
         type: "tuple",
       },
-      { internalType: "enum ToucanRelay.ErrReason", name: "reason", type: "uint8" },
+      { internalType: "enum ToucanReceiver.ErrReason", name: "reason", type: "uint8" },
     ],
-    name: "CannotVote",
+    name: "CannotReceiveVotes",
     type: "error",
   },
   {
@@ -39,17 +30,28 @@ export const ToucanRelayAbi = [
     type: "error",
   },
   { inputs: [], name: "InvalidDelegate", type: "error" },
-  { inputs: [], name: "InvalidDestinationEid", type: "error" },
   { inputs: [], name: "InvalidEndpointCall", type: "error" },
   {
-    inputs: [{ internalType: "uint16", name: "optionType", type: "uint16" }],
-    name: "InvalidOptionType",
+    inputs: [{ internalType: "uint256", name: "proposalRef", type: "uint256" }],
+    name: "InvalidProposalReference",
     type: "error",
   },
-  { inputs: [], name: "InvalidToken", type: "error" },
   { inputs: [], name: "LzTokenUnavailable", type: "error" },
   { inputs: [{ internalType: "uint32", name: "eid", type: "uint32" }], name: "NoPeer", type: "error" },
+  {
+    inputs: [{ internalType: "uint256", name: "proposalId", type: "uint256" }],
+    name: "NoVotesToSubmit",
+    type: "error",
+  },
   { inputs: [{ internalType: "uint256", name: "msgValue", type: "uint256" }], name: "NotEnoughNative", type: "error" },
+  {
+    inputs: [
+      { internalType: "address", name: "token", type: "address" },
+      { internalType: "address", name: "dao", type: "address" },
+    ],
+    name: "NothingToRefund",
+    type: "error",
+  },
   { inputs: [{ internalType: "address", name: "addr", type: "address" }], name: "OnlyEndpoint", type: "error" },
   {
     inputs: [
@@ -57,6 +59,15 @@ export const ToucanRelayAbi = [
       { internalType: "bytes32", name: "sender", type: "bytes32" },
     ],
     name: "OnlyPeer",
+    type: "error",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: "address", name: "token", type: "address" },
+      { internalType: "address", name: "dao", type: "address" },
+    ],
+    name: "RefundFailed",
     type: "error",
   },
   {
@@ -76,20 +87,17 @@ export const ToucanRelayAbi = [
   },
   {
     anonymous: false,
-    inputs: [{ indexed: false, internalType: "uint32", name: "buffer", type: "uint32" }],
-    name: "BrigeDelayBufferUpdated",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [{ indexed: false, internalType: "uint32", name: "dstEid", type: "uint32" }],
-    name: "DestinationEidUpdated",
-    type: "event",
-  },
-  {
-    anonymous: false,
     inputs: [{ indexed: false, internalType: "uint8", name: "version", type: "uint8" }],
     name: "Initialized",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: "address", name: "plugin", type: "address" },
+      { indexed: false, internalType: "address", name: "caller", type: "address" },
+    ],
+    name: "NewVotingPluginSet",
     type: "event",
   },
   {
@@ -103,16 +111,10 @@ export const ToucanRelayAbi = [
   },
   {
     anonymous: false,
-    inputs: [{ indexed: true, internalType: "address", name: "implementation", type: "address" }],
-    name: "Upgraded",
-    type: "event",
-  },
-  {
-    anonymous: false,
     inputs: [
-      { indexed: false, internalType: "uint32", name: "dstEid", type: "uint32" },
-      { indexed: true, internalType: "uint256", name: "proposalRef", type: "uint256" },
-      { indexed: false, internalType: "address", name: "voter", type: "address" },
+      { indexed: false, internalType: "uint256", name: "proposalId", type: "uint256" },
+      { indexed: false, internalType: "uint256", name: "votingChainId", type: "uint256" },
+      { indexed: false, internalType: "address", name: "plugin", type: "address" },
       {
         components: [
           { internalType: "uint256", name: "abstain", type: "uint256" },
@@ -121,18 +123,19 @@ export const ToucanRelayAbi = [
         ],
         indexed: false,
         internalType: "struct IVoteContainer.Tally",
-        name: "voteOptions",
+        name: "votes",
         type: "tuple",
       },
+      { indexed: false, internalType: "bytes", name: "revertData", type: "bytes" },
     ],
-    name: "VoteCast",
+    name: "SubmitVoteFailed",
     type: "event",
   },
   {
     anonymous: false,
     inputs: [
-      { indexed: false, internalType: "uint32", name: "dstEid", type: "uint32" },
-      { indexed: true, internalType: "uint256", name: "proposalRef", type: "uint256" },
+      { indexed: false, internalType: "uint256", name: "proposalId", type: "uint256" },
+      { indexed: false, internalType: "address", name: "plugin", type: "address" },
       {
         components: [
           { internalType: "uint256", name: "abstain", type: "uint256" },
@@ -145,12 +148,46 @@ export const ToucanRelayAbi = [
         type: "tuple",
       },
     ],
-    name: "VotesDispatched",
+    name: "SubmitVoteSuccess",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: "address", name: "implementation", type: "address" }],
+    name: "Upgraded",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: "uint256", name: "proposalId", type: "uint256" },
+      { indexed: false, internalType: "uint256", name: "votingChainId", type: "uint256" },
+      { indexed: false, internalType: "address", name: "plugin", type: "address" },
+      {
+        components: [
+          { internalType: "uint256", name: "abstain", type: "uint256" },
+          { internalType: "uint256", name: "yes", type: "uint256" },
+          { internalType: "uint256", name: "no", type: "uint256" },
+        ],
+        indexed: false,
+        internalType: "struct IVoteContainer.Tally",
+        name: "votes",
+        type: "tuple",
+      },
+    ],
+    name: "VotesReceived",
     type: "event",
   },
   {
     inputs: [],
     name: "OAPP_ADMINISTRATOR_ID",
+    outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "SWEEP_COLLECTOR_ID",
     outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
     stateMutability: "view",
     type: "function",
@@ -181,26 +218,8 @@ export const ToucanRelayAbi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "buffer",
-    outputs: [{ internalType: "uint32", name: "", type: "uint32" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "uint256", name: "_proposalRef", type: "uint256" }],
-    name: "canDispatch",
-    outputs: [
-      { internalType: "bool", name: "", type: "bool" },
-      { internalType: "enum ToucanRelay.ErrReason", name: "", type: "uint8" },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [
-      { internalType: "uint256", name: "_proposalRef", type: "uint256" },
-      { internalType: "address", name: "_voter", type: "address" },
+      { internalType: "uint256", name: "_proposalId", type: "uint256" },
       {
         components: [
           { internalType: "uint256", name: "abstain", type: "uint256" },
@@ -208,14 +227,14 @@ export const ToucanRelayAbi = [
           { internalType: "uint256", name: "no", type: "uint256" },
         ],
         internalType: "struct IVoteContainer.Tally",
-        name: "_voteOptions",
+        name: "_tally",
         type: "tuple",
       },
     ],
-    name: "canVote",
+    name: "canReceiveVotes",
     outputs: [
       { internalType: "bool", name: "", type: "bool" },
-      { internalType: "enum ToucanRelay.ErrReason", name: "", type: "uint8" },
+      { internalType: "enum ToucanReceiver.ErrReason", name: "", type: "uint8" },
     ],
     stateMutability: "view",
     type: "function",
@@ -235,40 +254,6 @@ export const ToucanRelayAbi = [
     type: "function",
   },
   {
-    inputs: [
-      { internalType: "uint256", name: "_proposalRef", type: "uint256" },
-      {
-        components: [
-          { internalType: "uint128", name: "gasLimit", type: "uint128" },
-          {
-            components: [
-              { internalType: "uint256", name: "nativeFee", type: "uint256" },
-              { internalType: "uint256", name: "lzTokenFee", type: "uint256" },
-            ],
-            internalType: "struct MessagingFee",
-            name: "fee",
-            type: "tuple",
-          },
-          { internalType: "bytes", name: "options", type: "bytes" },
-        ],
-        internalType: "struct ToucanRelay.LzSendParams",
-        name: "_params",
-        type: "tuple",
-      },
-    ],
-    name: "dispatchVotes",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "dstEid",
-    outputs: [{ internalType: "uint32", name: "", type: "uint32" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [],
     name: "endpoint",
     outputs: [{ internalType: "contract ILayerZeroEndpointV2", name: "", type: "address" }],
@@ -276,20 +261,20 @@ export const ToucanRelayAbi = [
     type: "function",
   },
   {
-    inputs: [
-      { internalType: "uint32", name: "_dstEid", type: "uint32" },
-      { internalType: "uint256", name: "_proposalRef", type: "uint256" },
-      { internalType: "address", name: "_voter", type: "address" },
-    ],
-    name: "getVotes",
+    inputs: [{ internalType: "uint256", name: "_proposalId", type: "uint256" }],
+    name: "getProposalParams",
     outputs: [
       {
         components: [
-          { internalType: "uint256", name: "abstain", type: "uint256" },
-          { internalType: "uint256", name: "yes", type: "uint256" },
-          { internalType: "uint256", name: "no", type: "uint256" },
+          { internalType: "enum IToucanVoting.VotingMode", name: "votingMode", type: "uint8" },
+          { internalType: "uint32", name: "supportThreshold", type: "uint32" },
+          { internalType: "uint32", name: "startDate", type: "uint32" },
+          { internalType: "uint32", name: "endDate", type: "uint32" },
+          { internalType: "uint32", name: "snapshotBlock", type: "uint32" },
+          { internalType: "uint32", name: "snapshotTimestamp", type: "uint32" },
+          { internalType: "uint256", name: "minVotingPower", type: "uint256" },
         ],
-        internalType: "struct IVoteContainer.Tally",
+        internalType: "struct IToucanVoting.ProposalParameters",
         name: "",
         type: "tuple",
       },
@@ -298,12 +283,45 @@ export const ToucanRelayAbi = [
     type: "function",
   },
   {
+    inputs: [{ internalType: "uint256", name: "_proposalId", type: "uint256" }],
+    name: "getProposalRef",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
-      { internalType: "uint256", name: "_proposalRef", type: "uint256" },
-      { internalType: "address", name: "_voter", type: "address" },
+      { internalType: "uint256", name: "_proposalId", type: "uint256" },
+      {
+        components: [
+          { internalType: "enum IToucanVoting.VotingMode", name: "votingMode", type: "uint8" },
+          { internalType: "uint32", name: "supportThreshold", type: "uint32" },
+          { internalType: "uint32", name: "startDate", type: "uint32" },
+          { internalType: "uint32", name: "endDate", type: "uint32" },
+          { internalType: "uint32", name: "snapshotBlock", type: "uint32" },
+          { internalType: "uint32", name: "snapshotTimestamp", type: "uint32" },
+          { internalType: "uint256", name: "minVotingPower", type: "uint256" },
+        ],
+        internalType: "struct IToucanVoting.ProposalParameters",
+        name: "_params",
+        type: "tuple",
+      },
     ],
-    name: "getVotes",
-    outputs: [
+    name: "getProposalRef",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "governanceToken",
+    outputs: [{ internalType: "contract IVotes", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "_proposalId", type: "uint256" },
       {
         components: [
           { internalType: "uint256", name: "abstain", type: "uint256" },
@@ -311,16 +329,11 @@ export const ToucanRelayAbi = [
           { internalType: "uint256", name: "no", type: "uint256" },
         ],
         internalType: "struct IVoteContainer.Tally",
-        name: "",
+        name: "_tally",
         type: "tuple",
       },
     ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "uint256", name: "_proposalRef", type: "uint256" }],
-    name: "hasEnoughTimeToBridge",
+    name: "hasEnoughVotingPowerForNewVotes",
     outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
@@ -334,11 +347,10 @@ export const ToucanRelayAbi = [
   },
   {
     inputs: [
-      { internalType: "address", name: "_token", type: "address" },
+      { internalType: "address", name: "_governanceToken", type: "address" },
       { internalType: "address", name: "_lzEndpoint", type: "address" },
       { internalType: "address", name: "_dao", type: "address" },
-      { internalType: "uint32", name: "_dstEid", type: "uint32" },
-      { internalType: "uint32", name: "_buffer", type: "uint32" },
+      { internalType: "address", name: "_votingPlugin", type: "address" },
     ],
     name: "initialize",
     outputs: [],
@@ -346,8 +358,15 @@ export const ToucanRelayAbi = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "uint256", name: "_proposalRef", type: "uint256" }],
+    inputs: [{ internalType: "uint256", name: "_proposalId", type: "uint256" }],
     name: "isProposalOpen",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "_proposalRef", type: "uint256" }],
+    name: "isProposalRefValid",
     outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
@@ -409,45 +428,6 @@ export const ToucanRelayAbi = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "uint256", name: "_proposalRef", type: "uint256" }],
-    name: "proposals",
-    outputs: [
-      {
-        components: [
-          { internalType: "uint256", name: "abstain", type: "uint256" },
-          { internalType: "uint256", name: "yes", type: "uint256" },
-          { internalType: "uint256", name: "no", type: "uint256" },
-        ],
-        internalType: "struct IVoteContainer.Tally",
-        name: "",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "uint32", name: "_dstEid", type: "uint32" },
-      { internalType: "uint256", name: "_proposalRef", type: "uint256" },
-    ],
-    name: "proposals",
-    outputs: [
-      {
-        components: [
-          { internalType: "uint256", name: "abstain", type: "uint256" },
-          { internalType: "uint256", name: "yes", type: "uint256" },
-          { internalType: "uint256", name: "no", type: "uint256" },
-        ],
-        internalType: "struct IVoteContainer.Tally",
-        name: "",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [],
     name: "proxiableUUID",
     outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
@@ -455,58 +435,8 @@ export const ToucanRelayAbi = [
     type: "function",
   },
   {
-    inputs: [
-      { internalType: "uint256", name: "_proposalRef", type: "uint256" },
-      { internalType: "uint128", name: "_gasLimit", type: "uint128" },
-    ],
-    name: "quote",
-    outputs: [
-      {
-        components: [
-          { internalType: "uint128", name: "gasLimit", type: "uint128" },
-          {
-            components: [
-              { internalType: "uint256", name: "nativeFee", type: "uint256" },
-              { internalType: "uint256", name: "lzTokenFee", type: "uint256" },
-            ],
-            internalType: "struct MessagingFee",
-            name: "fee",
-            type: "tuple",
-          },
-          { internalType: "bytes", name: "options", type: "bytes" },
-        ],
-        internalType: "struct ToucanRelay.LzSendParams",
-        name: "params",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "uint256", name: "_dstEid", type: "uint256" }],
-    name: "refundAddress",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "uint32", name: "_buffer", type: "uint32" }],
-    name: "setBridgeDelayBuffer",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [{ internalType: "address", name: "_delegate", type: "address" }],
     name: "setDelegate",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "uint32", name: "_dstEid", type: "uint32" }],
-    name: "setDstEid",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -522,17 +452,32 @@ export const ToucanRelayAbi = [
     type: "function",
   },
   {
+    inputs: [{ internalType: "address", name: "_plugin", type: "address" }],
+    name: "setVotingPlugin",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "_proposalId", type: "uint256" }],
+    name: "submitVotes",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [{ internalType: "bytes4", name: "_interfaceId", type: "bytes4" }],
     name: "supportsInterface",
     outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
   },
+  { inputs: [], name: "sweepNative", outputs: [], stateMutability: "nonpayable", type: "function" },
   {
-    inputs: [],
-    name: "token",
-    outputs: [{ internalType: "contract IVotes", name: "", type: "address" }],
-    stateMutability: "view",
+    inputs: [{ internalType: "address", name: "_token", type: "address" }],
+    name: "sweepToken",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -553,8 +498,9 @@ export const ToucanRelayAbi = [
     type: "function",
   },
   {
-    inputs: [
-      { internalType: "uint256", name: "_proposalRef", type: "uint256" },
+    inputs: [{ internalType: "uint256", name: "_proposalId", type: "uint256" }],
+    name: "votes",
+    outputs: [
       {
         components: [
           { internalType: "uint256", name: "abstain", type: "uint256" },
@@ -562,13 +508,62 @@ export const ToucanRelayAbi = [
           { internalType: "uint256", name: "no", type: "uint256" },
         ],
         internalType: "struct IVoteContainer.Tally",
-        name: "_voteOptions",
+        name: "",
         type: "tuple",
       },
     ],
-    name: "vote",
-    outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
     type: "function",
   },
+  {
+    inputs: [
+      { internalType: "uint256", name: "_proposalId", type: "uint256" },
+      { internalType: "uint256", name: "_votingChainId", type: "uint256" },
+    ],
+    name: "votes",
+    outputs: [
+      {
+        components: [
+          { internalType: "uint256", name: "abstain", type: "uint256" },
+          { internalType: "uint256", name: "yes", type: "uint256" },
+          { internalType: "uint256", name: "no", type: "uint256" },
+        ],
+        internalType: "struct IVoteContainer.Tally",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "_proposalId", type: "uint256" },
+      { internalType: "uint256", name: "_votingChainId", type: "uint256" },
+      { internalType: "address", name: "_votingPlugin", type: "address" },
+    ],
+    name: "votes",
+    outputs: [
+      {
+        components: [
+          { internalType: "uint256", name: "abstain", type: "uint256" },
+          { internalType: "uint256", name: "yes", type: "uint256" },
+          { internalType: "uint256", name: "no", type: "uint256" },
+        ],
+        internalType: "struct IVoteContainer.Tally",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "votingPlugin",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  { stateMutability: "payable", type: "receive" },
 ] as const;

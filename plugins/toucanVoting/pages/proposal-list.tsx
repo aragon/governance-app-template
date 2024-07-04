@@ -37,6 +37,7 @@ export default function Proposals() {
     functionName: "proposalCount",
     chainId: PUB_CHAIN.id,
   });
+
   const proposalCount = Number(proposalCountResponse);
 
   useEffect(() => {

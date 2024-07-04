@@ -1,6 +1,6 @@
-import { erc20Abi } from "viem";
-import { useReadContract } from "wagmi";
-import { PUB_TOKEN_L1_ADDRESS } from "@/constants";
+import { Address, erc20Abi } from "viem";
+import { useAccount, useReadContract } from "wagmi";
+import { PUB_L2_CHAIN, PUB_TOKEN_L1_ADDRESS, PUB_TOKEN_L2_ADDRESS } from "@/constants";
 
 export function useVotingToken() {
   const {
@@ -30,6 +30,59 @@ export function useVotingToken() {
     status: {
       isLoading: isLoading1 || isLoading2,
       isError: isError1 || isError2,
+    },
+  };
+}
+
+export function useVotingTokenL2Balance() {
+  const { address, isConnected } = useAccount();
+
+  const {
+    data: balance,
+    error,
+    isError,
+    isLoading,
+  } = useReadContract({
+    address: PUB_TOKEN_L2_ADDRESS,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: [address ?? "0x"],
+    chainId: PUB_L2_CHAIN.id,
+    query: { enabled: isConnected && !!address },
+  });
+
+  return {
+    balance,
+    status: {
+      error,
+      isLoading,
+      isError,
+    },
+  };
+}
+
+export function useVotingTokenBalance() {
+  const { address, isConnected } = useAccount();
+
+  const {
+    data: balance,
+    error,
+    isError,
+    isLoading,
+  } = useReadContract({
+    address: PUB_TOKEN_L1_ADDRESS,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: [address ?? "0x"],
+    query: { enabled: isConnected && !!address },
+  });
+
+  return {
+    balance,
+    status: {
+      error,
+      isLoading,
+      isError,
     },
   };
 }

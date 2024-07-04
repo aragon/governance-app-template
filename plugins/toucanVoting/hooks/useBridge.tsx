@@ -81,14 +81,14 @@ export function useBridge() {
     // success
     if (!bridgeTxHash) return;
     else if (isConfirming) {
-      addAlert("Vote submitted", {
+      addAlert("Bridge request submitted", {
         description: "Waiting for the transaction to be validated",
         txHash: bridgeTxHash,
       });
       return;
     } else if (!isConfirmed) return;
 
-    addAlert("Vote registered", {
+    addAlert("Tokens sent for bridging", {
       description: "The transaction has been validated",
       type: "success",
       txHash: bridgeTxHash,

@@ -9,6 +9,7 @@ export type AlertOptions = {
   description?: string;
   txHash?: string;
   timeout?: number;
+  explorerLinkOverride?: string;
 };
 
 export interface AlertContextProps {
@@ -49,7 +50,10 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       description: alertOptions?.description,
       type: alertOptions?.type ?? "info",
     };
-    if (alertOptions?.txHash && client) {
+    // allow the user to override the explorer link
+    if (alertOptions?.explorerLinkOverride) {
+      newAlert.explorerLink = alertOptions.explorerLinkOverride;
+    } else if (alertOptions?.txHash && client) {
       newAlert.explorerLink = client.chain.blockExplorers?.default.url + "/tx/" + alertOptions.txHash;
     }
     const timeout = alertOptions?.timeout ?? DEFAULT_ALERT_TIMEOUT;

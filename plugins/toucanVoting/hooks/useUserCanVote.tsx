@@ -17,7 +17,6 @@ export function useUserCanVote(proposalId: string) {
 
   useEffect(() => {
     refreshCanVote();
-    console.log("CanVote:", canVote);
   }, [blockNumber]);
 
   return canVote;

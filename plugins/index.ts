@@ -2,6 +2,7 @@ import {
   PUB_DELEGATION_CONTRACT_ADDRESS,
   PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+  PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
   PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
 } from "@/constants";
 import { IconType } from "@aragon/ods";
@@ -45,5 +46,12 @@ export const plugins: PluginItem[] = [
     title: "Delegation",
     icon: IconType.FEEDBACK,
     pluginAddress: PUB_DELEGATION_CONTRACT_ADDRESS,
+  },
+  {
+    id: "crosschain-voting",
+    folderName: "toucanVoting",
+    title: "Crosschain Voting",
+    icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
+    pluginAddress: PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
   },
 ];

@@ -9,8 +9,9 @@ import {
   PUB_WALLET_CONNECT_PROJECT_ID,
   PUB_WALLET_ICON,
   PUB_WEB3_ENDPOINT,
+  PUB_WEB3_ENDPOINT_L2,
 } from "@/constants";
-import { mainnet } from "viem/chains";
+import { mainnet, optimismSepolia } from "viem/chains";
 
 // wagmi config
 const metadata = {
@@ -21,11 +22,12 @@ const metadata = {
 };
 
 export const config = createConfig({
-  chains: [PUB_CHAIN, mainnet],
+  chains: [PUB_CHAIN, mainnet, optimismSepolia],
   ssr: true,
   transports: {
     [PUB_CHAIN.id]: http(PUB_WEB3_ENDPOINT, { batch: true }),
     [mainnet.id]: http(PUB_WEB3_ENDPOINT, { batch: true }),
+    [optimismSepolia.id]: http(PUB_WEB3_ENDPOINT_L2, { batch: true }),
   },
   connectors: [
     walletConnect({

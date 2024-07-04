@@ -4,7 +4,7 @@ import { Hex, fromHex, getAbiItem } from "viem";
 import { TokenVotingAbi } from "@/plugins/toucanVoting/artifacts/TokenVoting.sol";
 import { Action } from "@/utils/types";
 import { Proposal, ProposalMetadata, ProposalParameters, Tally } from "@/plugins/toucanVoting/utils/types";
-import { PUB_TOUCAN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_CHAIN, PUB_TOUCAN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 
 type ProposalCreatedLogResponse = {
@@ -25,7 +25,7 @@ const ProposalCreatedEvent = getAbiItem({
 });
 
 export function useProposal(proposalId: string, autoRefresh = false) {
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
   const [proposalCreationEvent, setProposalCreationEvent] = useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();
   const { data: blockNumber } = useBlockNumber();
@@ -37,6 +37,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     fetchStatus: proposalFetchStatus,
     refetch: proposalRefetch,
   } = useReadContract({
+    chainId: PUB_CHAIN.id,
     address: PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
     abi: TokenVotingAbi,
     functionName: "getProposal",
@@ -51,8 +52,6 @@ export function useProposal(proposalId: string, autoRefresh = false) {
   // Creation event
   useEffect(() => {
     if (!proposalData || !publicClient) return;
-
-    console.log("Snapshot block: ", proposalData.parameters.snapshotBlock);
 
     publicClient
       .getLogs({
@@ -125,7 +124,11 @@ function arrangeProposalData(
     active: proposalData.active,
     executed: proposalData.executed,
     parameters: proposalData.parameters,
-    tally: proposalData.tally,
+    tally: {
+      yes: proposalData.tally.yes || 0n,
+      no: proposalData.tally.no || 0n,
+      abstain: proposalData.tally.abstain || 0n,
+    },
     allowFailureMap: proposalData.allowFailureMap,
     creator: creationEvent?.creator || "",
     title: metadata?.title || "",

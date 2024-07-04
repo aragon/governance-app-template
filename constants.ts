@@ -27,10 +27,15 @@ export const PUB_DELEGATION_ANNOUNCEMENTS_START_BLOCK = BigInt(
 export const PUB_CHAIN_NAME = (process.env.NEXT_PUBLIC_CHAIN_NAME ?? "sepolia") as ChainName;
 export const PUB_CHAIN = getChain(PUB_CHAIN_NAME);
 
+export const PUB_L2_CHAIN_NAME = (process.env.NEXT_PUBLIC_L2_CHAIN_NAME ?? "arbitrumSepolia") as ChainName;
+export const PUB_L2_CHAIN = getChain(PUB_L2_CHAIN_NAME);
+
 // Network and services
 export const PUB_ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ?? "";
 
 export const PUB_WEB3_ENDPOINT = (process.env.NEXT_PUBLIC_WEB3_URL_PREFIX ?? "") + PUB_ALCHEMY_API_KEY;
+// export const PUB_WEB3_L2_ENDPOINT = (process.env.NEXT_PUBLIC_WEB3_L2_URL_PREFIX ?? "") + PUB_ALCHEMY_API_KEY;
+export const PUB_WEB3_L2_ENDPOINT = "https://optimism-sepolia.infura.io/v3/6058becc597c4a059354038b52b1e6c0";
 
 export const PUB_ETHERSCAN_API_KEY = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY ?? "";
 

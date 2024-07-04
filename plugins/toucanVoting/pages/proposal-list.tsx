@@ -12,8 +12,10 @@ import {
 } from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/toucanVoting/hooks/useCanCreateProposal";
 import Link from "next/link";
-import { Else, ElseIf, If, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { PUB_TOUCAN_VOTING_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
+
+import Bridge from "../components/bridge/BridgeToL2";
 
 const DEFAULT_PAGE_SIZE = 6;
 
@@ -86,60 +88,64 @@ export default function Proposals() {
             </If>
           </div>
         </div>
-        <If condition={proposalCount}>
-          <Then>
-            <DataList.Root
-              entityLabel={entityLabel}
-              itemsCount={proposalCount}
-              pageSize={DEFAULT_PAGE_SIZE}
-              state={dataListState}
-              //onLoadMore={fetchNextPage}
-            >
-              <DataList.Container
-                SkeletonElement={ProposalDataListItemSkeleton}
-                errorState={errorState}
-                emptyFilteredState={emptyFilteredState}
+
+        <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
+          <If condition={proposalCount}>
+            <Then>
+              <DataList.Root
+                entityLabel={entityLabel}
+                itemsCount={proposalCount}
+                pageSize={DEFAULT_PAGE_SIZE}
+                state={dataListState}
+                //onLoadMore={fetchNextPage}
               >
-                {proposalCount &&
-                  Array.from(Array(proposalCount)?.keys())
-                    .reverse()
-                    ?.map((proposalIndex, index) => (
-                      // TODO: update with router agnostic ODS DataListItem
-                      <ProposalCard key={proposalIndex} proposalId={BigInt(proposalIndex)} />
-                    ))}
-              </DataList.Container>
-              <DataList.Pagination />
-            </DataList.Root>
-          </Then>
-          <Else>
-            <div className="w-full">
-              <p className="text-md text-neutral-400">
-                No proposals have been created yet. Here you will see the proposals created by the Security Council
-                before they can be submitted to the{" "}
-                <Link href="/plugins/community-proposals/#/" className="underline">
-                  community voting stage
-                </Link>
-                .
-              </p>
-              <IllustrationHuman
-                className="mx-auto mb-10 max-w-72"
-                body="BLOCKS"
-                expression="SMILE_WINK"
-                hairs="CURLY"
-              />
-              <If condition={isConnected && canCreate}>
-                <div className="flex justify-center">
-                  <Link href="#/new">
-                    <Button iconLeft={IconType.PLUS} size="md" variant="primary">
-                      Submit Proposal
-                    </Button>
+                <DataList.Container
+                  SkeletonElement={ProposalDataListItemSkeleton}
+                  errorState={errorState}
+                  emptyFilteredState={emptyFilteredState}
+                >
+                  {proposalCount &&
+                    Array.from(Array(proposalCount)?.keys())
+                      .reverse()
+                      ?.map((proposalIndex, index) => (
+                        // TODO: update with router agnostic ODS DataListItem
+                        <ProposalCard key={proposalIndex} proposalId={BigInt(proposalIndex)} />
+                      ))}
+                </DataList.Container>
+                <DataList.Pagination />
+              </DataList.Root>
+            </Then>
+            <Else>
+              <div className="w-full">
+                <p className="text-md text-neutral-400">
+                  No proposals have been created yet. Here you will see the proposals created by the Security Council
+                  before they can be submitted to the{" "}
+                  <Link href="/plugins/community-proposals/#/" className="underline">
+                    community voting stage
                   </Link>
-                </div>
-              </If>
-            </div>
-          </Else>
-        </If>
+                  .
+                </p>
+                <IllustrationHuman
+                  className="mx-auto mb-10 max-w-72"
+                  body="BLOCKS"
+                  expression="SMILE_WINK"
+                  hairs="CURLY"
+                />
+                <If condition={isConnected && canCreate}>
+                  <div className="flex justify-center">
+                    <Link href="#/new">
+                      <Button iconLeft={IconType.PLUS} size="md" variant="primary">
+                        Submit Proposal
+                      </Button>
+                    </Link>
+                  </div>
+                </If>
+              </div>
+            </Else>
+          </If>
+        </div>
       </SectionView>
+      <Bridge />
     </MainSection>
   );
 }

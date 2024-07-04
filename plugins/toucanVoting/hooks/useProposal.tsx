@@ -4,8 +4,16 @@ import { Hex, fromHex, getAbiItem } from "viem";
 import { TokenVotingAbi } from "@/plugins/toucanVoting/artifacts/TokenVoting.sol";
 import { Action } from "@/utils/types";
 import { Proposal, ProposalMetadata, ProposalParameters, Tally } from "@/plugins/toucanVoting/utils/types";
-import { PUB_CHAIN, PUB_TOUCAN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import {
+  PUB_CHAIN,
+  PUB_TOUCAN_RECEIVER_ADDRESS,
+  PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
+  PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS,
+} from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
+import { ToucanReceiverAbi } from "../artifacts/ToucanReceiver.sol";
+import { optimismSepolia } from "viem/chains";
+import { ToucanRelayAbi } from "../artifacts/ToucanRelay.sol";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -43,7 +51,25 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     functionName: "getProposal",
     args: [BigInt(proposalId)],
   });
-  const proposalData = decodeProposalResultData(proposalResult as any);
+
+  const { data: proposalRef } = useReadContract({
+    chainId: PUB_CHAIN.id,
+    address: PUB_TOUCAN_RECEIVER_ADDRESS,
+    abi: ToucanReceiverAbi,
+    functionName: "getProposalRef",
+    args: [BigInt(proposalId)],
+  });
+
+  const { data: proposalL2Tally } = useReadContract({
+    chainId: optimismSepolia.id,
+    address: PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS,
+    abi: ToucanRelayAbi,
+    functionName: "proposals",
+    args: [proposalRef!],
+    query: { enabled: !!proposalRef },
+  });
+
+  const proposalData = decodeProposalResultData(proposalResult as any, proposalL2Tally);
 
   useEffect(() => {
     if (autoRefresh) proposalRefetch();
@@ -82,7 +108,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     error: metadataError,
   } = useMetadata<ProposalMetadata>(metadataUri);
 
-  const proposal = arrangeProposalData(proposalData, proposalCreationEvent, metadataContent);
+  const proposal = arrangeProposalData(proposalData, proposalCreationEvent, metadataContent, proposalRef);
 
   return {
     proposal,
@@ -99,14 +125,23 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
 // Helpers
 
-function decodeProposalResultData(data?: Array<any>) {
+function decodeProposalResultData(data: Array<any>, l2Tally: any) {
   if (!data?.length || data.length < 6) return null;
+
+  let finalTally: Tally = data[3];
+  if (l2Tally) {
+    finalTally = {
+      yes: data[3].yes + l2Tally?.yes || 0n,
+      no: data[3].no + l2Tally?.no || 0n,
+      abstain: data[3].abstain + l2Tally?.abstain || 0n,
+    };
+  }
 
   return {
     active: data[0] as boolean,
     executed: data[1] as boolean,
     parameters: data[2] as ProposalParameters,
-    tally: data[3] as Tally,
+    tally: finalTally as Tally,
     actions: data[4] as Array<Action>,
     allowFailureMap: data[5] as bigint,
   };
@@ -115,11 +150,13 @@ function decodeProposalResultData(data?: Array<any>) {
 function arrangeProposalData(
   proposalData?: ReturnType<typeof decodeProposalResultData>,
   creationEvent?: ProposalCreatedLogResponse["args"],
-  metadata?: ProposalMetadata
+  metadata?: ProposalMetadata,
+  proposalRef?: bigint
 ): Proposal | null {
   if (!proposalData) return null;
 
   return {
+    proposalRef: proposalRef || 0n,
     actions: proposalData.actions,
     active: proposalData.active,
     executed: proposalData.executed,

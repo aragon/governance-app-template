@@ -27,6 +27,7 @@ export type Tally = {
 };
 
 export type Proposal = {
+  proposalRef: bigint;
   active: boolean;
   executed: boolean;
   parameters: ProposalParameters;
@@ -43,6 +44,7 @@ export type Proposal = {
 export type ProposalMetadata = {
   title: string;
   summary: string;
+  description: string;
   resources: string[];
 };
 

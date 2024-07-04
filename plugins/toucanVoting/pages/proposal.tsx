@@ -39,7 +39,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   // TODO: This is not revelant anymore
   const proposalStage: ITransformedStage[] = [
     {
-      id: "1",
+      id: proposalId,
       type: ProposalStages.MAJORITY_VOTING,
       variant: "majorityVoting",
       title: "",

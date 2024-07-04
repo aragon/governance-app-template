@@ -76,7 +76,7 @@ export default function Proposals() {
   return (
     <MainSection>
       <SectionView>
-        <div className="flex w-full justify-between gap-x-10">
+        <div className="flex w-full max-w-screen-xl justify-between gap-x-10">
           <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
           <div className="justify-self-end">
             <If condition={isConnected && canCreate}>
@@ -90,7 +90,7 @@ export default function Proposals() {
         </div>
 
         <div
-          className="mx-auto flex w-full max-w-screen-xl flex-col justify-center 
+          className="mx-auto flex w-full max-w-screen-xl flex-col justify-between 
         gap-5 md:flex-row md:pb-20 "
         >
           <div className="flex w-full flex-col gap-x-12 gap-y-6 md:w-auto md:flex-row">
@@ -162,5 +162,5 @@ function MainSection({ children }: { children: ReactNode }) {
 }
 
 function SectionView({ children }: { children: ReactNode }) {
-  return <div className="mx-auto flex w-full flex-col items-center gap-y-6 md:px-6">{children}</div>;
+  return <div className="mx-auto flex w-full max-w-[1024px] flex-col items-center gap-y-6 md:px-6">{children}</div>;
 }

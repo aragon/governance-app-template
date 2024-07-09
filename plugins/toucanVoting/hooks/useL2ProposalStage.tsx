@@ -34,6 +34,7 @@ export function useL2ProposalStage(proposalId: string): ITransformedStage {
     disabled: false,
     proposalId,
     providerId: "1",
+    //@ts-expect-error ignoring for now
     result: {
       cta: {
         disabled: !canVote,

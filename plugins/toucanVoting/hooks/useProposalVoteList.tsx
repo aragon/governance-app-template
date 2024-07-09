@@ -3,12 +3,14 @@ import { getAbiItem } from "viem";
 import { TokenVotingAbi } from "@/plugins/toucanVoting/artifacts/TokenVoting.sol";
 import { Proposal, VoteCastEvent, VoteCastResponse } from "@/plugins/toucanVoting/utils/types";
 import { usePublicClient } from "wagmi";
-import { PUB_TOUCAN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_CHAIN, PUB_TOUCAN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
 const event = getAbiItem({ abi: TokenVotingAbi, name: "VoteCast" });
 
 export function useProposalVoteList(proposalId: string, proposal: Proposal | null) {
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({
+    chainId: PUB_CHAIN.id,
+  });
   const [proposalLogs, setLogs] = useState<VoteCastEvent[]>([]);
 
   async function getLogs() {

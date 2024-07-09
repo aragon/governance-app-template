@@ -1,6 +1,7 @@
 import { ChainName } from "@/utils/chains";
 import { EndpointId } from "@layerzerolabs/lz-definitions";
-import { Options } from "@layerzerolabs/lz-v2-utilities";
+import { Options, hexZeroPadTo32 } from "@layerzerolabs/lz-v2-utilities";
+import { zeroAddress } from "viem";
 
 // double check these against the layer zero docs - trust me.
 export function getEid(chainName: ChainName): EndpointId {
@@ -27,3 +28,5 @@ export function getEid(chainName: ChainName): EndpointId {
 
 export const getLzOptions = (gasLimit: bigint) =>
   Options.newOptions().addExecutorLzReceiveOption(gasLimit, 0).toHex().toString() as `0x${string}`;
+
+export const hexPadAddress = (address: string | undefined) => hexZeroPadTo32(address ?? zeroAddress) as `0x${string}`;

@@ -24,20 +24,25 @@ export const useProposalVariantStatus = (proposal: Proposal) => {
 
 export const useProposalStatus = (proposal: Proposal) => {
   const [status, setStatus] = useState<ProposalStatus>();
-  const tallySum = proposal?.tally?.yes + proposal?.tally?.no + proposal?.tally?.abstain;
 
   useEffect(() => {
-    if (!proposal || !proposal?.parameters) return;
-    setStatus(
-      proposal?.tally.yes >= proposal?.parameters?.supportThreshold
-        ? proposal?.executed
-          ? "executed"
-          : "accepted"
-        : dayjs().isAfter(dayjs(Number(proposal?.parameters.endDate) * 1000))
-          ? "failed"
-          : "active"
-    );
-  }, [proposal, proposal?.tally, proposal?.executed, proposal?.parameters?.supportThreshold]);
+    if (!proposal || !proposal?.parameters || !proposal?.tally) return;
+
+    const pastSupportThreshold = proposal.tally.yes >= proposal.parameters.supportThreshold;
+    const isExecuted = proposal.executed;
+    const endDate = dayjs(Number(proposal.parameters.endDate) * 1000);
+    const isActive = dayjs().isBefore(endDate);
+
+    if (isExecuted) {
+      setStatus("executed");
+    } else if (isActive) {
+      setStatus("active");
+    } else if (!pastSupportThreshold && !isActive) {
+      setStatus("rejected");
+    } else {
+      setStatus("accepted");
+    }
+  }, [proposal, proposal?.tally, proposal?.executed, proposal?.parameters.supportThreshold]);
 
   return status;
 };

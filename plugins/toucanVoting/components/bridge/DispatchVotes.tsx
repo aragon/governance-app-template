@@ -1,7 +1,7 @@
-import { Button, Card, Heading } from "@aragon/ods";
+import { Button, Card, Heading, Tooltip } from "@aragon/ods";
 import { useCanDispatch, useDispatchQuote, useDispatchVotes } from "../../hooks/useDispatchVotes";
 import { useCrossChainTransaction } from "../../hooks/useCrossChainTransactions";
-import { PUB_L2_CHAIN_NAME } from "@/constants";
+import { PUB_CHAIN, PUB_CHAIN_NAME, PUB_L2_CHAIN_NAME } from "@/constants";
 import { SplitRow } from "./SplitRow";
 import { formatEther } from "viem";
 import { useVotingToken } from "../../hooks/useVotingToken";
@@ -10,6 +10,7 @@ import { compactNumber } from "@/utils/numbers";
 import { useGetPendingVotesOnL2 } from "../../hooks/useProposalVotesL2";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { readableChainName } from "@/utils/chains";
 
 function compactAllowNegativeNumber(value: string, decimalPlace = 2) {
   if (value.startsWith("-")) {
@@ -45,12 +46,16 @@ export default function DispatchVotes({ id: proposalId }: { id: number }) {
 
   return (
     <Card className="flex flex-col gap-5 p-4 shadow-neutral-sm">
-      <Heading size="h3">Dispatch Pending Votes to L1</Heading>
+      <Heading size="h3">Dispatch Pending Votes</Heading>
       <div className="flex flex-col gap-1">
         <p>
-          Below are all votes not currently sent to the L1 chain. You can dispatch them by clicking the button below.
+          Below are all votes recorded on {readableChainName(PUB_L2_CHAIN_NAME)}, but not yet sent to{" "}
+          {readableChainName(PUB_CHAIN_NAME)}. You can dispatch them by clicking the button below.
         </p>
-        <p>Negative votes indicate that someone has changed their vote on the L2 chain</p>
+        <div>
+          {/* <Tooltip /> */}
+          <p>(Negative votes indicate that someone has changed their vote.)</p>
+        </div>
       </div>
       <Card className="flex flex-col gap-2 border border-neutral-100 p-3">
         <Heading size="h4">Votes Pending</Heading>

@@ -20,6 +20,27 @@ const chainNames = [
 ] as const;
 export type ChainName = (typeof chainNames)[number];
 
+export function readableChainName(chainName: ChainName): string {
+  switch (chainName) {
+    case "mainnet":
+      return "Ethereum";
+    case "polygon":
+      return "Polygon";
+    case "sepolia":
+      return "Sepolia";
+    case "mumbai":
+      return "Polygon Mumbai";
+    case "arbitrum":
+      return "Arbitrum One";
+    case "arbitrumSepolia":
+      return "Arbitrum Sepolia";
+    case "optimismSepolia":
+      return "Optimism Sepolia";
+    default:
+      throw new Error("Unknown chain");
+  }
+}
+
 // as const prevents using includes check
 const testnets = ["sepolia", "mumbai", "arbitrumSepolia", "optimismSepolia"];
 

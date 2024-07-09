@@ -1,6 +1,5 @@
 import { OFTAdapterAbi } from "@/plugins/toucanVoting/artifacts/OFTAdapter.sol";
 import { useAccount, useReadContract, useSwitchChain, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { hexZeroPadTo32 } from "@layerzerolabs/lz-v2-utilities";
 import {
   PUB_CHAIN,
   PUB_CHAIN_NAME,
@@ -10,7 +9,8 @@ import {
 } from "@/constants";
 import { useEffect } from "react";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
-import { getEid, getLzOptions } from "../utils/layer-zero";
+import { getEid, getLzOptions, hexPadAddress } from "../utils/layer-zero";
+import { zeroAddress } from "viem";
 
 // amount of gas to send with the bridge transaction
 const DEFAULT_BRIDGE_GAS_LIMIT = BigInt(250_000);
@@ -32,7 +32,7 @@ export function useBridgeQuote(tokensToSend: bigint, gasLimit: bigint = DEFAULT_
     args: [
       {
         dstEid: eid,
-        to: hexZeroPadTo32(address!) as `0x${string}`,
+        to: hexPadAddress(address),
         amountLD: tokensToSend,
         minAmountLD: tokensToSend,
         extraOptions: getLzOptions(gasLimit),
@@ -112,7 +112,7 @@ export function useBridge() {
       args: [
         {
           dstEid,
-          to: hexZeroPadTo32(address!) as `0x${string}`,
+          to: hexPadAddress(address),
           amountLD: tokensToSend,
           minAmountLD: tokensToSend,
           extraOptions: getLzOptions(gasLimit),

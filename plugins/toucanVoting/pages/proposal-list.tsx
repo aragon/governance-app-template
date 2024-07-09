@@ -53,6 +53,8 @@ export default function Proposals() {
     dataListState = "error";
   } else if (isFetchingNextPage) {
     dataListState = "fetchingNextPage";
+  } else {
+    dataListState = "loading";
   }
 
   const emptyFilteredState = {
@@ -94,15 +96,15 @@ export default function Proposals() {
           className="mx-auto flex w-full max-w-screen-xl flex-col justify-between 
         gap-5 md:flex-row md:pb-20 "
         >
-          <div className="flex w-full flex-col gap-x-12 gap-y-6 md:w-auto md:flex-row">
-            <If condition={proposalCount}>
+          <div className="flex w-full grow flex-col gap-x-12 gap-y-6 md:w-auto md:flex-row">
+            <If condition={true || proposalCount}>
               <Then>
                 <DataList.Root
                   entityLabel={entityLabel}
                   itemsCount={proposalCount}
                   pageSize={DEFAULT_PAGE_SIZE}
                   state={dataListState}
-                  //onLoadMore={fetchNextPage}
+                  // onLoadMore={fetchNextPage}
                 >
                   <DataList.Container
                     SkeletonElement={ProposalDataListItemSkeleton}
@@ -112,7 +114,7 @@ export default function Proposals() {
                     {proposalCount &&
                       Array.from(Array(proposalCount)?.keys())
                         .reverse()
-                        ?.map((proposalIndex, index) => (
+                        ?.map((proposalIndex) => (
                           // TODO: update with router agnostic ODS DataListItem
                           <ProposalCard key={proposalIndex} proposalId={BigInt(proposalIndex)} />
                         ))}
@@ -149,7 +151,7 @@ export default function Proposals() {
               </Else>
             </If>
           </div>
-          <div>
+          <div className="min-w-[33%]">
             <Bridge />
           </div>
         </div>

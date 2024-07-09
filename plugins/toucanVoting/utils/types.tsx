@@ -26,6 +26,11 @@ export type Tally = {
   no: bigint;
 };
 
+export type MetadataResource = {
+  name: string;
+  url: string;
+};
+
 export type Proposal = {
   active: boolean;
   executed: boolean;
@@ -37,13 +42,13 @@ export type Proposal = {
   title: string;
   summary: string;
   description: string;
-  resources: string[];
+  resources: MetadataResource[];
 };
 
 export type ProposalMetadata = {
   title: string;
   summary: string;
-  resources: string[];
+  resources: MetadataResource[];
   description: string;
 };
 

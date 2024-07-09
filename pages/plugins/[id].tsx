@@ -33,7 +33,7 @@ const PluginLoader: FC = () => {
   if (!PageComponent) {
     if (componentLoading) {
       return (
-        <div>
+        <div className="flex h-screen w-screen items-center justify-center">
           <PleaseWaitSpinner />
         </div>
       );

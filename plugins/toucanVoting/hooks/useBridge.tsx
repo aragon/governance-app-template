@@ -1,14 +1,19 @@
 import { OFTAdapterAbi } from "@/plugins/toucanVoting/artifacts/OFTAdapter.sol";
-import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { Options, hexZeroPadTo32 } from "@layerzerolabs/lz-v2-utilities";
-import { PUB_L2_CHAIN_NAME, PUB_OFT_ADAPTER_ADDRESSS, PUB_TOKEN_L1_ADDRESS } from "@/constants";
+import { useAccount, useReadContract, useSwitchChain, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { hexZeroPadTo32 } from "@layerzerolabs/lz-v2-utilities";
+import {
+  PUB_CHAIN,
+  PUB_CHAIN_NAME,
+  PUB_L2_CHAIN_NAME,
+  PUB_OFT_ADAPTER_ADDRESSS,
+  PUB_TOKEN_L1_ADDRESS,
+} from "@/constants";
 import { useEffect } from "react";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
-import { useRouter } from "next/router";
 import { getEid, getLzOptions } from "../utils/layer-zero";
 
 // amount of gas to send with the bridge transaction
-const DEFAULT_BRIDGE_GAS_LIMIT = BigInt(100_000);
+const DEFAULT_BRIDGE_GAS_LIMIT = BigInt(250_000);
 
 export function useBridgeQuote(tokensToSend: bigint, gasLimit: bigint = DEFAULT_BRIDGE_GAS_LIMIT) {
   const { address } = useAccount();
@@ -20,6 +25,7 @@ export function useBridgeQuote(tokensToSend: bigint, gasLimit: bigint = DEFAULT_
     error,
     isLoading,
   } = useReadContract({
+    chainId: PUB_CHAIN.id,
     address: PUB_OFT_ADAPTER_ADDRESSS,
     abi: OFTAdapterAbi,
     functionName: "quoteSend",
@@ -54,7 +60,7 @@ export function useBridge() {
   const { address } = useAccount();
   const dstEid = getEid(PUB_L2_CHAIN_NAME);
   const { addAlert } = useAlerts() as AlertContextProps;
-  const { reload } = useRouter();
+  const { switchChain } = useSwitchChain();
   const {
     writeContract: bridgeWrite,
     data: bridgeTxHash,
@@ -93,12 +99,13 @@ export function useBridge() {
       type: "success",
       txHash: bridgeTxHash,
     });
-
-    // reload();
   }, [bridgingStatus, bridgeTxHash, isConfirming, isConfirmed]);
 
   const bridgeTokens = (tokensToSend: bigint, fee: bigint, gasLimit = DEFAULT_BRIDGE_GAS_LIMIT) => {
+    switchChain({ chainId: PUB_CHAIN.id });
+
     bridgeWrite({
+      chainId: PUB_CHAIN.id,
       abi: OFTAdapterAbi,
       address: PUB_OFT_ADAPTER_ADDRESSS,
       functionName: "send",

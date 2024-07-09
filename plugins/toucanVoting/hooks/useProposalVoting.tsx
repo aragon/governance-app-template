@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 import { parseAbi } from "viem";
 import {
   PUB_CHAIN,
+  PUB_L2_CHAIN,
   PUB_TOKEN_ADDRESS,
   PUB_TOKEN_L2_ADDRESS,
   PUB_TOUCAN_RECEIVER_ADDRESS,
@@ -25,24 +26,22 @@ import { useUserCanVote } from "./useUserCanVote";
 import { ToucanRelayAbi } from "../artifacts/ToucanRelay.sol";
 import { ToucanReceiverAbi } from "../artifacts/ToucanReceiver.sol";
 import { optimismSepolia } from "viem/chains";
+import { useProposalRef } from "./useProposalRef";
+import { useForceL1Chain, useForceL2Chain } from "./useForceChain";
 
 const erc20VotesAbi = parseAbi(["function getPastVotes(address owner, uint256 timepoint) view returns (uint256)"]);
 
 export function useProposalVoting(proposalId: string) {
   const { address } = useAccount();
-  const { switchChainAsync } = useSwitchChain();
-  const chainId = useChainId();
+  const forceL1 = useForceL1Chain();
+  const forceL2 = useForceL2Chain();
   const { reload } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
   const { proposal, status: proposalFetchStatus } = useProposal(proposalId, true);
   const votes = useProposalVoteList(proposalId, proposal);
   const canVote = useUserCanVote(proposalId);
 
-  const {
-    data: addressVotes,
-    isError: isErrorVotes,
-    isLoading: isLoadingVotes,
-  } = useReadContract({
+  const { data: addressVotes } = useReadContract({
     chainId: PUB_CHAIN.id,
     address: PUB_TOKEN_ADDRESS,
     abi: erc20VotesAbi,
@@ -52,12 +51,8 @@ export function useProposalVoting(proposalId: string) {
       enabled: proposal?.parameters.snapshotBlock !== undefined,
     },
   });
-  const {
-    data: addressVotesL2,
-    isError: isErrorVotesL2,
-    isLoading: isLoadingVotesL2,
-  } = useReadContract({
-    chainId: optimismSepolia.id,
+  const { data: addressVotesL2 } = useReadContract({
+    chainId: PUB_L2_CHAIN.id,
     address: PUB_TOKEN_L2_ADDRESS,
     abi: erc20VotesAbi,
     functionName: "getPastVotes",
@@ -69,21 +64,10 @@ export function useProposalVoting(proposalId: string) {
   const { writeContract: voteWrite, data: votingTxHash, error: votingError, status: votingStatus } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: votingTxHash });
 
-  const { data: proposalRef } = useReadContract({
-    chainId: PUB_CHAIN.id,
-    address: PUB_TOUCAN_RECEIVER_ADDRESS,
-    abi: ToucanReceiverAbi,
-    functionName: "getProposalRef",
-    args: [BigInt(proposalId)],
-  });
+  const { proposalRef } = useProposalRef(Number(proposalId));
 
-  const {
-    data: canVoteInL2,
-    refetch: refecthCanVoteInL2,
-    error,
-    fetchStatus,
-  } = useReadContract({
-    chainId: optimismSepolia.id,
+  const { data: canVoteInL2 } = useReadContract({
+    chainId: PUB_L2_CHAIN.id,
     address: PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS,
     abi: ToucanRelayAbi,
     functionName: "canVote",
@@ -144,21 +128,25 @@ export function useProposalVoting(proposalId: string) {
     };
 
     if (canVoteInL2 && canVoteInL2[0]) {
-      if (chainId === PUB_CHAIN.id) await switchChainAsync({ chainId: optimismSepolia.id });
-      voteWrite({
-        chainId: optimismSepolia.id,
-        abi: ToucanRelayAbi,
-        address: PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS,
-        functionName: "vote",
-        args: [proposalRef!, votingTally],
-      });
+      forceL2(() =>
+        voteWrite({
+          chainId: PUB_L2_CHAIN.id,
+          abi: ToucanRelayAbi,
+          address: PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS,
+          functionName: "vote",
+          args: [proposalRef!, votingTally],
+        })
+      );
     } else {
-      voteWrite({
-        abi: TokenVotingAbi,
-        address: PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
-        functionName: "vote",
-        args: [BigInt(proposalId), votingTally, false],
-      });
+      forceL1(() =>
+        voteWrite({
+          chainId: PUB_L2_CHAIN.id,
+          abi: TokenVotingAbi,
+          address: PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
+          functionName: "vote",
+          args: [BigInt(proposalId), votingTally, false],
+        })
+      );
     }
   };
 

@@ -1,18 +1,24 @@
-import { PUB_TOKEN_L1_ADDRESS } from "@/constants";
+import { PUB_CHAIN, PUB_TOKEN_L1_ADDRESS } from "@/constants";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useEffect } from "react";
 import { Address, erc20Abi } from "viem";
-import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useAccount, useReadContract, useSwitchChain, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useForceL1Chain } from "./useForceChain";
 
 export function useApproveTokens(token: Address) {
   const { addAlert } = useAlerts() as AlertContextProps;
+  const forceL1 = useForceL1Chain();
   const {
     writeContract: approveWrite,
     data: approveTxHash,
     error: approveError,
     status: approveStatus,
   } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: approveTxHash });
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+    queryKey,
+  } = useWaitForTransactionReceipt({ hash: approveTxHash });
 
   useEffect(() => {
     if (approveStatus === "idle" || approveStatus === "pending") return;
@@ -46,14 +52,18 @@ export function useApproveTokens(token: Address) {
   }, [approveStatus, approveTxHash, isConfirming, isConfirmed]);
 
   const approveTokens = (amount: bigint, spender: Address) => {
-    approveWrite({
-      address: token,
-      abi: erc20Abi,
-      functionName: "approve",
-      args: [spender, amount],
-    });
+    forceL1(() =>
+      approveWrite({
+        chainId: PUB_CHAIN.id,
+        address: token,
+        abi: erc20Abi,
+        functionName: "approve",
+        args: [spender, amount],
+      })
+    );
   };
   return {
+    queryKey,
     approveTokens,
     approveStatus,
     isConfirming,
@@ -71,6 +81,7 @@ export function useAllowance(token: Address, spender: Address) {
     isLoading,
     queryKey,
   } = useReadContract({
+    chainId: PUB_CHAIN.id,
     address: token,
     abi: erc20Abi,
     functionName: "allowance",

@@ -7,14 +7,20 @@ import { generateBreadcrumbs } from "@/utils/nav";
 import { useRouter } from "next/router";
 import { BodySection } from "@/components/proposal/proposalBodySection";
 import { ProposalVoting } from "@/components/proposalVoting";
-import { IBreakdownMajorityVotingResult, type ITransformedStage, type IVote, ProposalStages } from "@/utils/types";
+import { type ITransformedStage, type IVote, ProposalStages } from "@/utils/types";
 import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
 import { CardResources } from "@/components/proposal/cardResources";
-import { getWinningOption } from "../utils/proposal-status";
 import { compactNumber } from "@/utils/numbers";
 import { formatEther } from "viem";
+import DispatchVotes from "../components/bridge/DispatchVotes";
+import { useVotingToken } from "../hooks/useVotingToken";
+import { useGetProposalVotesL2 } from "../hooks/useProposalVotesL2";
+import { L2ProposalVoting } from "../components/vote/L2Voting";
+import { Card, Heading } from "@aragon/ods";
+import { SplitRow } from "../components/bridge/SplitRow";
+import { Proposal } from "../utils/types";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const router = useRouter();
@@ -29,13 +35,25 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   } = useProposalVoting(proposalId);
 
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
+  const { symbol } = useVotingToken();
+  const { l2Votes } = useGetProposalVotesL2(Number(proposalId));
+  const tokenSymbol = symbol ?? "Votes";
   const breadcrumbs = generateBreadcrumbs(router.asPath);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-  const proposalVariant = useProposalStatus(proposal!);
 
+  if (!proposal || showProposalLoading) {
+    return (
+      <section className="justify-left items-left flex w-screen min-w-full max-w-full">
+        <PleaseWaitSpinner />
+      </section>
+    );
+  }
+
+  const proposalVariant = useProposalStatus(proposal!);
   const totalVotes = proposal?.tally.yes + proposal?.tally.no + proposal?.tally.abstain || 1n;
 
+  const l2VotesTotal = l2Votes?.yes + l2Votes?.no + l2Votes?.abstain || 1n;
   // TODO: This is not revelant anymore
   const proposalStage: ITransformedStage[] = [
     {
@@ -45,7 +63,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       title: "",
       status: proposalVariant!,
       disabled: false,
-      proposalId: proposalId,
+      proposalId,
       providerId: "1",
       result: {
         cta: proposal?.executed
@@ -68,21 +86,21 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         votingScores: [
           {
             option: "Yes",
-            voteAmount: compactNumber(formatEther(proposal?.tally.yes || 0n), 2),
-            votePercentage: Number((proposal?.tally.yes / totalVotes) * 100n),
-            tokenSymbol: "HLO",
+            voteAmount: compactNumber(formatEther(l2Votes?.yes || 0n), 2),
+            votePercentage: Number((l2Votes?.yes ?? 0n / l2VotesTotal) * 100n),
+            tokenSymbol,
           },
           {
             option: "No",
-            voteAmount: compactNumber(formatEther(proposal?.tally.yes || 0n), 2),
-            votePercentage: Number((proposal?.tally.no / totalVotes) * 100n),
-            tokenSymbol: "HLO",
+            voteAmount: compactNumber(formatEther(l2Votes?.yes || 0n), 2),
+            votePercentage: Number((l2Votes?.no ?? 0n / l2VotesTotal) * 100n),
+            tokenSymbol,
           },
           {
             option: "Abstain",
-            voteAmount: compactNumber(formatEther(proposal?.tally.abstain || 0n), 2),
-            votePercentage: Number((proposal?.tally.abstain / totalVotes) * 100n),
-            tokenSymbol: "HLO",
+            voteAmount: compactNumber(formatEther(l2Votes?.abstain || 0n), 2),
+            votePercentage: Number((l2Votes?.abstain ?? 0n / l2VotesTotal) * 100n),
+            tokenSymbol,
           },
         ],
       },
@@ -90,23 +108,15 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         censusBlock: Number(proposal?.parameters.snapshotBlock),
         startDate: "",
         endDate: dayjs(Number(proposal?.parameters.endDate) * 1000).toString(),
-        strategy: "Majority Voting",
+        strategy: "Crosschain Majority Voting",
         options: "yes, no, abstain",
       },
       votes: votes && votes.map(({ address }) => ({ address, variant: "approve" }) as IVote),
     },
   ];
 
-  if (!proposal || showProposalLoading) {
-    return (
-      <section className="justify-left items-left flex w-screen min-w-full max-w-full">
-        <PleaseWaitSpinner />
-      </section>
-    );
-  }
-
   return (
-    <section className="flex w-screen min-w-full max-w-full flex-col items-center">
+    <section className=" flex w-screen min-w-full max-w-full flex-col items-center">
       <ProposalHeader
         proposalNumber={Number(proposalId) + 1}
         proposal={proposal}
@@ -120,7 +130,9 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
           <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
             <BodySection body={proposal.description || "No description was provided"} />
-            <ProposalVoting stages={proposalStage} />
+            <L1ProposalSummary proposal={proposal} />
+            <L2ProposalVoting stages={proposalStage} />
+            {/* <ProposalVoting stages={proposalStage} /> */}
             <ProposalAction
               onExecute={() => executeProposal()}
               isConfirmingExecution={isConfirmingExecution}
@@ -129,11 +141,34 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
             />
           </div>
           <div className="flex flex-col gap-y-6 md:w-[33%]">
+            {/* Might be better to put a sentinel value here */}
+            <DispatchVotes id={Number(proposalId ?? 0)} />
             <CardResources resources={proposal.resources} title="Resources" />
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function L1ProposalSummary({ proposal }: { proposal: Proposal }) {
+  const { symbol } = useVotingToken();
+  const compactYes = compactNumber(formatEther(proposal.tally.yes), 2).concat(symbol ? ` ${symbol}` : "");
+  const compactNo = compactNumber(formatEther(proposal.tally.no), 2).concat(symbol ? ` ${symbol}` : "");
+  const compactAbstain = compactNumber(formatEther(proposal.tally.abstain), 2).concat(symbol ? ` ${symbol}` : "");
+  return (
+    <Card className="flex flex-col gap-4 p-4">
+      <Heading size="h2">Total L1 Votes</Heading>
+      <p className="text-lg leading-normal text-neutral-500">
+        Votes recorded on the main L1 chain. All voting chains aggregate votes here and if the proposal passes, the DAO
+        can execute.
+      </p>
+      <Card className="flex  flex-col gap-2 border-[1px] border-neutral-100 p-4">
+        <SplitRow left="Yes" right={compactYes} />
+        <SplitRow left="No" right={compactNo} />
+        <SplitRow left="Abstain" right={compactAbstain} />
+      </Card>
+    </Card>
   );
 }
 

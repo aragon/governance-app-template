@@ -1,0 +1,66 @@
+import { Button, Card, Heading } from "@aragon/ods";
+import { useCanDispatch, useDispatchQuote, useDispatchVotes } from "../../hooks/useDispatchVotes";
+import { useCrossChainTransaction } from "../../hooks/useCrossChainTransactions";
+import { PUB_L2_CHAIN_NAME } from "@/constants";
+import { SplitRow } from "./SplitRow";
+import { formatEther } from "viem";
+import { useVotingToken } from "../../hooks/useVotingToken";
+import { MessageStatus } from "@layerzerolabs/scan-client";
+import { compactNumber } from "@/utils/numbers";
+import { useGetPendingVotesOnL2 } from "../../hooks/useProposalVotesL2";
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+
+function compactAllowNegativeNumber(value: string, decimalPlace = 2) {
+  if (value.startsWith("-")) {
+    const positive = value.slice(1);
+    return `-${compactNumber(positive, decimalPlace)}`;
+  } else {
+    return compactNumber(value, decimalPlace);
+  }
+}
+
+export default function DispatchVotes({ id: proposalId }: { id: number }) {
+  const queryClient = useQueryClient();
+  const { canDispatch } = useCanDispatch(proposalId);
+  const quote = useDispatchQuote(proposalId);
+  const { pending, hasPending, queries } = useGetPendingVotesOnL2(proposalId);
+  const { symbol } = useVotingToken();
+
+  const { dispatchVotes, dispatchTxHash } = useDispatchVotes(proposalId, quote?.lzSendParams);
+  const { message } = useCrossChainTransaction(dispatchTxHash, PUB_L2_CHAIN_NAME);
+
+  const disabled = !canDispatch || !hasPending || message?.status === MessageStatus.INFLIGHT;
+
+  // parse to sensible values
+  const [y, n, a] = [pending.yes, pending.no, pending.abstain].map((i) =>
+    compactAllowNegativeNumber(formatEther(i), 2).concat(symbol ? ` ${symbol}` : "")
+  );
+
+  useEffect(() => {
+    if (message?.status === MessageStatus.DELIVERED && Array.isArray(queries)) {
+      queries.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
+    }
+  }, [message]);
+
+  return (
+    <Card className="flex flex-col gap-5 p-4 shadow-neutral-sm">
+      <Heading size="h3">Dispatch Pending Votes to L1</Heading>
+      <div className="flex flex-col gap-1">
+        <p>
+          Below are all votes not currently sent to the L1 chain. You can dispatch them by clicking the button below.
+        </p>
+        <p>Negative votes indicate that someone has changed their vote on the L2 chain</p>
+      </div>
+      <Card className="flex flex-col gap-2 border border-neutral-100 p-3">
+        <Heading size="h4">Votes Pending</Heading>
+        <SplitRow left="Yes" right={y} />
+        <SplitRow left="No" right={n} />
+        <SplitRow left="Abstain" right={a} />
+      </Card>
+      <Button disabled={disabled} onClick={dispatchVotes}>
+        {hasPending ? "Dispatch Votes" : "Nothing to Dispatch"}
+      </Button>
+    </Card>
+  );
+}

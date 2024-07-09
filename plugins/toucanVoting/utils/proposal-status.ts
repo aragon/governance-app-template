@@ -1,5 +1,7 @@
 import { Proposal, VotingMode } from "@/plugins/tokenVoting/utils/types";
 import { Tally } from "./types";
+import { compactNumber } from "@/utils/numbers";
+import { formatEther } from "viem";
 export const RATIO_BASE = 1_000_000;
 
 export function getProposalStatusVariant(proposal: Proposal, tokenSupply: bigint) {
@@ -54,7 +56,7 @@ export function getWinningOption(tally: Tally | undefined): {
 
   return {
     option: winningOption,
-    voteAmount: winningVotes.toString(),
+    voteAmount: compactNumber(formatEther(winningVotes), 2),
     votePercentage: Number((winningVotes / totalVotes) * BigInt(100)),
   };
 }

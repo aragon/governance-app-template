@@ -33,7 +33,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   const expired = proposal.parameters.endDate <= Date.now() / 1000;
 
   return (
-    <div className="flex w-full justify-center bg-neutral-0">
+    <div className="-z-10 flex w-full justify-center bg-neutral-0">
       {/* Wrapper */}
       <MainSection className="flex flex-col gap-y-6 md:px-16 md:py-10">
         <Breadcrumbs

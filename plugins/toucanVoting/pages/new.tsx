@@ -2,7 +2,7 @@ import { create } from "ipfs-http-client";
 import { Button, IconType, Icon, InputText, TextAreaRichText } from "@aragon/ods";
 import React, { useEffect, useState } from "react";
 import { uploadToIPFS } from "@/utils/ipfs";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useChainId, useSwitchChain, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { toHex } from "viem";
 import { TokenVotingAbi } from "@/plugins/toucanVoting/artifacts/TokenVoting.sol";
 import { useAlerts } from "@/context/Alerts";
@@ -28,6 +28,8 @@ const ipfsClient = create({
 
 export default function Create() {
   const { push } = useRouter();
+  const { switchChainAsync } = useSwitchChain();
+  const chainId = useChainId();
   const [title, setTitle] = useState<string>("");
   const [summary, setSummary] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -123,6 +125,7 @@ export default function Create() {
     });
 
     const ipfsPin = await uploadToIPFS(ipfsClient, blob);
+    if (chainId !== PUB_CHAIN.id) await switchChainAsync({ chainId: PUB_CHAIN.id });
     createProposalWrite({
       chainId: PUB_CHAIN.id,
       abi: TokenVotingAbi,

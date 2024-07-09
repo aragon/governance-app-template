@@ -36,6 +36,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     error: proposalError,
     fetchStatus: proposalFetchStatus,
     refetch: proposalRefetch,
+    queryKey: proposalQueryKey,
   } = useReadContract({
     chainId: PUB_CHAIN.id,
     address: PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
@@ -86,6 +87,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
   return {
     proposal,
+    proposalQueryKey,
     status: {
       proposalReady: proposalFetchStatus === "idle",
       proposalLoading: proposalFetchStatus === "fetching",
@@ -115,7 +117,7 @@ function decodeProposalResultData(data?: Array<any>) {
 function arrangeProposalData(
   proposalData?: ReturnType<typeof decodeProposalResultData>,
   creationEvent?: ProposalCreatedLogResponse["args"],
-  metadata?: ProposalMetadata
+  metadata?: ProposalMetadata & { description: string }
 ): Proposal | null {
   if (!proposalData) return null;
 

@@ -4,10 +4,12 @@ import { TokenVotingAbi } from "../artifacts/TokenVoting.sol";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_TOUCAN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { useForceL1Chain } from "./useForceChain";
 
 export function useProposalExecute(proposalId: string) {
   const { reload } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
+  const forceL1 = useForceL1Chain();
 
   const {
     data: canExecute,
@@ -31,13 +33,15 @@ export function useProposalExecute(proposalId: string) {
   const executeProposal = () => {
     if (!canExecute) return;
 
-    executeWrite({
-      chainId: PUB_CHAIN.id,
-      abi: TokenVotingAbi,
-      address: PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
-      functionName: "execute",
-      args: [BigInt(proposalId)],
-    });
+    forceL1(() =>
+      executeWrite({
+        chainId: PUB_CHAIN.id,
+        abi: TokenVotingAbi,
+        address: PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
+        functionName: "execute",
+        args: [BigInt(proposalId)],
+      })
+    );
   };
 
   useEffect(() => {

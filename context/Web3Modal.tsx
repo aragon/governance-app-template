@@ -1,6 +1,5 @@
 import { http, createConfig } from "wagmi";
-import { injected } from "wagmi/connectors";
-import { walletConnect, coinbaseWallet } from "wagmi/connectors";
+import { walletConnect } from "wagmi/connectors";
 import {
   PUB_APP_DESCRIPTION,
   PUB_APP_NAME,
@@ -12,7 +11,7 @@ import {
   PUB_WEB3_ENDPOINT,
   PUB_WEB3_ENDPOINT_L2,
 } from "@/constants";
-import { mainnet, optimismSepolia } from "viem/chains";
+import { mainnet } from "viem/chains";
 
 // wagmi config
 const metadata = {
@@ -24,12 +23,12 @@ const metadata = {
 
 export const config = createConfig({
   chains: [PUB_CHAIN, mainnet, PUB_L2_CHAIN],
+  syncConnectedChain: true,
   ssr: true,
   transports: {
     [PUB_CHAIN.id]: http(PUB_WEB3_ENDPOINT, { batch: true }),
-    [PUB_L2_CHAIN.id]: http(PUB_WEB3_L2_ENDPOINT, { batch: true }),
+    [PUB_L2_CHAIN.id]: http(PUB_WEB3_ENDPOINT_L2, { batch: true }),
     [mainnet.id]: http(PUB_WEB3_ENDPOINT, { batch: true }),
-    [optimismSepolia.id]: http(PUB_WEB3_ENDPOINT_L2, { batch: true }),
   },
   connectors: [
     walletConnect({

@@ -23,7 +23,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="h-30 sticky top-0 w-full flex-col gap-2 border-b border-b-neutral-100 bg-neutral-0 p-3 md:px-6 md:pb-0 md:pt-5 lg:gap-3">
+      <nav className="h-30 sticky top-0 z-10 w-full flex-col gap-2 border-b border-b-neutral-100 bg-neutral-0 p-3 md:px-6 md:pb-0 md:pt-5 lg:gap-3">
         <div className="flex w-full items-center justify-between">
           <Link
             href="/"

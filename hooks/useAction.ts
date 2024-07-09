@@ -26,6 +26,7 @@ export function useAction(action: Action) {
   }, [action.data, action.to, isLoading]);
 
   return {
+    ...action,
     isLoading,
     functionName,
     functionAbi,

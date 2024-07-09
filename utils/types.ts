@@ -8,6 +8,12 @@ export type Action = {
   data: Hex;
 };
 
+export type RawAction = {
+  to: Address;
+  value: bigint;
+  data: Hex;
+};
+
 export interface IAlert {
   id: number;
   type: "success" | "info" | "error";
@@ -23,6 +29,11 @@ export enum ProposalStages {
   OPTIMISTIC_EXECUTION = "Optimistic Execution",
   MAJORITY_VOTING = "Majority Voting",
 }
+
+export type IProposalResource = {
+  name: string;
+  url: string;
+};
 
 export type VotingCta = Pick<IButtonProps, "disabled" | "isLoading"> & {
   label?: string;

@@ -44,6 +44,7 @@ export type ProposalMetadata = {
   title: string;
   summary: string;
   resources: string[];
+  description: string;
 };
 
 export type VoteCastResponse = {

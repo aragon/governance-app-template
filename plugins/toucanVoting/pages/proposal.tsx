@@ -39,7 +39,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const { l2Votes } = useGetProposalVotesL2(Number(proposalId));
   const tokenSymbol = symbol ?? "Votes";
   const breadcrumbs = generateBreadcrumbs(router.asPath);
-
+  const proposalVariant = useProposalStatus(proposal!);
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
 
   if (!proposal || showProposalLoading) {
@@ -50,10 +50,14 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     );
   }
 
-  const proposalVariant = useProposalStatus(proposal!);
   const totalVotes = proposal?.tally.yes + proposal?.tally.no + proposal?.tally.abstain || 1n;
 
-  const l2VotesTotal = l2Votes?.yes + l2Votes?.no + l2Votes?.abstain || 1n;
+  const l2Yes = l2Votes?.yes || 0n;
+  const l2No = l2Votes?.no || 0n;
+  const l2Abstain = l2Votes?.abstain || 0n;
+  const l2VotesTotal = l2Yes + l2No + l2Abstain;
+  const l2Denominator = l2VotesTotal === 0n ? 1n : l2VotesTotal;
+
   // TODO: This is not revelant anymore
   const proposalStage: ITransformedStage[] = [
     {
@@ -66,6 +70,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       proposalId,
       providerId: "1",
       result: {
+        // @ts-expect-error ignoring for now
         cta: proposal?.executed
           ? {
               disabled: true,
@@ -87,19 +92,19 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           {
             option: "Yes",
             voteAmount: compactNumber(formatEther(l2Votes?.yes || 0n), 2),
-            votePercentage: Number((l2Votes?.yes ?? 0n / l2VotesTotal) * 100n),
+            votePercentage: Number((l2Yes / l2Denominator) * 100n),
             tokenSymbol,
           },
           {
             option: "No",
             voteAmount: compactNumber(formatEther(l2Votes?.yes || 0n), 2),
-            votePercentage: Number((l2Votes?.no ?? 0n / l2VotesTotal) * 100n),
+            votePercentage: Number((l2No / l2Denominator) * 100n),
             tokenSymbol,
           },
           {
             option: "Abstain",
             voteAmount: compactNumber(formatEther(l2Votes?.abstain || 0n), 2),
-            votePercentage: Number((l2Votes?.abstain ?? 0n / l2VotesTotal) * 100n),
+            votePercentage: Number((l2Abstain / l2Denominator) * 100n),
             tokenSymbol,
           },
         ],
@@ -111,7 +116,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         strategy: "Crosschain Majority Voting",
         options: "yes, no, abstain",
       },
-      votes: votes && votes.map(({ address }) => ({ address, variant: "approve" }) as IVote),
+      votes: votes && votes.map(({ voter: address }) => ({ address, variant: "approve" }) as IVote),
     },
   ];
 
@@ -143,7 +148,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           <div className="flex flex-col gap-y-6 md:w-[33%]">
             {/* Might be better to put a sentinel value here */}
             <DispatchVotes id={Number(proposalId ?? 0)} />
-            <CardResources resources={proposal.resources} title="Resources" />
+            {/* <CardResources resources={proposal.resources} title="Resources" /> */}
           </div>
         </div>
       </div>

@@ -117,7 +117,7 @@ function decodeProposalResultData(data?: Array<any>) {
 function arrangeProposalData(
   proposalData?: ReturnType<typeof decodeProposalResultData>,
   creationEvent?: ProposalCreatedLogResponse["args"],
-  metadata?: ProposalMetadata & { description: string }
+  metadata?: ProposalMetadata
 ): Proposal | null {
   if (!proposalData) return null;
 

@@ -5,26 +5,36 @@ import { formatEther } from "viem";
 import { useVotingToken } from "./useVotingToken";
 import { useProposalVoting } from "./useProposalVoting";
 import { useProposalStatus } from "./useProposalVariantStatus";
-import { useGetProposalVotesL2 } from "./useProposalVotesL2";
+import { useGetProposalVotesL2 } from "./usePendingVotesRelay";
+import { useRelayVotesList } from "./useProposalVoteList";
+import { removeDuplicates } from "../utils/array";
+import { useMemo } from "react";
+import { useCanVoteL2 } from "./useUserCanVote";
 
 export function useL2ProposalStage(proposalId: string): ITransformedStage {
   const { symbol } = useVotingToken();
   const tokenSymbol = symbol ?? "Votes";
-  const { proposal } = useProposalVoting(proposalId);
+  const { proposal, voteProposal } = useProposalVoting(proposalId);
   const proposalStatus = useProposalStatus(proposal!);
   const { l2Votes, isLoading } = useGetProposalVotesL2(Number(proposalId));
+  const canVote = useCanVoteL2(proposalId);
 
   const yes = l2Votes?.yes ?? 0n;
   const no = l2Votes?.no ?? 0n;
   const abstain = l2Votes?.abstain ?? 0n;
   const denominator = yes + no + abstain > 0n ? yes + no + abstain : 1n;
 
-  const votes = [] as any[];
+  const votes = useRelayVotesList(proposalId, proposal);
 
-  const canVote = true;
+  // performance wise, this is O(n^2) and should be optimized
+  // so we disable it as the number of votes grows super large
+  // and we memoize the result to be safe
+  const filteredVotes = useMemo(() => {
+    if (votes.length <= 1000) return removeDuplicates(votes, "voter");
+    else return votes;
+  }, [votes]);
 
-  const voteProposal = () => {};
-
+  // todo this can be simplified a lot
   return {
     id: "1",
     type: ProposalStages.MAJORITY_VOTING,
@@ -34,12 +44,12 @@ export function useL2ProposalStage(proposalId: string): ITransformedStage {
     disabled: false,
     proposalId,
     providerId: "1",
-    //@ts-expect-error ignoring for now
     result: {
       cta: {
         disabled: !canVote,
         isLoading,
         label: "Vote",
+        //@ts-expect-error ignoring for now
         onClick: voteProposal,
       },
       votingScores: [
@@ -70,6 +80,6 @@ export function useL2ProposalStage(proposalId: string): ITransformedStage {
       strategy: "Crosschain Majority Voting",
       options: "Yes, No, Abstain",
     },
-    votes: votes && votes.map(({ voter: address }) => ({ address, variant: "approve" }) as IVote),
+    votes: filteredVotes && filteredVotes.map(({ voter: address }) => ({ address, variant: "approve" }) as IVote),
   };
 }

@@ -1,5 +1,9 @@
+import { If } from "@/components/if";
 import { PUB_CHAIN_NAME, PUB_L2_CHAIN_NAME } from "@/constants";
-import { readableChainName } from "@/utils/chains";
+import { useL1ProposalStage } from "@/plugins/toucanVoting/hooks/useL1ProposalStage";
+import { useL2ProposalStage } from "@/plugins/toucanVoting/hooks/useL2ProposalStage";
+import { useCanVoteL1, useCanVoteL2 } from "@/plugins/toucanVoting/hooks/useUserCanVote";
+import { ChainName, readableChainName } from "@/utils/chains";
 import { capitalizeFirstLetter } from "@/utils/text";
 import { VotingCta } from "@/utils/types";
 import { Button, Heading, Progress, RadioCard, RadioGroup } from "@aragon/ods";
@@ -26,18 +30,30 @@ const choiceTextClassNames: Record<Choices, string> = {
 };
 
 export const CrossChainMajorityVotingResult: React.FC<{
-  l1: IBreakdownMajorityVotingResult;
-  l2: IBreakdownMajorityVotingResult;
-}> = (props) => {
-  const { cta: ctaL1, votingScores: votingScoresL1 } = props.l1;
-  const { cta: ctaL2, votingScores: votingScoresL2 } = props.l2;
+  proposalId: string;
+}> = ({ proposalId }) => {
+  const { result: resultL1 } = useL1ProposalStage(proposalId);
+  const { result: resultL2 } = useL2ProposalStage(proposalId);
+
+  const canVoteInL1 = useCanVoteL1(proposalId);
+  const canVoteInL2 = useCanVoteL2(proposalId);
+
+  const { votingScores: votingScoresL1, cta: ctaL1 } = resultL1 as IBreakdownMajorityVotingResult;
+  const { votingScores: votingScoresL2 } = resultL2 as IBreakdownMajorityVotingResult;
+
+  // only add the L1 and L2 labels if the user can vote in both chains
+  const l1Label = "Vote " + readableChainName(PUB_CHAIN_NAME).split(" ")[0];
+  const l2Label = "Vote " + readableChainName(PUB_L2_CHAIN_NAME).split(" ")[0];
 
   const [showOptions, setShowOptions] = useState(false);
   const [option, setOption] = useState<string>();
 
-  const handleVoteClick = () => {
+  const handleVoteClick = (chainName: ChainName) => {
     if (showOptions || votingScoresL1.length === 1) {
-      ctaL1?.onClick?.(parseInt(option ?? "0"));
+      const voteOption = parseInt(option ?? "0");
+      const voteWrite = ctaL1?.onClick as any;
+
+      if (voteWrite) voteWrite(voteOption, chainName);
     } else {
       setShowOptions(true);
     }
@@ -49,7 +65,6 @@ export const CrossChainMajorityVotingResult: React.FC<{
     }
   }, [ctaL1?.disabled, option]);
 
-  const label = showOptions && !ctaL1?.isLoading ? "Submit vote" : ctaL1?.label;
   const disabled = (!!showOptions && !option) || ctaL1?.disabled;
 
   return (
@@ -128,16 +143,28 @@ export const CrossChainMajorityVotingResult: React.FC<{
       {/* Button group */}
       {ctaL1 && (
         <div className="flex w-full flex-col gap-y-4 md:flex-row md:gap-x-4">
-          <Button
-            size="md"
-            className="!rounded-full"
-            disabled={disabled}
-            onClick={handleVoteClick}
-            isLoading={ctaL1.isLoading}
-          >
-            {label}
-          </Button>
-
+          <If condition={canVoteInL1}>
+            <Button
+              size="md"
+              className="!rounded-full"
+              disabled={disabled}
+              onClick={() => handleVoteClick(PUB_CHAIN_NAME)}
+              isLoading={ctaL1.isLoading}
+            >
+              {l1Label}
+            </Button>
+          </If>
+          <If condition={canVoteInL2}>
+            <Button
+              size="md"
+              className="!rounded-full"
+              disabled={disabled}
+              onClick={() => handleVoteClick(PUB_L2_CHAIN_NAME)}
+              isLoading={ctaL1.isLoading}
+            >
+              {l2Label}
+            </Button>
+          </If>
           {showOptions && (
             <Button size="md" className="!rounded-full" onClick={() => setShowOptions(false)} variant="tertiary">
               Cancel

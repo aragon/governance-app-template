@@ -1,81 +1,44 @@
 import { useEffect } from "react";
-import {
-  useAccount,
-  useWriteContract,
-  useWaitForTransactionReceipt,
-  useReadContract,
-  useSwitchChain,
-  useChainId,
-} from "wagmi";
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
 import { TokenVotingAbi } from "@/plugins/toucanVoting/artifacts/TokenVoting.sol";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { parseAbi } from "viem";
 import {
   PUB_CHAIN,
+  PUB_CHAIN_NAME,
   PUB_L2_CHAIN,
-  PUB_TOKEN_ADDRESS,
-  PUB_TOKEN_L2_ADDRESS,
-  PUB_TOUCAN_RECEIVER_ADDRESS,
+  PUB_L2_CHAIN_NAME,
   PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
   PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS,
 } from "@/constants";
 import { useProposal } from "./useProposal";
-import { useProposalVoteList } from "./useProposalVoteList";
-import { useUserCanVote } from "./useUserCanVote";
+import { useCombinedVotesList } from "./useProposalVoteList";
+import { useCanVoteL1, useCanVoteL2 } from "./useUserCanVote";
 import { ToucanRelayAbi } from "../artifacts/ToucanRelay.sol";
-import { ToucanReceiverAbi } from "../artifacts/ToucanReceiver.sol";
-import { optimismSepolia } from "viem/chains";
 import { useProposalRef } from "./useProposalRef";
 import { useForceL1Chain, useForceL2Chain } from "./useForceChain";
-
-const erc20VotesAbi = parseAbi(["function getPastVotes(address owner, uint256 timepoint) view returns (uint256)"]);
+import { ChainName, readableChainName } from "@/utils/chains";
+import { useProposalL1Voting, useProposalL2Voting } from "./useGetPastVotes";
 
 export function useProposalVoting(proposalId: string) {
-  const { address } = useAccount();
   const forceL1 = useForceL1Chain();
   const forceL2 = useForceL2Chain();
   const { reload } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
   const { proposal, status: proposalFetchStatus } = useProposal(proposalId, true);
-  const votes = useProposalVoteList(proposalId, proposal);
-  const canVote = useUserCanVote(proposalId);
+  const votes = useCombinedVotesList(proposalId, proposal);
 
-  const { data: addressVotes } = useReadContract({
-    chainId: PUB_CHAIN.id,
-    address: PUB_TOKEN_ADDRESS,
-    abi: erc20VotesAbi,
-    functionName: "getPastVotes",
-    args: [address!, proposal?.parameters.snapshotBlock || 0n],
-    query: {
-      enabled: proposal?.parameters.snapshotBlock !== undefined,
-    },
-  });
-  const { data: addressVotesL2 } = useReadContract({
-    chainId: PUB_L2_CHAIN.id,
-    address: PUB_TOKEN_L2_ADDRESS,
-    abi: erc20VotesAbi,
-    functionName: "getPastVotes",
-    args: [address!, proposal?.parameters.startDate || 0n],
-    query: {
-      enabled: !!proposal && proposal?.parameters.snapshotBlock !== undefined,
-    },
-  });
+  const canVoteL1 = useCanVoteL1(proposalId);
+  const canVoteInL2 = useCanVoteL2(proposalId);
+
+  const { votes: addressVotesL1 } = useProposalL1Voting(proposalId);
+  const { votes: addressVotesL2 } = useProposalL2Voting(proposalId);
+
   const { writeContract: voteWrite, data: votingTxHash, error: votingError, status: votingStatus } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: votingTxHash });
 
   const { proposalRef } = useProposalRef(Number(proposalId));
-
-  const { data: canVoteInL2 } = useReadContract({
-    chainId: PUB_L2_CHAIN.id,
-    address: PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS,
-    abi: ToucanRelayAbi,
-    functionName: "canVote",
-    args: [proposalRef!, address!, { abstain: 0n, yes: 1n, no: 0n }],
-    query: {
-      enabled: proposalRef !== undefined,
-    },
-  });
 
   // Loading status and errors
   useEffect(() => {
@@ -111,11 +74,9 @@ export function useProposalVoting(proposalId: string) {
     reload();
   }, [votingStatus, votingTxHash, isConfirming, isConfirmed]);
 
-  const voteProposal = async (votingOption: number, autoExecute: boolean = false) => {
-    let effectiveVotes = addressVotes;
-    if (canVoteInL2 && canVoteInL2[0]) {
-      effectiveVotes = addressVotesL2;
-    }
+  const voteProposal = async (votingOption: number, chainName: ChainName) => {
+    const effectiveVotes = chainName === PUB_L2_CHAIN_NAME ? addressVotesL2 : addressVotesL1;
+
     if (effectiveVotes === undefined) {
       addAlert("Could not fetch the user's voting power", { type: "error" });
       return;
@@ -127,7 +88,12 @@ export function useProposalVoting(proposalId: string) {
       abstain: votingOption === 3 ? effectiveVotes : 0n,
     };
 
-    if (canVoteInL2 && canVoteInL2[0]) {
+    if (chainName === PUB_L2_CHAIN_NAME) {
+      if (!canVoteInL2) {
+        addAlert("User cannot vote in " + readableChainName(PUB_L2_CHAIN_NAME), { type: "error" });
+        return;
+      }
+
       forceL2(() =>
         voteWrite({
           chainId: PUB_L2_CHAIN.id,
@@ -138,9 +104,14 @@ export function useProposalVoting(proposalId: string) {
         })
       );
     } else {
+      if (!canVoteL1) {
+        addAlert("User cannot vote in " + readableChainName(PUB_CHAIN_NAME), { type: "error" });
+        return;
+      }
+
       forceL1(() =>
         voteWrite({
-          chainId: PUB_L2_CHAIN.id,
+          chainId: PUB_CHAIN.id,
           abi: TokenVotingAbi,
           address: PUB_TOUCAN_VOTING_PLUGIN_ADDRESS,
           functionName: "vote",
@@ -154,7 +125,7 @@ export function useProposalVoting(proposalId: string) {
     proposal,
     proposalFetchStatus,
     votes,
-    canVote,
+    canVote: canVoteL1,
     voteProposal,
     votingStatus,
     isConfirming,

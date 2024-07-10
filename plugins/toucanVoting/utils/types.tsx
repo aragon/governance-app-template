@@ -17,6 +17,7 @@ export type ProposalParameters = {
   startDate: bigint;
   endDate: bigint;
   snapshotBlock: bigint;
+  snapshotTimestamp: bigint;
   minVotingPower: bigint;
 };
 
@@ -61,4 +62,27 @@ export type VoteCastEvent = {
   proposalId: bigint;
   voteOption: number;
   votingPower: bigint;
+};
+
+// event VoteCast(uint32 dstEid, uint256 indexed proposalRef, address voter, Tally voteOptions);
+export type VoteCastRelayEvent = {
+  dstEid: number;
+  proposalRef: bigint;
+  voter: Address;
+  voteOptions: Tally;
+};
+
+export type VoteCastRelayResponse = {
+  args: VoteCastRelayEvent[];
+};
+
+/// event VotesDispatched(uint32 dstEid, uint256 indexed proposalRef, Tally votes);
+export type VotesDispatchedEvent = {
+  dstEid: number;
+  proposalRef: bigint;
+  votes: Tally;
+};
+
+export type VotesDispatchedResponse = {
+  args: VotesDispatchedEvent[];
 };

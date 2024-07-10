@@ -97,16 +97,6 @@ export const CrossChainVoting: React.FC<ICrossChainVotingProps> = ({ proposalId 
   const l1Label = "Votes " + readableChainName(PUB_CHAIN_NAME).split(" ")[0];
   const l2Label = "Votes " + readableChainName(PUB_L2_CHAIN_NAME).split(" ")[0];
 
-  const l1XChainProps: IBreakdownMajorityVotingResult = {
-    cta: l1.result?.cta,
-    votingScores: (l1.result as IBreakdownMajorityVotingResult)?.votingScores,
-  };
-
-  const l2XChainProps: IBreakdownMajorityVotingResult = {
-    cta: l2.result?.cta,
-    votingScores: (l2.result as IBreakdownMajorityVotingResult)?.votingScores,
-  };
-
   return (
     <AccordionItem value="1" disabled={l1.disabled} className="border-t border-t-neutral-100 bg-neutral-0">
       <AccordionItemHeader className="!items-start !gap-y-5">
@@ -133,9 +123,7 @@ export const CrossChainVoting: React.FC<ICrossChainVotingProps> = ({ proposalId 
             <Tabs.Trigger value="details" label="Details" />
           </Tabs.List>
           <Tabs.Content value="breakdown" asChild={true}>
-            <div className="py-4 pb-8">
-              {l1.result && <CrossChainMajorityVotingResult l1={l1XChainProps} l2={l2XChainProps} />}
-            </div>
+            <div className="py-4 pb-8">{l1.result && <CrossChainMajorityVotingResult proposalId={proposalId} />}</div>
           </Tabs.Content>
           <Tabs.Content value="l1Votes">
             <div className="py-4 pb-8">

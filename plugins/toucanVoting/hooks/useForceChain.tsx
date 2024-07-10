@@ -3,7 +3,8 @@ import { useSwitchChain } from "wagmi";
 
 export function useForceChain(chainId: number) {
   const { switchChain } = useSwitchChain();
-  return (callback: () => void) => switchChain({ chainId }, { onSuccess: callback });
+  return (onSuccess: () => void, onError?: (err: Error) => void, onSettled?: () => void) =>
+    switchChain({ chainId }, { onSuccess, onError, onSettled });
 }
 
 export function useForceL2Chain() {

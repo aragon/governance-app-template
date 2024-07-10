@@ -7,7 +7,7 @@ import { formatEther } from "viem";
 import { useVotingToken } from "../../hooks/useVotingToken";
 import { MessageStatus } from "@layerzerolabs/scan-client";
 import { compactNumber } from "@/utils/numbers";
-import { useGetPendingVotesOnL2 } from "../../hooks/useProposalVotesL2";
+import { useGetPendingVotesOnL2 } from "../../hooks/usePendingVotesRelay";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { readableChainName } from "@/utils/chains";

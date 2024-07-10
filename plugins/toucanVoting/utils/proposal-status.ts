@@ -57,6 +57,6 @@ export function getWinningOption(tally: Tally | undefined): {
   return {
     option: winningOption,
     voteAmount: compactNumber(formatEther(winningVotes), 2),
-    votePercentage: Number((winningVotes / totalVotes) * BigInt(100)),
+    votePercentage: Number((winningVotes * 100n) / totalVotes),
   };
 }

@@ -5,7 +5,7 @@ import { ProposalDataListItem } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
 import { useAccount } from "wagmi";
-import { Tally, VoteCastEvent } from "../../utils/types";
+import { Tally } from "../../utils/types";
 import { getWinningOption } from "../../utils/proposal-status";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
@@ -49,7 +49,7 @@ export default function ProposalCard(props: ProposalInputs) {
 
   const proposalVariant = useProposalStatus(proposal!);
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-  const hasVoted = votes?.some((vote: VoteCastEvent) => vote.voter === address);
+  const hasVoted = votes?.some(({ voter }) => voter === address);
   const winningOption = getWinningOption(proposal?.tally as Tally);
 
   if (!proposal && showLoading) {

@@ -79,7 +79,13 @@ export function useRelayVotesList(proposalId: string, proposal: Proposal | null)
     })) as any;
 
     const newLogs = logs.flatMap((log) => log.args);
-    if (newLogs.length > proposalLogs.length) setLogs(newLogs);
+
+    // find the last value in the new logs for each user
+    const lastLogForEachAddress = newLogs
+      .reverse()
+      .filter((log, index, self) => self.findIndex((l) => l.voter === log.voter) === index);
+
+    if (lastLogForEachAddress.length > proposalLogs.length) setLogs(lastLogForEachAddress);
   }
 
   useEffect(() => {

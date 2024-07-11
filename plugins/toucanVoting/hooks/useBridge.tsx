@@ -1,23 +1,14 @@
 import { OFTAdapterAbi } from "@/plugins/toucanVoting/artifacts/OFTAdapter.sol";
 import { useAccount, useReadContract, useSwitchChain, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import {
-  PUB_CHAIN,
-  PUB_CHAIN_NAME,
-  PUB_L2_CHAIN_NAME,
-  PUB_OFT_ADAPTER_ADDRESSS,
-  PUB_TOKEN_L1_ADDRESS,
-} from "@/constants";
-import { useEffect } from "react";
+import { PUB_CHAIN_NAME, PUB_L2_CHAIN_NAME } from "@/constants";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
-import { getEid, getLzOptions, hexPadAddress } from "../utils/layer-zero";
-import { zeroAddress } from "viem";
+import { OFTBridgeConfig, getEid, getLzOptions, hexPadAddress } from "../utils/layer-zero";
+import { ChainName, getChain } from "@/utils/chains";
+import { useEffect } from "react";
+import { useForceL1Chain, useForceL2Chain } from "./useForceChain";
 
-// amount of gas to send with the bridge transaction
-const DEFAULT_BRIDGE_GAS_LIMIT = BigInt(250_000);
-
-export function useBridgeQuote(tokensToSend: bigint, gasLimit: bigint = DEFAULT_BRIDGE_GAS_LIMIT) {
+export function useBridgeQuote(tokensToSend: bigint, config: OFTBridgeConfig) {
   const { address } = useAccount();
-  const eid = getEid(PUB_L2_CHAIN_NAME);
 
   const {
     data: quote,
@@ -25,17 +16,18 @@ export function useBridgeQuote(tokensToSend: bigint, gasLimit: bigint = DEFAULT_
     error,
     isLoading,
   } = useReadContract({
-    chainId: PUB_CHAIN.id,
-    address: PUB_OFT_ADAPTER_ADDRESSS,
+    chainId: getChain(config.chainName).id,
+    address: config.address,
+    // this is an OFT so the abi is the same
     abi: OFTAdapterAbi,
     functionName: "quoteSend",
     args: [
       {
-        dstEid: eid,
+        dstEid: config.dstEid,
         to: hexPadAddress(address),
         amountLD: tokensToSend,
         minAmountLD: tokensToSend,
-        extraOptions: getLzOptions(gasLimit),
+        extraOptions: getLzOptions(config.gasLimit),
         composeMsg: "0x",
         oftCmd: "0x",
       },
@@ -58,9 +50,9 @@ export function useBridgeQuote(tokensToSend: bigint, gasLimit: bigint = DEFAULT_
 
 export function useBridge() {
   const { address } = useAccount();
-  const dstEid = getEid(PUB_L2_CHAIN_NAME);
   const { addAlert } = useAlerts() as AlertContextProps;
-  const { switchChain } = useSwitchChain();
+  const forceL1 = useForceL1Chain();
+  const forceL2 = useForceL2Chain();
   const {
     writeContract: bridgeWrite,
     data: bridgeTxHash,
@@ -101,34 +93,37 @@ export function useBridge() {
     });
   }, [bridgingStatus, bridgeTxHash, isConfirming, isConfirmed]);
 
-  const bridgeTokens = (tokensToSend: bigint, fee: bigint, gasLimit = DEFAULT_BRIDGE_GAS_LIMIT) => {
-    switchChain({ chainId: PUB_CHAIN.id });
+  const bridgeTokens = (tokensToSend: bigint, fee: bigint, config: OFTBridgeConfig) => {
+    const chainId = getChain(config.chainName).id;
 
-    bridgeWrite({
-      chainId: PUB_CHAIN.id,
-      abi: OFTAdapterAbi,
-      address: PUB_OFT_ADAPTER_ADDRESSS,
-      functionName: "send",
-      args: [
-        {
-          dstEid,
-          to: hexPadAddress(address),
-          amountLD: tokensToSend,
-          minAmountLD: tokensToSend,
-          extraOptions: getLzOptions(gasLimit),
-          composeMsg: "0x",
-          oftCmd: "0x",
-        },
-        {
-          nativeFee: fee,
-          lzTokenFee: BigInt(0),
-        },
-        address!,
-      ],
-      value: fee,
-    });
+    const force = config.chainName === PUB_CHAIN_NAME ? forceL1 : forceL2;
+
+    force(() =>
+      bridgeWrite({
+        chainId,
+        abi: OFTAdapterAbi,
+        address: config.address,
+        functionName: "send",
+        args: [
+          {
+            dstEid: config.dstEid,
+            to: hexPadAddress(address),
+            amountLD: tokensToSend,
+            minAmountLD: tokensToSend,
+            extraOptions: getLzOptions(config.gasLimit),
+            composeMsg: "0x",
+            oftCmd: "0x",
+          },
+          {
+            nativeFee: fee,
+            lzTokenFee: BigInt(0),
+          },
+          address!,
+        ],
+        value: fee,
+      })
+    );
   };
-
   return {
     bridgeTokens,
     bridgeTxHash,

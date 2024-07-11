@@ -8,6 +8,8 @@ import {
   IconType,
   IllustrationHuman,
   ProposalDataListItemSkeleton,
+  Tabs,
+  TabsList,
   type DataListState,
 } from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/toucanVoting/hooks/useCanCreateProposal";
@@ -15,7 +17,7 @@ import Link from "next/link";
 import { Else, If, Then } from "@/components/if";
 import { PUB_TOUCAN_VOTING_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 
-import Bridge from "../components/bridge/BridgeToL2";
+import BridgeOFT, { BridgeToL1, BridgeToL2 } from "../components/bridge/BridgeOFT";
 
 const DEFAULT_PAGE_SIZE = 6;
 
@@ -151,8 +153,8 @@ export default function Proposals() {
               </Else>
             </If>
           </div>
-          <div className="min-w-[33%]">
-            <Bridge />
+          <div className="flex min-w-[33%] flex-col gap-y-3">
+            <BridgeOFT />
           </div>
         </div>
       </SectionView>

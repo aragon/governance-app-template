@@ -13,7 +13,7 @@ export function useProposalRef(proposalId: number) {
     abi: ToucanReceiverAbi,
     functionName: "getProposalRef",
     args: [BigInt(proposalId ?? 0)],
-    query: { enabled: !!proposalId },
+    query: { enabled: proposalId !== undefined },
   });
 
   return {

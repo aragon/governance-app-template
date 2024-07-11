@@ -1,13 +1,11 @@
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { PUB_L2_CHAIN, PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS } from "@/constants";
+import { PUB_L2_CHAIN, PUB_L2_CHAIN_NAME, PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS } from "@/constants";
 import { useEffect } from "react";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { ToucanRelayAbi } from "../artifacts/ToucanRelay.sol";
 import { useProposalRef } from "./useProposalRef";
 import { useForceL2Chain } from "./useForceChain";
-
-// amount of gas to send with the bridge transaction
-const DEFAULT_DISPATCH_GAS_LIMIT = BigInt(300_000);
+import { getGasForCrossChainOperation } from "../utils/layer-zero";
 
 type LzSendParamsDispatch = {
   gasLimit: bigint;
@@ -18,7 +16,10 @@ type LzSendParamsDispatch = {
   };
 };
 
-export function useDispatchQuote(proposalId: number, gasLimit: bigint = DEFAULT_DISPATCH_GAS_LIMIT) {
+export function useDispatchQuote(
+  proposalId: number,
+  gasLimit = getGasForCrossChainOperation(PUB_L2_CHAIN_NAME, "DISPATCH_VOTES")
+) {
   const { proposalRef } = useProposalRef(proposalId);
 
   const {

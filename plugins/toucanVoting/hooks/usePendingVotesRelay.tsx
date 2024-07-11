@@ -1,13 +1,20 @@
 import { usePublicClient, useReadContract } from "wagmi";
 import { useProposalRef } from "./useProposalRef";
-import { PUB_L2_CHAIN, PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS } from "@/constants";
+import { PUB_CHAIN, PUB_L2_CHAIN, PUB_TOUCAN_RECEIVER_ADDRESS, PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS } from "@/constants";
 import { ToucanRelayAbi } from "../artifacts/ToucanRelay.sol";
 import { getAbiItem } from "viem";
-import { Proposal, VotesDispatchedEvent, VotesDispatchedResponse } from "../utils/types";
+import {
+  Proposal,
+  VotesDispatchedEvent,
+  VotesDispatchedResponse,
+  VotesReceivedEvent,
+  VotesReceivedResponse,
+} from "../utils/types";
 import { useEffect, useState } from "react";
 import { useProposal } from "./useProposal";
 import { useRelayVotesList } from "./useProposalVoteList";
 import { QueryKey } from "@tanstack/react-query";
+import { ToucanReceiverAbi } from "../artifacts/ToucanReceiver.sol";
 
 export function useGetProposalVotesL2(proposalId: number) {
   const { proposalRef } = useProposalRef(proposalId);
@@ -36,6 +43,7 @@ export function useGetProposalVotesL2(proposalId: number) {
 
 const VoteDispatchEvent = getAbiItem({ abi: ToucanRelayAbi, name: "VotesDispatched" });
 
+/// This doesn't work if the message doesn't make it to the receiver
 export function useDispatchEvents(proposalId: string, proposal: Proposal | null) {
   const publicClient = usePublicClient({
     chainId: PUB_L2_CHAIN.id,
@@ -49,7 +57,7 @@ export function useDispatchEvents(proposalId: string, proposal: Proposal | null)
 
     const logs: VotesDispatchedResponse[] = (await publicClient.getLogs({
       address: PUB_TOUCAN_VOTING_PLUGIN_L2_ADDRESS,
-      event: VoteDispatchEvent as any,
+      event: VoteDispatchEvent,
       args: {
         proposalRef,
       },
@@ -69,6 +77,40 @@ export function useDispatchEvents(proposalId: string, proposal: Proposal | null)
   return dispatchLogs;
 }
 
+const VotesReceivedAbiEvent = getAbiItem({ abi: ToucanReceiverAbi, name: "VotesReceived" });
+
+/// this is on the receiver, but does not guarantee votes have been submitted on the proposal
+export function useVotesReceivedEvents(proposalId: number, proposal: Proposal | null): VotesReceivedEvent[] | [] {
+  const publicClient = usePublicClient({
+    chainId: PUB_CHAIN.id,
+  });
+  const [votesReceived, setVotesReceived] = useState<VotesReceivedEvent[]>([]);
+
+  async function getLogs() {
+    if (!publicClient || !proposal) return;
+
+    const logs: VotesReceivedResponse[] = (await publicClient.getLogs({
+      address: PUB_TOUCAN_RECEIVER_ADDRESS,
+      event: VotesReceivedAbiEvent,
+      // can't use proposal id as log b/c not indexed
+      // fromBlock: proposal?.parameters?.snapshotBlock ?? 0n,
+      // some networks mess w. blocks, you'd need to fetch arbitrum blocks
+      // for log queries
+      fromBlock: 0n,
+      toBlock: "latest",
+    })) as any;
+
+    const newLogs = logs.flatMap((log) => log.args).filter((f) => Number(f.proposalId) === proposalId);
+    if (newLogs.length > votesReceived.length) setVotesReceived(newLogs);
+  }
+
+  useEffect(() => {
+    getLogs();
+  }, [proposalId, proposal?.parameters?.snapshotBlock]);
+
+  return votesReceived ?? [];
+}
+
 export function useGetPendingVotesOnL2(proposalId: number): {
   queries: QueryKey[];
   hasPending: boolean;
@@ -80,19 +122,15 @@ export function useGetPendingVotesOnL2(proposalId: number): {
   const votes = useRelayVotesList(proposalId.toString(), proposal);
 
   // get the dispatch events
-  const dispatches = useDispatchEvents(proposalId.toString(), proposal);
+  const receipts = useVotesReceivedEvents(proposalId, proposal);
 
-  console.log({ proposal, votes, dispatches });
-
-  if (!proposal || !votes || !dispatches || !dispatches.length) {
+  if (!proposal || !votes || !receipts) {
     return {
       queries: [proposalQueryKey],
       hasPending: false,
       pending: { yes: 0n, no: 0n, abstain: 0n },
     };
   }
-
-  const lastDispatch = dispatches[dispatches.length - 1];
 
   // add the votes
   const totalVotes = votes.reduce(
@@ -106,11 +144,13 @@ export function useGetPendingVotesOnL2(proposalId: number): {
     { yes: 0n, no: 0n, abstain: 0n }
   );
 
+  const lastReceipt = receipts[receipts.length - 1];
+
   // if this total is different from the last dispatch, we have pending votes
   const pending = {
-    yes: totalVotes.yes - lastDispatch.votes.yes,
-    no: totalVotes.no - lastDispatch.votes.no,
-    abstain: totalVotes.abstain - lastDispatch.votes.abstain,
+    yes: totalVotes.yes - (lastReceipt?.votes.yes ?? 0n),
+    no: totalVotes.no - (lastReceipt?.votes.no ?? 0n),
+    abstain: totalVotes.abstain - (lastReceipt?.votes.abstain ?? 0n),
   };
 
   return {

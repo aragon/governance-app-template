@@ -1,5 +1,6 @@
 import { Address } from "viem";
 import { Action } from "@/utils/types";
+import { MessagingReceipt } from "./layer-zero";
 
 export type ProposalInputs = {
   proposalId: bigint;
@@ -64,7 +65,12 @@ export type VoteCastEvent = {
   votingPower: bigint;
 };
 
-// event VoteCast(uint32 dstEid, uint256 indexed proposalRef, address voter, Tally voteOptions);
+//  event VoteCast(
+//   uint32 indexed dstEid,
+//   uint256 indexed proposalRef,
+//   address indexed voter,
+//   Tally voteOptions
+// );
 export type VoteCastRelayEvent = {
   dstEid: number;
   proposalRef: bigint;
@@ -76,13 +82,31 @@ export type VoteCastRelayResponse = {
   args: VoteCastRelayEvent[];
 };
 
-/// event VotesDispatched(uint32 dstEid, uint256 indexed proposalRef, Tally votes);
+// event VotesDispatched(
+//   uint32 indexed dstEid,
+//   uint256 indexed proposalRef,
+//   Tally votes,
+//   MessagingReceipt receipt
+// );
 export type VotesDispatchedEvent = {
   dstEid: number;
   proposalRef: bigint;
   votes: Tally;
+  receipt: MessagingReceipt;
 };
 
 export type VotesDispatchedResponse = {
   args: VotesDispatchedEvent[];
+};
+
+///  event VotesReceived(uint256 proposalId,uint256 votingChainId,address plugin,IVoteContainer.Tally votes);
+export type VotesReceivedEvent = {
+  proposalId: bigint;
+  votingChainId: bigint;
+  plugin: Address;
+  votes: Tally;
+};
+
+export type VotesReceivedResponse = {
+  args: VotesReceivedEvent[];
 };

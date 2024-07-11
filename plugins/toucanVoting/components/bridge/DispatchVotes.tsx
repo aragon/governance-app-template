@@ -1,4 +1,4 @@
-import { Button, Card, Heading, Tooltip } from "@aragon/ods";
+import { Button, Card, Heading, Spinner, Tooltip } from "@aragon/ods";
 import { useCanDispatch, useDispatchQuote, useDispatchVotes } from "../../hooks/useDispatchVotes";
 import { useCrossChainTransaction } from "../../hooks/useCrossChainTransactions";
 import { PUB_CHAIN, PUB_CHAIN_NAME, PUB_L2_CHAIN_NAME } from "@/constants";
@@ -28,10 +28,14 @@ export default function DispatchVotes({ id: proposalId }: { id: number }) {
   const { pending, hasPending, queries } = useGetPendingVotesOnL2(proposalId);
   const { symbol } = useVotingToken();
 
-  const { dispatchVotes, dispatchTxHash } = useDispatchVotes(proposalId, quote?.lzSendParams);
-  const { message } = useCrossChainTransaction(dispatchTxHash, PUB_L2_CHAIN_NAME);
+  const { dispatchVotes, dispatchTxHash, isConfirming, dispatchTxStatus } = useDispatchVotes(
+    proposalId,
+    quote?.lzSendParams
+  );
+  const { isBridged, isBridging, message } = useCrossChainTransaction(dispatchTxHash, PUB_L2_CHAIN_NAME);
 
-  const disabled = !canDispatch || !hasPending || message?.status === MessageStatus.INFLIGHT;
+  const isInFlight = isBridging || isConfirming;
+  const disabled = !canDispatch || !hasPending || isBridging || isConfirming || dispatchTxStatus === "pending";
 
   // parse to sensible values
   const [y, n, a] = [pending.yes, pending.no, pending.abstain].map((i) =>
@@ -42,7 +46,7 @@ export default function DispatchVotes({ id: proposalId }: { id: number }) {
     if (message?.status === MessageStatus.DELIVERED && Array.isArray(queries)) {
       queries.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
     }
-  }, [message]);
+  }, [isBridged, message, queries]);
 
   return (
     <Card className="flex flex-col gap-5 p-4 shadow-neutral-sm">
@@ -64,7 +68,7 @@ export default function DispatchVotes({ id: proposalId }: { id: number }) {
         <SplitRow left="Abstain" right={a} />
       </Card>
       <Button disabled={disabled} onClick={dispatchVotes}>
-        {hasPending ? "Dispatch Votes" : "Nothing to Dispatch"}
+        {isInFlight ? <Spinner size="lg" variant="neutral" /> : hasPending ? "Dispatch Votes" : "Nothing to Dispatch"}
       </Button>
     </Card>
   );

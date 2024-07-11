@@ -1,13 +1,14 @@
-import { PUB_CHAIN, PUB_TOKEN_L1_ADDRESS } from "@/constants";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useEffect } from "react";
 import { Address, erc20Abi } from "viem";
-import { useAccount, useReadContract, useSwitchChain, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { useForceL1Chain } from "./useForceChain";
+import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useForceChain } from "./useForceChain";
+import { ChainName, getChain } from "@/utils/chains";
+import { PUB_CHAIN_NAME } from "@/constants";
 
-export function useApproveTokens(token: Address) {
+export function useApproveTokens(token: Address, chainName: ChainName) {
   const { addAlert } = useAlerts() as AlertContextProps;
-  const forceL1 = useForceL1Chain();
+  const { forceL1, forceL2 } = useForceChain();
   const {
     writeContract: approveWrite,
     data: approveTxHash,
@@ -52,9 +53,10 @@ export function useApproveTokens(token: Address) {
   }, [approveStatus, approveTxHash, isConfirming, isConfirmed]);
 
   const approveTokens = (amount: bigint, spender: Address) => {
-    forceL1(() =>
+    const force = chainName === PUB_CHAIN_NAME ? forceL1 : forceL2;
+    force(() =>
       approveWrite({
-        chainId: PUB_CHAIN.id,
+        chainId: getChain(chainName).id,
         address: token,
         abi: erc20Abi,
         functionName: "approve",
@@ -71,7 +73,7 @@ export function useApproveTokens(token: Address) {
   };
 }
 
-export function useAllowance(token: Address, spender: Address) {
+export function useAllowance(token: Address, spender: Address, chainName: ChainName) {
   const { address, isConnected } = useAccount();
 
   const {
@@ -81,7 +83,7 @@ export function useAllowance(token: Address, spender: Address) {
     isLoading,
     queryKey,
   } = useReadContract({
-    chainId: PUB_CHAIN.id,
+    chainId: getChain(chainName).id,
     address: token,
     abi: erc20Abi,
     functionName: "allowance",

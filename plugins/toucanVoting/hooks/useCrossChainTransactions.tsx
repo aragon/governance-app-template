@@ -10,12 +10,17 @@ function layerZeroScanURL(chainName: ChainName) {
 
 export function useCrossChainTransaction(srcTx: `0x${string}` | undefined, srcChainName: ChainName) {
   const [message, setMessage] = useState<Message | null>(null);
+  const [isBridging, setIsBridging] = useState(false);
+  const [isBridged, setIsBridged] = useState(false);
+  const [isFailed, setIsFailed] = useState(false);
   const [scanUrl, setScanUrl] = useState("");
   useCrossChainNotifications({ message, scanUrl });
   const srcEid = getEid(srcChainName);
 
   useEffect(() => {
     if (!srcTx || !srcEid) return;
+
+    if (!isBridged || !isBridging) setIsBridging(true);
 
     const fetchMessage = async () => {
       try {
@@ -24,6 +29,13 @@ export function useCrossChainTransaction(srcTx: `0x${string}` | undefined, srcCh
           const msg = messages[0];
           setMessage(msg);
           setScanUrl(`${layerZeroScanURL(srcChainName)}/tx/${srcTx}`);
+          if (msg.status === MessageStatus.DELIVERED) {
+            setIsBridged(true);
+            setIsBridging(false);
+          } else if (msg.status === MessageStatus.FAILED) {
+            setIsFailed(true);
+            setIsBridging(false);
+          }
         }
       } catch (error) {
         console.error("Error fetching cross-chain message:", error);
@@ -33,12 +45,12 @@ export function useCrossChainTransaction(srcTx: `0x${string}` | undefined, srcCh
     fetchMessage();
     const intervalId = setInterval(fetchMessage, 3000); // Poll every 3 seconds
 
-    if (message?.dstTxHash) clearInterval(intervalId); // Stop polling if message has been delivered
+    if (!isBridging && (isBridged || isFailed)) clearInterval(intervalId);
 
     return () => clearInterval(intervalId); // Cleanup on component unmount
   }, [srcTx, srcEid, srcChainName]);
 
-  return { message, scanUrl };
+  return { message, scanUrl, isBridged, isBridging };
 }
 
 export function useCrossChainNotifications({ message, scanUrl }: { message: Message | null; scanUrl: string }) {

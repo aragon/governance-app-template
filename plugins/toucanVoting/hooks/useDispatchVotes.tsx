@@ -92,7 +92,7 @@ export function useDispatchVotes(proposalId: number, lzSendParams: LzSendParamsD
     }
 
     // final state: success
-    addAlert("Dispatch request successfully sent", {
+    addAlert("The message has been accepted by the bridge and will be picked up shortly", {
       description: "The transaction has been validated",
       type: "success",
       txHash: dispatchTxHash,

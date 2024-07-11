@@ -1,9 +1,9 @@
 import { OFTAdapterAbi } from "@/plugins/toucanVoting/artifacts/OFTAdapter.sol";
 import { useAccount, useReadContract, useSwitchChain, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { PUB_CHAIN_NAME, PUB_L2_CHAIN_NAME } from "@/constants";
+import { PUB_CHAIN_NAME } from "@/constants";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { OFTBridgeConfig, getEid, getLzOptions, hexPadAddress } from "../utils/layer-zero";
-import { ChainName, getChain } from "@/utils/chains";
+import { getChain } from "@/utils/chains";
 import { useEffect } from "react";
 import { useForceL1Chain, useForceL2Chain } from "./useForceChain";
 
@@ -58,6 +58,7 @@ export function useBridge() {
     data: bridgeTxHash,
     error: bridgingError,
     status: bridgingStatus,
+    ...rest
   } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: bridgeTxHash });
 
@@ -130,5 +131,6 @@ export function useBridge() {
     bridgingStatus,
     isConfirming,
     isConfirmed,
+    ...rest,
   };
 }

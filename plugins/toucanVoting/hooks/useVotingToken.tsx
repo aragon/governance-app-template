@@ -46,6 +46,7 @@ export function useVotingTokenL2Balance() {
     error,
     isError,
     isLoading,
+    queryKey,
   } = useReadContract({
     address: PUB_TOKEN_L2_ADDRESS,
     abi: erc20Abi,
@@ -62,6 +63,7 @@ export function useVotingTokenL2Balance() {
       isLoading,
       isError,
     },
+    queryKey,
   };
 }
 
@@ -73,6 +75,7 @@ export function useVotingTokenBalance() {
     error,
     isError,
     isLoading,
+    queryKey,
   } = useReadContract({
     chainId: PUB_CHAIN.id,
     address: PUB_TOKEN_L1_ADDRESS,
@@ -89,5 +92,6 @@ export function useVotingTokenBalance() {
       isLoading,
       isError,
     },
+    queryKey,
   };
 }

@@ -1,6 +1,6 @@
-import { polygon, mainnet, sepolia, arbitrum, polygonMumbai, Chain } from "@wagmi/core/chains";
+import { polygon, mainnet, sepolia, holesky, arbitrum, polygonMumbai, Chain } from "@wagmi/core/chains";
 
-const chainNames = ["mainnet", "polygon", "sepolia", "mumbai", "arbitrum"] as const;
+const chainNames = ["mainnet", "polygon", "sepolia", "holesky", "mumbai", "arbitrum"] as const;
 export type ChainName = (typeof chainNames)[number];
 
 export function getChain(chainName: ChainName): Chain {
@@ -13,6 +13,8 @@ export function getChain(chainName: ChainName): Chain {
       return arbitrum;
     case "sepolia":
       return sepolia;
+    case "holesky":
+      return holesky;
     case "mumbai":
       return polygonMumbai;
     default:

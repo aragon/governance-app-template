@@ -42,16 +42,17 @@ export const useAbi = (contractAddress: Address) => {
     error,
   } = useQuery<AbiFunction[], Error>({
     queryKey: ["abi", resolvedAddress || "", !!publicClient],
-    queryFn: () => {
+    queryFn: async () => {
       if (!resolvedAddress || !isAddress(resolvedAddress) || !publicClient) {
-        return Promise.resolve([]);
+        return [];
+      } else if (!(await isContract(resolvedAddress, publicClient))) {
+        return [];
       }
 
-      const abiLoader = getEtherscanAbiLoader();
       return whatsabi
         .autoload(resolvedAddress, {
           provider: publicClient,
-          abiLoader,
+          abiLoader: getEtherscanAbiLoader(),
           followProxies: false,
           enableExperimentalMetadata: true,
         })
@@ -68,15 +69,7 @@ export const useAbi = (contractAddress: Address) => {
               type: item.type,
             });
           }
-          functionItems.sort((a, b) => {
-            const a_RO = ["pure", "view"].includes(a.stateMutability);
-            const b_RO = ["pure", "view"].includes(b.stateMutability);
-
-            if (a_RO === b_RO) return 0;
-            else if (a_RO) return 1;
-            else if (b_RO) return -1;
-            return 0;
-          });
+          functionItems.sort(abiSortCallback);
           return functionItems;
         })
         .catch((err) => {
@@ -125,6 +118,11 @@ function getEtherscanAbiLoader() {
         apiKey: PUB_ETHERSCAN_API_KEY,
         baseURL: "https://api-sepolia.etherscan.io/api",
       });
+    case "holesky":
+      return new whatsabi.loaders.EtherscanABILoader({
+        apiKey: PUB_ETHERSCAN_API_KEY,
+        baseURL: "https://api-holesky.etherscan.io/api",
+      });
     case "mumbai":
       return new whatsabi.loaders.EtherscanABILoader({
         apiKey: PUB_ETHERSCAN_API_KEY,
@@ -133,4 +131,22 @@ function getEtherscanAbiLoader() {
     default:
       throw new Error("Unknown chain");
   }
+}
+
+function isContract(address: Address, publicClient: ReturnType<typeof usePublicClient>) {
+  if (!publicClient) return Promise.reject(new Error("Invalid client"));
+
+  return publicClient.getBytecode({ address }).then((bytecode) => {
+    return bytecode !== undefined && bytecode !== "0x";
+  });
+}
+
+function abiSortCallback(a: AbiFunction, b: AbiFunction) {
+  const a_RO = ["pure", "view"].includes(a.stateMutability);
+  const b_RO = ["pure", "view"].includes(b.stateMutability);
+
+  if (a_RO === b_RO) return 0;
+  else if (a_RO) return 1;
+  else if (b_RO) return -1;
+  return 0;
 }

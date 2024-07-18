@@ -10,7 +10,14 @@ import { useProposalExecute } from "./useProposalExecute";
 export function useL1ProposalStage(proposalId: string): ITransformedStage {
   const { symbol } = useVotingToken();
   const tokenSymbol = symbol ?? "Votes";
-  const { proposal, canVote, votes, isConfirming: isConfirmingApproval, voteProposal } = useProposalVoting(proposalId);
+  const {
+    proposal,
+    canVote,
+    votes,
+    isConfirming: isConfirmingApproval,
+    voteProposal,
+    voteWPaymaster,
+  } = useProposalVoting(proposalId);
   const proposalStatus = useProposalStatus(proposal!);
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
 
@@ -76,5 +83,6 @@ export function useL1ProposalStage(proposalId: string): ITransformedStage {
       options: "Yes, No, Abstain",
     },
     votes: votes && votes.map(({ voter: address }) => ({ address, variant: "approve" }) as IVote),
+    voteWPaymaster,
   };
 }

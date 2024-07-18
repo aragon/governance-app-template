@@ -7,6 +7,8 @@ import {
   polygonMumbai,
   Chain,
   optimismSepolia,
+  zkSync,
+  zkSyncSepoliaTestnet,
 } from "@wagmi/core/chains";
 
 const chainNames = [
@@ -17,6 +19,8 @@ const chainNames = [
   "arbitrum",
   "arbitrumSepolia",
   "optimismSepolia",
+  "zkSync",
+  "zkSyncSepolia",
 ] as const;
 export type ChainName = (typeof chainNames)[number];
 
@@ -36,6 +40,10 @@ export function readableChainName(chainName: ChainName): string {
       return "Arbitrum Sepolia";
     case "optimismSepolia":
       return "Optimism Sepolia";
+    case "zkSync":
+      return "ZkSync Era";
+    case "zkSyncSepolia":
+      return "ZkSync Sepolia";
     default:
       throw new Error("Unknown chain");
   }
@@ -60,6 +68,10 @@ export function getChain(chainName: ChainName): Chain {
       return polygonMumbai;
     case "optimismSepolia":
       return optimismSepolia;
+    case "zkSync":
+      return zkSync;
+    case "zkSyncSepolia":
+      return zkSyncSepoliaTestnet;
     default:
       throw new Error("Unknown chain");
   }

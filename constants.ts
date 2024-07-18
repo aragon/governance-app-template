@@ -53,3 +53,7 @@ export const PUB_PROJECT_URL = "https://aragon.org/";
 export const PUB_WALLET_ICON = "https://avatars.githubusercontent.com/u/37784886";
 
 export const PUB_DISCORD_URL = "https://discord.com/";
+
+// paymasters && zkSync
+export const PUB_MINTABLE_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_MINTABLE_TOKEN_ADDRESS ?? "") as Address;
+export const PUB_PAYMASTER_ADDRESS = (process.env.NEXT_PUBLIC_PAYMASTER_ADDRESS ?? "") as Address;

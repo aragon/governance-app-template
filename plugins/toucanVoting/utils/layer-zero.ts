@@ -21,6 +21,11 @@ export function getEid(chainName: ChainName): EndpointId {
       return EndpointId.POLYGON_V2_TESTNET;
     case "optimismSepolia":
       return EndpointId.OPTSEP_V2_TESTNET;
+    case "zkSync":
+      return EndpointId.ZKSYNC_V2_MAINNET;
+    // wont work tho
+    case "zkSyncSepolia":
+      return EndpointId.ZKSYNCSEP_V2_TESTNET;
     default:
       throw new Error("Unknown chain");
   }
@@ -61,6 +66,14 @@ const CROSS_CHAIN_GAS_DEFAULTS: CrossChainGas = {
   ["arbitrumSepolia"]: {
     BRIDGE_OFT: 250_000,
     RELAY_ACTIONS: 250_000,
+  },
+  ["arbitrum"]: {
+    BRIDGE_OFT: 250_000,
+    RELAY_ACTIONS: 250_000,
+  },
+  ["zkSync"]: {
+    BRIDGE_OFT: 250_000,
+    DISPATCH_VOTES: 250_000,
   },
 };
 

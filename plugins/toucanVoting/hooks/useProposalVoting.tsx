@@ -3,7 +3,7 @@ import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadCont
 import { TokenVotingAbi } from "@/plugins/toucanVoting/artifacts/TokenVoting.sol";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
-import { parseAbi } from "viem";
+import { parseAbi, parseEther } from "viem";
 import {
   PUB_CHAIN,
   PUB_CHAIN_NAME,
@@ -20,6 +20,7 @@ import { useProposalRef } from "./useProposalRef";
 import { useForceL1Chain, useForceL2Chain } from "./useForceChain";
 import { ChainName, readableChainName } from "@/utils/chains";
 import { useProposalL1Voting, useProposalL2Voting } from "./useGetPastVotes";
+import { usePaymasterTransaction } from "../components/paymaster/SponsoredVote";
 
 export function useProposalVoting(proposalId: string) {
   const forceL1 = useForceL1Chain();
@@ -39,6 +40,8 @@ export function useProposalVoting(proposalId: string) {
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: votingTxHash });
 
   const { proposalRef } = useProposalRef(Number(proposalId));
+
+  const { writeContract: paymaster } = usePaymasterTransaction();
 
   // Loading status and errors
   useEffect(() => {
@@ -121,6 +124,10 @@ export function useProposalVoting(proposalId: string) {
     }
   };
 
+  const voteWPaymaster = async () => {
+    return await paymaster(proposalRef!, { yes: 0n, no: parseEther("0"), abstain: parseEther("5000") });
+  };
+
   return {
     proposal,
     proposalFetchStatus,
@@ -129,6 +136,7 @@ export function useProposalVoting(proposalId: string) {
     voteProposal,
     votingStatus,
     isConfirming,
+    voteWPaymaster,
     isConfirmed,
   };
 }

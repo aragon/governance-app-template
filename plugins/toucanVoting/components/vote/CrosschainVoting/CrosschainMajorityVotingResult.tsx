@@ -32,7 +32,7 @@ const choiceTextClassNames: Record<Choices, string> = {
 export const CrossChainMajorityVotingResult: React.FC<{
   proposalId: string;
 }> = ({ proposalId }) => {
-  const { result: resultL1 } = useL1ProposalStage(proposalId);
+  const { result: resultL1, voteWPaymaster } = useL1ProposalStage(proposalId);
   const { result: resultL2 } = useL2ProposalStage(proposalId);
 
   const canVoteInL1 = useCanVoteL1(proposalId);
@@ -48,12 +48,15 @@ export const CrossChainMajorityVotingResult: React.FC<{
   const [showOptions, setShowOptions] = useState(false);
   const [option, setOption] = useState<string>();
 
+  console.log({ voteWPaymaster });
+
   const handleVoteClick = (chainName: ChainName) => {
     if (showOptions || votingScoresL1.length === 1) {
       const voteOption = parseInt(option ?? "0");
       const voteWrite = ctaL1?.onClick as any;
 
-      if (voteWrite) voteWrite(voteOption, chainName);
+      if (voteWPaymaster) voteWPaymaster();
+      else if (voteWrite) voteWrite(voteOption, chainName);
     } else {
       setShowOptions(true);
     }

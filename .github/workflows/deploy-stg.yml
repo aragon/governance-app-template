@@ -33,4 +33,3 @@ jobs:
           dist_path: .
           project_name: aragonette
           enable_cache: false
-

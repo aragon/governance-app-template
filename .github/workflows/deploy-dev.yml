@@ -1,0 +1,35 @@
+name: Deploy develop
+
+on:
+  pull_request:
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Render penv
+        id: render_template
+        uses: chuhlomin/render-template@v1
+        with:
+          template: .env.production
+          result_path: .env.production
+          vars: |
+            NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
+            NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID }}
+            NEXT_PUBLIC_IPFS_API_KEY: ${{ secrets.NEXT_PUBLIC_IPFS_API_KEY }}
+            NEXT_PUBLIC_ETHERSCAN_API_KEY: ${{ secrets.NEXT_PUBLIC_ETHERSCAN_API_KEY }}
+
+      - uses: darwinia-network/devops/actions/smart-vercel@main
+        name: Deploy to Vercel
+        with:
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
+          vercel_group: itering
+          preview_output: true
+          script_run: false
+          dist_path: .
+          project_name: aragonette
+          enable_notify_comment: true
+          enable_cache: false

@@ -1,7 +1,7 @@
 import { Chain, createPublicClient, createWalletClient, http } from "viem";
 import { deploymentAccount as account } from "./account";
 import { getEnv } from "./env";
-import { sepolia, mainnet, polygon, arbitrum, base } from "viem/chains";
+import { sepolia, mainnet, polygon, arbitrum, base, darwinia } from "viem/chains";
 
 const ALCHEMY_API_KEY = getEnv("DEPLOYMENT_ALCHEMY_API_KEY", true);
 const WEB3_ENDPOINT = getEnv("DEPLOYMENT_WEB3_ENDPOINT", true);
@@ -34,6 +34,8 @@ function resolveNetwork(): Chain {
       return arbitrum;
     case "base":
       return base;
+    case "darwinia":
+      return darwinia;
   }
   throw new Error("Unsupported network");
 }

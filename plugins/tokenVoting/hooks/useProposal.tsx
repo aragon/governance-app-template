@@ -57,13 +57,13 @@ export function useProposal(proposalId: string, autoRefresh = false) {
         address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
         event: ProposalCreatedEvent as any,
         args: {
-          proposalId: proposalId,
+          proposalId: BigInt(proposalId),
         } as any,
         fromBlock: proposalData.parameters.snapshotBlock,
-        toBlock: proposalData.parameters.startDate,
+        toBlock: proposalData.parameters.snapshotBlock + BigInt(1),
       })
       .then((logs) => {
-        if (!logs || !logs.length) throw new Error("No creation logs");
+        if (!logs || !logs.length) throw new Error("No creation logs of token voting");
 
         const log: ProposalCreatedLogResponse = logs[0] as any;
         setProposalCreationEvent(log.args);

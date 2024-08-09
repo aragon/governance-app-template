@@ -17,6 +17,7 @@ export type ProposalParameters = {
   startDate: bigint;
   endDate: bigint;
   snapshotBlock: bigint;
+  snapshotTimepoint: bigint;
   minVotingPower: bigint;
 };
 

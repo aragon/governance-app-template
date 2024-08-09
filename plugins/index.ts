@@ -18,13 +18,6 @@ type PluginItem = {
 
 export const plugins: PluginItem[] = [
   {
-    id: "core-proposals",
-    folderName: "dualGovernance",
-    title: "Core team proposals",
-    icon: IconType.APP_MEMBERS,
-    pluginAddress: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-  },
-  {
     id: "community-proposals",
     folderName: "tokenVoting",
     title: "Community proposals",

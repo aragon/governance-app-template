@@ -12,14 +12,14 @@ import {
   DEPLOYMENT_TOKEN_NAME,
   DEPLOYMENT_TOKEN_RECEIVERS,
   DEPLOYMENT_TOKEN_SYMBOL,
+  DEPLOYMENT_TARGET_CHAIN_ID,
 } from "./priv-constants";
+import { contracts } from "@aragon/osx-commons-configs";
 
 export async function deployTokenContracts() {
   const daoToken = await deployGovernanceErc20Token();
-  const governanceErc20Base = await deployGovernanceErc20Base();
-  const governanceWrappedErc20Base = await deployGovernanceWrappedErc20Base();
 
-  return { daoToken, governanceErc20Base, governanceWrappedErc20Base };
+  return { daoToken };
 }
 
 async function deployGovernanceErc20Token(): Promise<Address> {
@@ -45,46 +45,6 @@ async function deployGovernanceErc20Token(): Promise<Address> {
     throw new Error("The ERC20 token could not be deployed");
   }
   console.log("  - ERC20 token:", receipt.contractAddress);
-
-  return receipt.contractAddress;
-}
-
-async function deployGovernanceErc20Base(): Promise<Address> {
-  console.log("- Deploying GovernanceErc20 (base implementation)");
-
-  const hash = await walletClient.deployContract({
-    abi: GovernanceErc20ABI,
-    account,
-    bytecode: GovernanceErc20Bytecode,
-    args: [ADDRESS_ZERO, "", "", { amounts: [], receivers: [] }],
-  });
-  console.log("  - Waiting for transaction (" + hash + ")");
-
-  const receipt = await publicClient.waitForTransactionReceipt({ hash });
-  if (!receipt.contractAddress) {
-    throw new Error("The base contract for GovernanceErc20 could not be deployed");
-  }
-  console.log("  - GovernanceErc20:", receipt.contractAddress);
-
-  return receipt.contractAddress;
-}
-
-async function deployGovernanceWrappedErc20Base(): Promise<Address> {
-  console.log("- Deploying GovernanceWrappedErc20 (base implementation)");
-
-  const hash = await walletClient.deployContract({
-    abi: GovernanceWrappedErc20ABI,
-    account,
-    bytecode: GovernanceWrappedErc20Bytecode,
-    args: [ADDRESS_ZERO, "", ""],
-  });
-  console.log("  - Waiting for transaction (" + hash + ")");
-
-  const receipt = await publicClient.waitForTransactionReceipt({ hash });
-  if (!receipt.contractAddress) {
-    throw new Error("The base contract for GovernanceWrappedErc20 could not be deployed");
-  }
-  console.log("  - GovernanceWrappedErc20:", receipt.contractAddress);
 
   return receipt.contractAddress;
 }

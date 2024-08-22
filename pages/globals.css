@@ -5,17 +5,78 @@
 @layer base {
   :root {
     --tw-text-opacity: 1;
-    --color-primary-50: rgb(var(--ods-color-neutral-50)); /* former: 235,242,254 */
-    --color-primary-100: rgb(var(--ods-color-neutral-100)); /* former: 215,230,253 */
-    --color-primary-200: rgb(var(--ods-color-neutral-200)); /* former: 176,205,251 */
-    --color-primary-300: rgb(var(--ods-color-neutral-300)); /* former: 137,180,250 */
-    --color-primary-400: rgb(var(--ods-color-neutral-400)); /* former: 98,155,248 */
-    --color-primary-500: rgb(var(--ods-color-neutral-500)); /* former: 59,130,246 */
-    --color-primary-600: rgb(var(--ods-color-neutral-600)); /* former: 11,97,238 */
-    --color-primary-700: rgb(var(--ods-color-neutral-700)); /* former: 8,75,184 */
-    --color-primary-800: rgb(var(--ods-color-neutral-800)); /* former: 6,53,131 */
-    --color-primary-900: rgb(var(--ods-color-neutral-900)); /* former: 4,31,77 */
+
+    /* Primary */
+    --ods-color-primary-50: rgb(var(--ods-color-neutral-50));
+    --ods-color-primary-100: rgb(var(--ods-color-neutral-100));
+    --ods-color-primary-200: rgb(var(--ods-color-neutral-200));
+    --ods-color-primary-300: rgb(var(--ods-color-neutral-300));
+    --ods-color-primary-400: rgb(var(--ods-color-neutral-400));
+    --ods-color-primary-500: rgb(var(--ods-color-neutral-500));
+    --ods-color-primary-600: rgb(var(--ods-color-neutral-600));
+    --ods-color-primary-700: rgb(var(--ods-color-neutral-700));
+    --ods-color-primary-800: rgb(var(--ods-color-neutral-800));
+    --ods-color-primary-900: rgb(var(--ods-color-neutral-900));
+
+    /* Secondary */
+    /* --ods-color-secondary-50: 238 226 254; */
+    /* --ods-color-secondary-100: 222 196 253; */
+    /* --ods-color-secondary-200: 188 137 250; */
+    /* --ods-color-secondary-300: 155 78 248; */
+    /* --ods-color-secondary-400: 124 25 246; */
+    /* --ods-color-secondary-500: 93 8 200; */
+    /* --ods-color-secondary-600: 76 6 162; */
+    /* --ods-color-secondary-700: 56 5 118; */
+    /* --ods-color-secondary-800: 37 3 78; */
+    /* --ods-color-secondary-900: 19 2 39; */
+
+    /* Success */
+    /* --ods-color-success-100: 232 247 242; */
+    /* --ods-color-success-200: 205 238 228; */
+    /* --ods-color-success-300: 179 229 213; */
+    /* --ods-color-success-400: 144 218 194; */
+    /* --ods-color-success-500: 110 206 176; */
+    /* --ods-color-success-600: 64 191 151; */
+    /* --ods-color-success-700: 57 168 133; */
+    /* --ods-color-success-800: 46 137 108; */
+    /* --ods-color-success-900: 33 99 78; */
+
+    /* Critical */
+    /* --ods-color-critical-100: 255 235 235; */
+    /* --ods-color-critical-200: 254 210 210; */
+    /* --ods-color-critical-300: 254 180 180; */
+    /* --ods-color-critical-400: 253 145 145; */
+    /* --ods-color-critical-500: 252 98 99; */
+    /* --ods-color-critical-600: 251 60 60; */
+    /* --ods-color-critical-700: 235 4 4; */
+    /* --ods-color-critical-800: 195 4 4; */
+    /* --ods-color-critical-900: 145 3 3; */
+
+    /* Warning */
+    /* --ods-color-warning-100: 255 252 242; */
+    /* --ods-color-warning-200: 255 247 221; */
+    /* --ods-color-warning-300: 255 241 201; */
+    /* --ods-color-warning-400: 255 234 180; */
+    /* --ods-color-warning-500: 255 226 160; */
+    /* --ods-color-warning-600: 255 191 63; */
+    /* --ods-color-warning-700: 221 142 0; */
+    /* --ods-color-warning-800: 124 76 0; */
+    /* --ods-color-warning-900: 27 16 0; */
+
     --foreground-rgb: rgb(var(--ods-color-neutral-800));
+
+    /* Font */
+    --ods-font-weight-normal: 400;
+    --ods-font-weight-semibold: 600;
+
+    /* Layering */
+    --hub-navbar-z-index: 10;
+    --ods-dialog-overlay-z-index: 20;
+    --ods-dialog-alert-overlay-z-index: 20;
+    --ods-dialog-content-z-index: 30;
+    --ods-dialog-alert-content-z-index: 30;
+    --ods-dropdown-container-content-z-index: 40;
+    --ods-text-area-rich-text-expanded-z-index: 50;
   }
 }
 
@@ -23,8 +84,16 @@ body {
   /* Variables imported from layout.tsx > @aragon/ods */
   color: var(--ods-color-neutral-800);
   background-color: var(--ods-color-neutral-50);
+
   font-family: var(--ods-font-family);
+  /* Custom font here */
+  /* font-family: "..."; */
 }
+
+/* Custom font here */
+/* body,span,p,ul,ol,div { */
+/* font-family: "..."; */
+/* } */
 
 h1,
 h2,
@@ -34,6 +103,10 @@ h5,
 h6 {
   /* Variables imported from layout.tsx > @aragon/ods */
   color: var(--ods-color-neutral-800);
+
+  /* Custom font here */
+  /* font-family: "..."; */
+  /* font-weight: 600; */
 }
 
 p,

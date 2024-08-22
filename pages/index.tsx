@@ -1,10 +1,31 @@
+import { plugins } from "@/plugins";
+import { MainSection } from "@/components/layout/main-section";
+import { PleaseWaitSpinner } from "@/components/please-wait";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import { Button, IllustrationHuman } from "@aragon/ods";
 import { type ReactNode } from "react";
 import { useAccount } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Else, If, Then } from "@/components/if";
 
-export default function Home() {
+export default function RedirectingHome() {
+  const { replace } = useRouter();
+  useEffect(() => {
+    replace("/plugins/" + plugins[0].id);
+  }, []);
+
+  return (
+    <MainSection>
+      <div className="flex h-24 w-full items-center justify-center">
+        <PleaseWaitSpinner />
+      </div>
+    </MainSection>
+  );
+}
+
+// Alternate dashboard
+function StandardHome() {
   const { isConnected } = useAccount();
   const { open } = useWeb3Modal();
 
@@ -19,7 +40,7 @@ export default function Home() {
         <div className="">
           <IllustrationHuman className="mx-auto mb-10 max-w-96" body="BLOCKS" expression="SMILE_WINK" hairs="CURLY" />
           <div className="flex justify-center">
-            <If condition={isConnected}>
+            <If true={isConnected}>
               <Then>
                 <Button className="mb-2" variant="primary" href="https://devs.aragon.org/docs/osx/" target="_blank">
                   Learn more about OSx
@@ -38,7 +59,7 @@ export default function Home() {
   );
 }
 
-// This should be encapsulated as soon as ODS exports this widget
+// This should be encapsulated
 const Card = function ({ children }: { children: ReactNode }) {
   return (
     <div

@@ -1,11 +1,12 @@
-import { PUB_ALCHEMY_API_KEY } from "@/constants";
+import { PUB_ALCHEMY_API_KEY, PUB_CHAIN } from "@/constants";
 import { formatHexString } from "@/utils/evm";
 import { MemberAvatar } from "@aragon/ods";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import classNames from "classnames";
+import { useEffect } from "react";
 import { createClient, http } from "viem";
 import { normalize } from "viem/ens";
-import { createConfig, useAccount, useEnsAvatar, useEnsName } from "wagmi";
+import { createConfig, useAccount, useEnsAvatar, useEnsName, useSwitchChain } from "wagmi";
 import { mainnet } from "wagmi/chains";
 
 const config = createConfig({
@@ -22,7 +23,8 @@ const config = createConfig({
 // TODO: update with ODS wallet module - [https://linear.app/aragon/issue/RD-198/create-ods-walletmodule]
 const WalletContainer = () => {
   const { open } = useWeb3Modal();
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
+  const { switchChain } = useSwitchChain();
 
   const { data: ensName } = useEnsName({
     config,
@@ -37,6 +39,13 @@ const WalletContainer = () => {
     gatewayUrls: ["https://cloudflare-ipfs.com"],
     query: { enabled: !!ensName },
   });
+
+  useEffect(() => {
+    if (!chainId) return;
+    else if (chainId === PUB_CHAIN.id) return;
+
+    switchChain({ chainId: PUB_CHAIN.id });
+  }, [chainId]);
 
   return (
     <button

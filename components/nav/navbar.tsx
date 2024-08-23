@@ -7,26 +7,18 @@ import { MobileNavDialog } from "./mobileNavDialog";
 import { NavLink, type INavLink } from "./navLink";
 import { AvatarIcon, IconType } from "@aragon/ods";
 import { PUB_APP_NAME, PUB_PROJECT_LOGO } from "@/constants";
-import { useAccount } from "wagmi";
-import { useMultisigMembers } from "@/plugins/members/hooks/useMultisigMembers";
 
 export const Navbar: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
-  const { address } = useAccount();
-  const { members } = useMultisigMembers();
-  const showAllLinks = address && members.includes(address);
 
   const navLinks: INavLink[] = [
-    // { path: "/", id: "dashboard", name: "Dashboard" /*, icon: IconType.APP_DASHBOARD*/ },
-    ...plugins
-      .filter((link) => showAllLinks || !link.hiddenIfNotSigner)
-      .map((p) => ({
-        id: p.id,
-        name: p.title,
-        path: `/plugins/${p.id}/#/`,
-        hiddenIfNotSigner: p.hiddenIfNotSigner,
-        // icon: p.icon,
-      })),
+    { path: "/", id: "dashboard", name: "Dashboard" /*, icon: IconType.APP_DASHBOARD*/ },
+    ...plugins.map((p) => ({
+      id: p.id,
+      name: p.title,
+      path: `/plugins/${p.id}/#/`,
+      // icon: p.icon,
+    })),
   ];
 
   return (

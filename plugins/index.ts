@@ -47,7 +47,6 @@ export const plugins: PluginItem[] = [
     title: "Multisig",
     // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_MULTISIG_PLUGIN_ADDRESS,
-    hiddenIfNotSigner: true,
   },
   {
     id: "emergency",
@@ -55,7 +54,6 @@ export const plugins: PluginItem[] = [
     title: "Security Council",
     // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
-    hiddenIfNotSigner: true,
   },
   {
     id: "members",

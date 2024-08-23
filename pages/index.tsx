@@ -1,36 +1,16 @@
-import { plugins } from "@/plugins";
 import { MainSection } from "@/components/layout/main-section";
-import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
 import { Button, IllustrationHuman } from "@aragon/ods";
 import { type ReactNode } from "react";
 import { useAccount } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Else, If, Then } from "@/components/if";
 
-export default function RedirectingHome() {
-  const { replace } = useRouter();
-  useEffect(() => {
-    replace("/plugins/" + plugins[0].id);
-  }, []);
-
-  return (
-    <MainSection>
-      <div className="flex h-24 w-full items-center justify-center">
-        <PleaseWaitSpinner />
-      </div>
-    </MainSection>
-  );
-}
-
-// Alternate dashboard
-function StandardHome() {
+export default function StandardHome() {
   const { isConnected } = useAccount();
   const { open } = useWeb3Modal();
 
   return (
-    <main className="w-screen max-w-full flex-col">
+    <MainSection>
       <Card>
         <h1 className="text-2xl font-[700] text-neutral-800">Welcome to Aragonette!</h1>
         <p className="text-md text-neutral-400">
@@ -55,7 +35,7 @@ function StandardHome() {
           </div>
         </div>
       </Card>
-    </main>
+    </MainSection>
   );
 }
 

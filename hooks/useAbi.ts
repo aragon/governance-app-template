@@ -3,10 +3,10 @@ import { whatsabi } from "@shazow/whatsabi";
 import { usePublicClient } from "wagmi";
 import { AbiFunction } from "abitype";
 import { useQuery } from "@tanstack/react-query";
-import { isAddress, isContract } from "@/utils/evm";
+import { ADDRESS_ZERO, isAddress, isContract } from "@/utils/evm";
 import { PUB_CHAIN, PUB_ETHERSCAN_API_KEY } from "@/constants";
 import { useAlerts } from "@/context/Alerts";
-import { getImplementation, isProxyContract } from "@/utils/proxies";
+import { getImplementation } from "@/utils/proxies";
 import { ChainName } from "@/utils/chains";
 
 const CHAIN_NAME = PUB_CHAIN.name.toLowerCase() as ChainName;
@@ -23,14 +23,13 @@ export const useAbi = (contractAddress: Address) => {
         return null;
       }
 
-      return isProxyContract(publicClient, contractAddress)
-        .then((isProxy) => {
-          if (!isProxy) return null;
-          return getImplementation(publicClient, contractAddress);
+      return getImplementation(publicClient, contractAddress)
+        .then((address) => {
+          if (!address || address === ADDRESS_ZERO) return null;
+          return address;
         })
         .catch(() => null);
     },
-    initialData: null,
     retry: 6,
     refetchOnMount: false,
     refetchOnReconnect: false,

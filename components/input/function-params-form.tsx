@@ -70,7 +70,7 @@ export const FunctionParamsForm = ({
   };
 
   return (
-    <div className="w-full overflow-y-auto rounded-r-lg pt-4">
+    <div className="w-full rounded-r-lg pt-4">
       <If true={functionAbi?.inputs.length || 0 > 0}>
         <div className="flex flex-row items-center justify-between border-b border-neutral-200 pb-4">
           <p className="text-md font-semibold text-neutral-800">Parameters</p>

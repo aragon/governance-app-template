@@ -25,7 +25,7 @@ export default function StandardHome() {
           <div className="flex justify-center">
             <If true={isConnected}>
               <Then>
-                <Button className="mb-2" variant="primary" href="https://devs.aragon.org/docs/osx/" target="_blank">
+                <Button className="mb-2" variant="primary" href="https://devs.aragon.org/" target="_blank">
                   Learn more about OSx
                 </Button>
               </Then>

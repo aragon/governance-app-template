@@ -44,7 +44,7 @@ export const PUB_APP_NAME = "Patito DAO";
 export const PUB_APP_DESCRIPTION = "Patito DAO's official UI to interact with the DAO smart contract";
 export const PUB_TOKEN_SYMBOL = "PDT";
 
-export const PUB_PROJECT_LOGO = "/logo-aragon-text.svg";
+export const PUB_PROJECT_LOGO = "/logo.png";
 export const PUB_PROJECT_URL = "https://patito-dao.org/";
 export const PUB_BLOG_URL = "https://patito-dao.org/blog";
 export const PUB_FORUM_URL = "https://community.patito-dao.org/";

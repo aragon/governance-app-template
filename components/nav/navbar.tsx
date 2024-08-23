@@ -34,7 +34,7 @@ export const Navbar: React.FC = () => {
                   "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
                 )}
               >
-                <img src={PUB_PROJECT_LOGO} width="130" height="32" className="shrink-0" alt={PUB_APP_NAME + " logo"} />
+                <img src={PUB_PROJECT_LOGO} width="150" className="shrink-0" alt={PUB_APP_NAME + " logo"} />
               </Link>
               <div className="flex items-center gap-x-2">
                 <span className="text-md leading-tight text-neutral-500">Governed on</span>

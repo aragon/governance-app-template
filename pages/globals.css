@@ -7,16 +7,16 @@
     --tw-text-opacity: 1;
 
     /* Primary */
-    --ods-color-primary-50: rgb(var(--ods-color-neutral-50));
-    --ods-color-primary-100: rgb(var(--ods-color-neutral-100));
-    --ods-color-primary-200: rgb(var(--ods-color-neutral-200));
-    --ods-color-primary-300: rgb(var(--ods-color-neutral-300));
-    --ods-color-primary-400: rgb(var(--ods-color-neutral-400));
-    --ods-color-primary-500: rgb(var(--ods-color-neutral-500));
-    --ods-color-primary-600: rgb(var(--ods-color-neutral-600));
-    --ods-color-primary-700: rgb(var(--ods-color-neutral-700));
-    --ods-color-primary-800: rgb(var(--ods-color-neutral-800));
-    --ods-color-primary-900: rgb(var(--ods-color-neutral-900));
+    --ods-color-primary-900: 24 15 1;
+    --ods-color-primary-800: 72 44 4;
+    --ods-color-primary-700: 120 73 7;
+    --ods-color-primary-600: 169 103 10;
+    --ods-color-primary-500: 217 132 13;
+    --ods-color-primary-400: 242 158 38;
+    --ods-color-primary-300: 245 179 86;
+    --ods-color-primary-200: 248 201 135;
+    --ods-color-primary-100: 251 223 183;
+    --ods-color-primary-50: 254 244 231;
 
     /* Secondary */
     /* --ods-color-secondary-50: 238 226 254; */
@@ -30,38 +30,49 @@
     /* --ods-color-secondary-800: 37 3 78; */
     /* --ods-color-secondary-900: 19 2 39; */
 
-    /* Success */
-    /* --ods-color-success-100: 232 247 242; */
-    /* --ods-color-success-200: 205 238 228; */
-    /* --ods-color-success-300: 179 229 213; */
-    /* --ods-color-success-400: 144 218 194; */
-    /* --ods-color-success-500: 110 206 176; */
-    /* --ods-color-success-600: 64 191 151; */
-    /* --ods-color-success-700: 57 168 133; */
-    /* --ods-color-success-800: 46 137 108; */
-    /* --ods-color-success-900: 33 99 78; */
+    /* Info */
+    --ods-color-info-100: 227 250 252;
+    --ods-color-info-200: 186 240 247;
+    --ods-color-info-300: 145 229 242;
+    --ods-color-info-400: 70 208 232;
+    --ods-color-info-500: 0 181 221;
+    --ods-color-info-600: 0 156 199;
+    --ods-color-info-700: 0 119 166;
+    --ods-color-info-800: 0 86 133;
+    --ods-color-info-900: 0 60 99;
 
-    /* Critical */
-    /* --ods-color-critical-100: 255 235 235; */
-    /* --ods-color-critical-200: 254 210 210; */
-    /* --ods-color-critical-300: 254 180 180; */
-    /* --ods-color-critical-400: 253 145 145; */
-    /* --ods-color-critical-500: 252 98 99; */
-    /* --ods-color-critical-600: 251 60 60; */
-    /* --ods-color-critical-700: 235 4 4; */
-    /* --ods-color-critical-800: 195 4 4; */
-    /* --ods-color-critical-900: 145 3 3; */
+    /* Success */
+    --ods-color-success-100: 225 250 245;
+    --ods-color-success-200: 182 242 229;
+    --ods-color-success-300: 141 235 211;
+    --ods-color-success-400: 66 219 173;
+    --ods-color-success-500: 0 205 132;
+    --ods-color-success-600: 0 184 113;
+    --ods-color-success-700: 0 153 87;
+    --ods-color-success-800: 0 122 63;
+    --ods-color-success-900: 0 92 43;
 
     /* Warning */
-    /* --ods-color-warning-100: 255 252 242; */
-    /* --ods-color-warning-200: 255 247 221; */
-    /* --ods-color-warning-300: 255 241 201; */
-    /* --ods-color-warning-400: 255 234 180; */
-    /* --ods-color-warning-500: 255 226 160; */
-    /* --ods-color-warning-600: 255 191 63; */
-    /* --ods-color-warning-700: 221 142 0; */
-    /* --ods-color-warning-800: 124 76 0; */
-    /* --ods-color-warning-900: 27 16 0; */
+    --ods-color-warning-100: 255 244 204;
+    --ods-color-warning-200: 255 231 153;
+    --ods-color-warning-300: 255 214 102;
+    --ods-color-warning-400: 255 197 63;
+    --ods-color-warning-500: 255 170 0;
+    --ods-color-warning-600: 219 138 0;
+    --ods-color-warning-700: 183 109 0;
+    --ods-color-warning-800: 147 83 0;
+    --ods-color-warning-900: 122 64 0;
+
+    /* Critical */
+    --ods-color-critical-100: 255 229 211;
+    --ods-color-critical-200: 255 196 168;
+    --ods-color-critical-300: 255 156 124;
+    --ods-color-critical-400: 255 119 92;
+    --ods-color-critical-500: 255 56 38;
+    --ods-color-critical-600: 219 27 27;
+    --ods-color-critical-700: 183 19 32;
+    --ods-color-critical-800: 147 12 34;
+    --ods-color-critical-900: 122 7 35;
 
     --foreground-rgb: rgb(var(--ods-color-neutral-800));
 

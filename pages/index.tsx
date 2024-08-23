@@ -13,7 +13,9 @@ export default function StandardHome() {
   return (
     <MainSection narrow>
       <Card>
-        <h1 className="text-2xl font-[700] text-neutral-800">Welcome to {PUB_APP_NAME}!</h1>
+        <h1 className="line-clamp-1 flex flex-1 shrink-0 text-2xl font-normal leading-tight text-neutral-800 md:text-3xl">
+          Welcome to {PUB_APP_NAME}
+        </h1>
         <p className="text-md text-neutral-400">
           A beaufitul DAO experience in a simple template that you can customize. Get started by connecting your wallet
           and selecting a plugin from the menu.

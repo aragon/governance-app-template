@@ -1,6 +1,6 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { useEffect } from "react";
-import ProposalCard from "@/plugins/optimistic-proposals/components/proposal";
+import ProposalCard from "../components/proposal";
 import { AlertCard, DataList, Link, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";

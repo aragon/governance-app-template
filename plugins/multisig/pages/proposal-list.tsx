@@ -75,11 +75,8 @@ export default function Proposals() {
         <ElseIf not={proposalCount}>
           <MissingContentView>
             No proposals have been created yet. <br />
-            Here you will see the proposals created by the Council before they can be submitted to the{" "}
-            <Link href="/plugins/community-proposals/#/" className="underline">
-              community veto stage
-            </Link>
-            . <If true={canCreate}>Create your first proposal.</If>
+            Here you will see the proposals created by the Council before they can be submitted to the community veto
+            stage. <If true={canCreate}>Create your first proposal.</If>
           </MissingContentView>
         </ElseIf>
         <Else>

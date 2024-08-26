@@ -4,7 +4,7 @@ import {
   PUB_MULTISIG_PLUGIN_ADDRESS,
   PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
   // PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
-  // PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
+  PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
 } from "@/constants";
 import { IconType } from "@aragon/ods";
 
@@ -23,10 +23,17 @@ export const plugins: PluginItem[] = [
   // {
   //   id: "token-voting",
   //   folderName: "tokenVoting",
-  //   title: "Community proposals",
-  //   icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
+  //   title: "Token Voting",
+  //   // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
   //   pluginAddress: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
   // },
+  {
+    id: "lock-to-vote",
+    folderName: "lockToVote",
+    title: "Lock to bote",
+    // icon: IconType.BLOCKCHAIN_BLOCK,
+    pluginAddress: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
+  },
   {
     id: "optimistic",
     folderName: "optimistic-proposals",
@@ -34,13 +41,6 @@ export const plugins: PluginItem[] = [
     // icon: IconType.APP_MEMBERS,
     pluginAddress: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   },
-  // {
-  //   id: "lock-to-vote",
-  //   folderName: "lockToVote",
-  //   title: "Lock to bote",
-  //   icon: IconType.BLOCKCHAIN_BLOCK,
-  //   pluginAddress: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
-  // },
   {
     id: "multisig",
     folderName: "multisig",

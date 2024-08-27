@@ -1,12 +1,12 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { type ReactNode, useEffect } from "react";
 import ProposalCard from "../components/proposal";
-import { LockToVetoPluginAbi } from "../artifacts/LockToVetoPlugin.sol";
+import { TokenVotingAbi } from "../artifacts/TokenVoting.sol";
 import { Button, DataList, IconType, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
 import { useCanCreateProposal } from "../hooks/useCanCreateProposal";
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
-import { PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
+import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { MainSection } from "@/components/layout/main-section";
 import { MissingContentView } from "@/components/MissingContentView";
 
@@ -24,8 +24,8 @@ export default function Proposals() {
     isFetching: isFetchingNextPage,
     refetch,
   } = useReadContract({
-    address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
-    abi: LockToVetoPluginAbi,
+    address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+    abi: TokenVotingAbi,
     functionName: "proposalCount",
     chainId: PUB_CHAIN.id,
   });

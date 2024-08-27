@@ -1,8 +1,8 @@
-import type { useProposal } from "@/plugins/optimistic-proposals/hooks/useProposal";
-import ProposalHeader from "@/plugins/optimistic-proposals/components/proposal/header";
+import { useProposal } from "../hooks/useProposal";
+import ProposalHeader from "../components/proposal/header";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useProposalVeto } from "@/plugins/optimistic-proposals/hooks/useProposalVeto";
-import { useProposalExecute } from "@/plugins/optimistic-proposals/hooks/useProposalExecute";
+import { useProposalVoting } from "../hooks/useProposalVoting";
+import { useProposalExecute } from "../hooks/useProposalExecute";
 import { BodySection } from "@/components/proposal/proposalBodySection";
 import { IBreakdownMajorityVotingResult, ProposalVoting } from "@/components/proposalVoting";
 import type { ITransformedStage, IVote } from "@/utils/types";
@@ -13,45 +13,42 @@ import { ProposalActions } from "@/components/proposalActions/proposalActions";
 import { CardResources } from "@/components/proposal/cardResources";
 import { Address, formatEther } from "viem";
 import { useToken } from "../hooks/useToken";
-import { usePastSupply } from "../hooks/usePastSupply";
+// import { usePastSupply } from "../hooks/usePastSupply";
 import { ElseIf, If, Then } from "@/components/if";
-import { AlertCard, ProposalStatus } from "@aragon/ods";
-import { PUB_TOKEN_SYMBOL } from "@/constants";
+import { AlertCard, Button, DialogContent, DialogFooter, DialogHeader, DialogRoot, ProposalStatus } from "@aragon/ods";
 import { useAccount } from "wagmi";
 import { useTokenVotes } from "@/hooks/useTokenVotes";
 import { ADDRESS_ZERO } from "@/utils/evm";
 import { AddressText } from "@/components/text/address";
 import Link from "next/link";
+import { useCanVote } from "../hooks/useCanVote";
+import { useState } from "react";
+import { PUB_TOKEN_SYMBOL } from "@/constants";
+import { useProposalVoteList } from "../hooks/useProposalVoteList";
 
 const ZERO = BigInt(0);
+const ABSTAIN_VALUE = 1;
+const VOTE_YES_VALUE = 2;
+const VOTE_NO_VALUE = 3;
 
 export default function ProposalDetail({ index: proposalIdx }: { index: number }) {
   const { address } = useAccount();
-  const {
-    proposal,
-    proposalFetchStatus,
-    canVeto,
-    vetoes,
-    isConfirming: isConfirmingVeto,
-    vetoProposal,
-  } = useProposalVeto(proposalIdx);
-  const pastSupply = usePastSupply(proposal);
+  const { voteProposal, isConfirming: isConfirmingVote } = useProposalVoting(proposalIdx);
+  const { proposal, status: proposalFetchStatus } = useProposal(proposalIdx);
+  const canVote = useCanVote(proposalIdx);
+  // const pastSupply = usePastSupply(proposal?.parameters.snapshotBlock);
+  const votes = useProposalVoteList(proposalIdx, proposal);
   const { symbol: tokenSymbol } = useToken();
   const { balance, delegatesTo } = useTokenVotes(address);
-
+  const [showVotingModal, setShowVotingModal] = useState(false);
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalIdx);
-
-  const startDate = dayjs(Number(proposal?.parameters.vetoStartDate) * 1000).toString();
-  const endDate = dayjs(Number(proposal?.parameters.vetoEndDate) * 1000).toString();
-
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalStatus = useProposalStatus(proposal!);
-  let vetoPercentage = 0;
-  if (proposal?.vetoTally && pastSupply && proposal.parameters.minVetoRatio) {
-    vetoPercentage = Number(
-      (BigInt(1000) * proposal.vetoTally) / ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(10000000))
-    );
-  }
+
+  const startDate = dayjs(Number(proposal?.parameters.startDate) * 1000).toString();
+  const endDate = dayjs(Number(proposal?.parameters.endDate) * 1000).toString();
+  const totalVotes =
+    (proposal?.tally.yes || BigInt(0)) + (proposal?.tally.no || BigInt(0)) + (proposal?.tally.abstain || BigInt(0));
 
   let cta: IBreakdownMajorityVotingResult["cta"];
   if (proposal?.executed) {
@@ -68,19 +65,27 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
     };
   } else if (proposalStatus === ProposalStatus.ACTIVE) {
     cta = {
-      disabled: !canVeto,
-      isLoading: isConfirmingVeto,
-      label: "Veto",
-      onClick: vetoProposal,
+      disabled: !canVote,
+      isLoading: isConfirmingVote,
+      label: "Vote",
+      onClick: () => setShowVotingModal(true),
     };
   }
+
+  const onVote = (voteOption: number | null) => {
+    setShowVotingModal(false);
+
+    if (voteOption === null) return;
+
+    voteProposal(voteOption, true);
+  };
 
   const proposalStage: ITransformedStage[] = [
     {
       id: "1",
-      type: ProposalStages.OPTIMISTIC_EXECUTION,
+      type: ProposalStages.TOKEN_VOTING,
       variant: "majorityVoting",
-      title: "Optimistic voting",
+      title: "Token voting",
       status: proposalStatus!,
       disabled: false,
       proposalId: proposalIdx.toString(),
@@ -89,22 +94,34 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
         cta,
         votingScores: [
           {
-            option: "Veto",
-            voteAmount: formatEther(proposal?.vetoTally || BigInt(0)),
-            votePercentage: vetoPercentage,
+            option: "Yes",
+            voteAmount: formatEther(proposal?.tally.yes || BigInt(0)),
+            votePercentage: Number(((proposal?.tally.yes || BigInt(0)) * BigInt(10_000)) / totalVotes) / 100,
+            tokenSymbol: tokenSymbol || PUB_TOKEN_SYMBOL,
+          },
+          {
+            option: "No",
+            voteAmount: formatEther(proposal?.tally.no || BigInt(0)),
+            votePercentage: Number(((proposal?.tally.no || BigInt(0)) * BigInt(10_000)) / totalVotes) / 100,
+            tokenSymbol: tokenSymbol || PUB_TOKEN_SYMBOL,
+          },
+          {
+            option: "Abstain",
+            voteAmount: formatEther(proposal?.tally.abstain || BigInt(0)),
+            votePercentage: Number(((proposal?.tally.abstain || BigInt(0)) * BigInt(10_000)) / totalVotes) / 100,
             tokenSymbol: tokenSymbol || PUB_TOKEN_SYMBOL,
           },
         ],
         proposalId: proposalIdx.toString(),
       },
       details: {
-        censusTimestamp: Number(proposal?.parameters.snapshotTimestamp || 0) || 0,
+        censusTimestamp: Number(proposal?.parameters.snapshotBlock || 0) || 0,
         startDate,
         endDate,
-        strategy: "Optimistic voting",
-        options: "Veto",
+        strategy: "Token voting",
+        options: "Vote",
       },
-      votes: vetoes.map(({ voter }) => ({ address: voter, variant: "no" }) as IVote),
+      votes: votes.map(({ voter }) => ({ address: voter, variant: "no" }) as IVote),
     },
   ];
 
@@ -128,18 +145,18 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
         <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
           <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
             <BodySection body={proposal.description || "No description was provided"} />
-            <If true={hasBalance && (delegatingToSomeoneElse || delegatedToZero)}>
-              <NoVetoPowerWarning
+            <If all={[hasBalance, delegatingToSomeoneElse || delegatedToZero]}>
+              <NoVotePowerWarning
                 delegatingToSomeoneElse={delegatingToSomeoneElse}
                 delegatesTo={delegatesTo}
                 delegatedToZero={delegatedToZero}
                 address={address}
-                canVeto={canVeto}
+                canVote={!!canVote}
               />
             </If>
             <ProposalVoting
               stages={proposalStage}
-              description="Proposals approved by the Security Council become eventually executable, unless the community reaches the veto threshold during the community veto stage."
+              description="Proposals approved by the Security Council become eventually executable, unless the community reaches the vote threshold during the community vote stage."
             />
             <ProposalActions actions={proposal.actions} />
           </div>
@@ -148,22 +165,58 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
           </div>
         </div>
       </div>
+      <VoteOptionDialog show={showVotingModal} onClose={onVote} />
     </section>
   );
 }
 
-const NoVetoPowerWarning = ({
+export const VoteOptionDialog: React.FC<{ show: boolean; onClose: (voteOption: number | null) => void }> = (props) => {
+  const { show, onClose } = props;
+
+  const dismiss = () => {
+    onClose(null);
+  };
+
+  if (!show) {
+    return <></>;
+  }
+
+  return (
+    <DialogRoot open={show} containerClassName="!max-w-[420px]">
+      <DialogHeader title="Select a vote option" onCloseClick={() => dismiss()} onBackClick={() => dismiss()} />
+      <DialogContent className="flex flex-col gap-y-4 md:gap-y-6">
+        <div className="">
+          <Button variant="primary" size="lg" onClick={() => onClose(VOTE_YES_VALUE)}>
+            Vote yes
+          </Button>
+          <Button variant="primary" size="lg" onClick={() => onClose(VOTE_NO_VALUE)}>
+            Vote no
+          </Button>
+          <Button variant="primary" size="lg" onClick={() => onClose(ABSTAIN_VALUE)}>
+            Abstain
+          </Button>
+          <Button variant="secondary" size="lg" onClick={() => dismiss()}>
+            Cancel
+          </Button>
+        </div>
+      </DialogContent>
+      <DialogFooter />
+    </DialogRoot>
+  );
+};
+
+const NoVotePowerWarning = ({
   delegatingToSomeoneElse,
   delegatesTo,
   delegatedToZero,
   address,
-  canVeto,
+  canVote,
 }: {
   delegatingToSomeoneElse: boolean;
   delegatesTo: Address | undefined;
   delegatedToZero: boolean;
   address: Address | undefined;
-  canVeto: boolean;
+  canVote: boolean;
 }) => {
   return (
     <AlertCard
@@ -189,9 +242,9 @@ const NoVetoPowerWarning = ({
       message={
         delegatingToSomeoneElse
           ? "Your voting power is currently delegated"
-          : canVeto
-            ? "You cannot veto on new proposals"
-            : "You cannot veto"
+          : canVote
+            ? "You cannot vote on new proposals"
+            : "You cannot vote"
       }
       variant="info"
     />

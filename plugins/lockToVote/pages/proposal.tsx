@@ -16,6 +16,7 @@ import { useToken } from "../hooks/useToken";
 import { usePastSupply } from "../hooks/usePastSupply";
 import { ElseIf, If, Then } from "@/components/if";
 import { AlertCard, ProposalStatus } from "@aragon/ods";
+import { PUB_TOKEN_SYMBOL } from "@/constants";
 import { useAccount } from "wagmi";
 import { useTokenVotes } from "@/hooks/useTokenVotes";
 import { ADDRESS_ZERO } from "@/utils/evm";
@@ -93,7 +94,7 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
             option: "Veto",
             voteAmount: formatEther(proposal?.vetoTally || BigInt(0)),
             votePercentage: vetoPercentage,
-            tokenSymbol: tokenSymbol || "TKO",
+            tokenSymbol: tokenSymbol || PUB_TOKEN_SYMBOL,
           },
         ],
         proposalId: proposalIdx.toString(),

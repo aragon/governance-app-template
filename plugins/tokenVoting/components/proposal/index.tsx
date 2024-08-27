@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { Card, ProposalStatus, ProposalDataListItem } from "@aragon/ods";
+import { Card, ProposalStatus, ProposalDataListItem, IProposalDataListItemStructureProps } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useProposalVeto } from "../../hooks/useProposalVeto";
+import { useProposal } from "../../hooks/useProposal";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
-import { usePastSupply } from "../../hooks/usePastSupply";
+// import { usePastSupply } from "../../hooks/usePastSupply";
 import { useToken } from "../../hooks/useToken";
-import { PUB_TOKEN_SYMBOL } from "@/constants";
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
+import { PUB_TOKEN_SYMBOL } from "@/constants";
+import { useProposalVoteList } from "../../hooks/useProposalVoteList";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(The metadata of the proposal is not available)";
@@ -18,13 +19,16 @@ type ProposalInputs = {
 
 export default function ProposalCard(props: ProposalInputs) {
   const { address } = useAccount();
-  const { proposal, proposalFetchStatus, vetoes } = useProposalVeto(props.proposalIndex);
-  const pastSupply = usePastSupply(proposal?.parameters.snapshotBlock);
+  const { proposal, status: proposalFetchStatus } = useProposal(props.proposalIndex);
+  const votes = useProposalVoteList(props.proposalIndex, proposal);
+  // const pastSupply = usePastSupply(proposal?.parameters.snapshotBlock);
   const { symbol: tokenSymbol } = useToken();
-
   const proposalStatus = useProposalStatus(proposal!);
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-  const hasVetoed = vetoes?.some((veto) => veto.voter === address);
+
+  const hasVoted = votes?.some((vote) => vote.voter === address);
+  const totalVotes =
+    (proposal?.tally.yes || BigInt(0)) + (proposal?.tally.no || BigInt(0)) + (proposal?.tally.abstain || BigInt(0));
 
   if (!proposal && showLoading) {
     return (
@@ -62,12 +66,25 @@ export default function ProposalCard(props: ProposalInputs) {
     );
   }
 
-  let vetoPercentage = 0;
-  if (proposal?.vetoTally && pastSupply && proposal.parameters.minVetoVotingPower) {
-    vetoPercentage = Number(
-      (BigInt(1000) * proposal.vetoTally) /
-        ((pastSupply * BigInt(proposal.parameters.minVetoVotingPower)) / BigInt(10000000))
-    );
+  let result = { option: "", voteAmount: "", votePercentage: 0 };
+  if (proposal?.tally.yes > proposal?.tally.no && proposal?.tally.yes > proposal?.tally.abstain) {
+    result = {
+      option: "Yes",
+      voteAmount: formatEther(proposal.tally.yes) + " " + (tokenSymbol || PUB_TOKEN_SYMBOL),
+      votePercentage: Number(((proposal?.tally.yes || BigInt(0)) * BigInt(10_000)) / totalVotes) / 100,
+    };
+  } else if (proposal?.tally.no > proposal?.tally.yes && proposal?.tally.no > proposal?.tally.abstain) {
+    result = {
+      option: "No",
+      voteAmount: formatEther(proposal.tally.no) + " " + (tokenSymbol || PUB_TOKEN_SYMBOL),
+      votePercentage: Number(((proposal?.tally.no || BigInt(0)) * BigInt(10_000)) / totalVotes) / 100,
+    };
+  } else if (proposal?.tally.abstain > proposal?.tally.no && proposal?.tally.abstain > proposal?.tally.yes) {
+    result = {
+      option: "Abstain",
+      voteAmount: formatEther(proposal.tally.abstain) + " " + (tokenSymbol || PUB_TOKEN_SYMBOL),
+      votePercentage: Number(((proposal?.tally.abstain || BigInt(0)) * BigInt(10_000)) / totalVotes) / 100,
+    };
   }
 
   return (
@@ -75,17 +92,13 @@ export default function ProposalCard(props: ProposalInputs) {
       title={proposal.title}
       summary={proposal.summary}
       href={`#/proposals/${props.proposalIndex}`}
-      voted={hasVetoed}
+      voted={hasVoted}
       date={
         [ProposalStatus.ACTIVE, ProposalStatus.ACCEPTED].includes(proposalStatus!) && proposal.parameters.endDate
           ? Number(proposal.parameters.endDate) * 1000
           : undefined
       }
-      result={{
-        option: "Veto",
-        voteAmount: formatEther(proposal.vetoTally) + " " + (tokenSymbol || PUB_TOKEN_SYMBOL),
-        votePercentage: vetoPercentage,
-      }}
+      result={result}
       publisher={{ address: proposal.creator }}
       status={proposalStatus!}
       type={"majorityVoting"}
@@ -94,8 +107,8 @@ export default function ProposalCard(props: ProposalInputs) {
 }
 
 function getShowProposalLoading(
-  proposal: ReturnType<typeof useProposalVeto>["proposal"],
-  status: ReturnType<typeof useProposalVeto>["proposalFetchStatus"]
+  proposal: ReturnType<typeof useProposal>["proposal"],
+  status: ReturnType<typeof useProposal>["status"]
 ) {
   if (!proposal || status.proposalLoading) return true;
   else if (status.metadataLoading && !status.metadataError) return true;

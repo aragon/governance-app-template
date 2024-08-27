@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { ProposalMetadata, RawAction } from "@/utils/types";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useAlerts } from "@/context/Alerts";
-import { PUB_APP_NAME, PUB_CHAIN, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS, PUB_PROJECT_URL } from "@/constants";
+import { PUB_APP_NAME, PUB_CHAIN, PUB_TOKEN_VOTING_PLUGIN_ADDRESS, PUB_PROJECT_URL } from "@/constants";
 import { uploadToPinata } from "@/utils/ipfs";
-import { LockToVetoPluginAbi } from "../artifacts/LockToVetoPlugin.sol";
+import { TokenVotingAbi } from "../artifacts/TokenVoting.sol";
 import { URL_PATTERN } from "@/utils/input-values";
 import { toHex } from "viem";
+import { VotingMode } from "../utils/types";
 
 const UrlRegex = new RegExp(URL_PATTERN);
 const DEFAULT_PROPOSAL_DURATION = BigInt(60 * 60 * 3); // 3 hours
@@ -107,12 +108,13 @@ export function useCreateProposal() {
       const startDate = BigInt(Math.floor(Date.now() / 1000));
       const endDate = startDate + DEFAULT_PROPOSAL_DURATION;
 
+      const tryEarlyExecution = false;
       createProposalWrite({
         chainId: PUB_CHAIN.id,
-        abi: LockToVetoPluginAbi,
-        address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
+        abi: TokenVotingAbi,
+        address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
         functionName: "createProposal",
-        args: [toHex(ipfsPin), actions, BigInt(0), startDate, endDate],
+        args: [toHex(ipfsPin), actions, BigInt(0), startDate, endDate, VotingMode.Standard, tryEarlyExecution],
       });
     } catch (err) {
       setIsCreating(false);

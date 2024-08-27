@@ -45,6 +45,7 @@ export enum ProposalStages {
   DRAFT = "Draft",
   MULTISIG_APPROVAL = "Multisig Approval",
   OPTIMISTIC_EXECUTION = "Optimistic Execution",
+  TOKEN_VOTING = "Token voting",
 }
 
 export type VotingCta = Pick<IButtonProps, "disabled" | "isLoading"> & {

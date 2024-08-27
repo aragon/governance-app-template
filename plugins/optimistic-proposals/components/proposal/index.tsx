@@ -4,6 +4,7 @@ import { Card, ProposalStatus } from "@aragon/ods";
 import { ProposalDataListItem } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
+import { PUB_TOKEN_SYMBOL } from "@/constants";
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
 import { usePastSupply } from "../../hooks/usePastSupply";
@@ -82,7 +83,7 @@ export default function ProposalCard(props: ProposalInputs) {
       }
       result={{
         option: "Veto",
-        voteAmount: formatEther(proposal.vetoTally) + " " + (tokenSymbol || "TKO"),
+        voteAmount: formatEther(proposal.vetoTally) + " " + (tokenSymbol || PUB_TOKEN_SYMBOL),
         votePercentage: vetoPercentage,
       }}
       publisher={{ address: proposal.creator }}

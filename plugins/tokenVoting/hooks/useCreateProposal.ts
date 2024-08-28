@@ -11,7 +11,6 @@ import { toHex } from "viem";
 import { VotingMode } from "../utils/types";
 
 const UrlRegex = new RegExp(URL_PATTERN);
-const DEFAULT_PROPOSAL_DURATION = BigInt(60 * 60 * 3); // 3 hours
 
 export function useCreateProposal() {
   const { push } = useRouter();
@@ -104,9 +103,8 @@ export function useCreateProposal() {
       };
 
       const ipfsPin = await uploadToPinata(JSON.stringify(proposalMetadataJsonObject));
-
-      const startDate = BigInt(Math.floor(Date.now() / 1000));
-      const endDate = startDate + DEFAULT_PROPOSAL_DURATION;
+      const startDate = BigInt(0);
+      const endDate = BigInt(0);
 
       const tryEarlyExecution = false;
       createProposalWrite({

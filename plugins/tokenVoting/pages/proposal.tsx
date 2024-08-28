@@ -68,16 +68,19 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
       disabled: !canVote,
       isLoading: isConfirmingVote,
       label: "Vote",
-      onClick: () => setShowVotingModal(true),
+      onClick: (option?: number) => (option ? onVote(option) : null),
     };
   }
 
   const onVote = (voteOption: number | null) => {
-    setShowVotingModal(false);
-
-    if (voteOption === null) return;
-
-    voteProposal(voteOption, true);
+    switch (voteOption) {
+      case 1:
+        return voteProposal(VOTE_YES_VALUE, true);
+      case 2:
+        return voteProposal(VOTE_NO_VALUE, true);
+      case 3:
+        return voteProposal(ABSTAIN_VALUE, true);
+    }
   };
 
   const proposalStage: ITransformedStage[] = [
@@ -96,19 +99,22 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
           {
             option: "Yes",
             voteAmount: formatEther(proposal?.tally.yes || BigInt(0)),
-            votePercentage: Number(((proposal?.tally.yes || BigInt(0)) * BigInt(10_000)) / totalVotes) / 100,
+            votePercentage:
+              Number(((proposal?.tally.yes || BigInt(0)) * BigInt(10_000)) / (totalVotes || BigInt(1))) / 100,
             tokenSymbol: tokenSymbol || PUB_TOKEN_SYMBOL,
           },
           {
             option: "No",
             voteAmount: formatEther(proposal?.tally.no || BigInt(0)),
-            votePercentage: Number(((proposal?.tally.no || BigInt(0)) * BigInt(10_000)) / totalVotes) / 100,
+            votePercentage:
+              Number(((proposal?.tally.no || BigInt(0)) * BigInt(10_000)) / (totalVotes || BigInt(1))) / 100,
             tokenSymbol: tokenSymbol || PUB_TOKEN_SYMBOL,
           },
           {
             option: "Abstain",
             voteAmount: formatEther(proposal?.tally.abstain || BigInt(0)),
-            votePercentage: Number(((proposal?.tally.abstain || BigInt(0)) * BigInt(10_000)) / totalVotes) / 100,
+            votePercentage:
+              Number(((proposal?.tally.abstain || BigInt(0)) * BigInt(10_000)) / (totalVotes || BigInt(1))) / 100,
             tokenSymbol: tokenSymbol || PUB_TOKEN_SYMBOL,
           },
         ],
@@ -121,7 +127,13 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
         strategy: "Token voting",
         options: "Vote",
       },
-      votes: votes.map(({ voter }) => ({ address: voter, variant: "no" }) as IVote),
+      votes: votes.map(
+        ({ voter, voteOption: opt }) =>
+          ({
+            address: voter,
+            variant: opt === ABSTAIN_VALUE ? "abstain" : opt === VOTE_YES_VALUE ? "yes" : "no",
+          }) as IVote
+      ),
     },
   ];
 
@@ -156,7 +168,7 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
             </If>
             <ProposalVoting
               stages={proposalStage}
-              description="Proposals approved by the Security Council become eventually executable, unless the community reaches the vote threshold during the community vote stage."
+              description="Proposals approved by the community become executable when the support ratio is above the threshold and the minimum participation is met."
             />
             <ProposalActions actions={proposal.actions} />
           </div>

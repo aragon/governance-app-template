@@ -5,7 +5,7 @@ import { TokenVotingAbi } from "../artifacts/TokenVoting.sol";
 import { Button, DataList, IconType, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
 import { useCanCreateProposal } from "../hooks/useCanCreateProposal";
 import Link from "next/link";
-import { Else, ElseIf, If, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { MainSection } from "@/components/layout/main-section";
 import { MissingContentView } from "@/components/MissingContentView";

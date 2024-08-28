@@ -27,7 +27,7 @@ const ProposalCreatedEvent = getAbiItem({
 export function useProposal(proposalIdx: number, autoRefresh = false) {
   const publicClient = usePublicClient();
   const [proposalCreationEvent, setProposalCreationEvent] = useState<ProposalCreatedLogResponse["args"]>();
-  const [metadataUri, setMetadata] = useState<string>();
+  const [metadataUri, setMetadataUri] = useState<string>();
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
   // Proposal on-chain data
@@ -68,7 +68,7 @@ export function useProposal(proposalIdx: number, autoRefresh = false) {
 
         const log: ProposalCreatedLogResponse = logs[0] as any;
         setProposalCreationEvent(log.args);
-        setMetadata(log.args.metadata);
+        setMetadataUri(log.args.metadata);
       })
       .catch((err) => {
         console.error("Could not fetch the proposal details", err);

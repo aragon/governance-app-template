@@ -71,19 +71,20 @@ export default function ProposalCard(props: ProposalInputs) {
     result = {
       option: "Yes",
       voteAmount: formatEther(proposal.tally.yes) + " " + (tokenSymbol || PUB_TOKEN_SYMBOL),
-      votePercentage: Number(((proposal?.tally.yes || BigInt(0)) * BigInt(10_000)) / totalVotes) / 100,
+      votePercentage: Number(((proposal?.tally.yes || BigInt(0)) * BigInt(10_000)) / (totalVotes || BigInt(1))) / 100,
     };
   } else if (proposal?.tally.no > proposal?.tally.yes && proposal?.tally.no > proposal?.tally.abstain) {
     result = {
       option: "No",
       voteAmount: formatEther(proposal.tally.no) + " " + (tokenSymbol || PUB_TOKEN_SYMBOL),
-      votePercentage: Number(((proposal?.tally.no || BigInt(0)) * BigInt(10_000)) / totalVotes) / 100,
+      votePercentage: Number(((proposal?.tally.no || BigInt(0)) * BigInt(10_000)) / (totalVotes || BigInt(1))) / 100,
     };
   } else if (proposal?.tally.abstain > proposal?.tally.no && proposal?.tally.abstain > proposal?.tally.yes) {
     result = {
       option: "Abstain",
       voteAmount: formatEther(proposal.tally.abstain) + " " + (tokenSymbol || PUB_TOKEN_SYMBOL),
-      votePercentage: Number(((proposal?.tally.abstain || BigInt(0)) * BigInt(10_000)) / totalVotes) / 100,
+      votePercentage:
+        Number(((proposal?.tally.abstain || BigInt(0)) * BigInt(10_000)) / (totalVotes || BigInt(1))) / 100,
     };
   }
 

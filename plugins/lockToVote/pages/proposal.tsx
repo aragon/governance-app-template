@@ -141,7 +141,7 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
             </If>
             <ProposalVoting
               stages={proposalStage}
-              description="Proposals approved by the Security Council become eventually executable, unless the community reaches the veto threshold during the community veto stage."
+              description="Proposals become eventually executable, unless the community reaches the veto threshold during the community veto stage."
             />
             <ProposalActions actions={proposal.actions} />
           </div>

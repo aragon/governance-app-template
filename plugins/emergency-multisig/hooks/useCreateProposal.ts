@@ -1,8 +1,7 @@
 import { useRouter } from "next/router";
 import { useEncryptedData } from "./useEncryptedData";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProposalMetadata, RawAction } from "@/utils/types";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useAlerts } from "@/context/Alerts";
 import {
   PUB_APP_NAME,
@@ -15,6 +14,7 @@ import { uploadToPinata } from "@/utils/ipfs";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
 import { URL_PATTERN } from "@/utils/input-values";
 import { toHex } from "viem";
+import { useTransactionManager } from "@/hooks/useTransactionManager";
 
 const UrlRegex = new RegExp(URL_PATTERN);
 
@@ -29,47 +29,19 @@ export function useCreateProposal() {
   const [resources, setResources] = useState<{ name: string; url: string }[]>([
     { name: PUB_APP_NAME, url: PUB_PROJECT_URL },
   ]);
-  const { writeContract: createProposalWrite, data: createTxHash, error, status } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: createTxHash });
   const { encryptProposalData } = useEncryptedData();
 
-  useEffect(() => {
-    if (status === "idle" || status === "pending") return;
-    else if (status === "error") {
-      if (error?.message?.startsWith("User rejected the request")) {
-        addAlert("The transaction signature was declined", {
-          description: "Nothing will be sent to the network",
-          timeout: 4 * 1000,
-        });
-      } else {
-        console.error(error);
-        addAlert("Could not create the proposal", { type: "error" });
-      }
-      setIsCreating(false);
-      return;
-    }
-
-    // success
-    if (!createTxHash) return;
-    else if (isConfirming) {
-      addAlert("Proposal submitted", {
-        description: "Waiting for the transaction to be validated",
-        txHash: createTxHash,
-      });
-      return;
-    } else if (!isConfirmed) return;
-
-    addAlert("Proposal created", {
-      description: "The transaction has been validated",
-      type: "success",
-      txHash: createTxHash,
-    });
-
-    setTimeout(() => {
-      push("#/");
-      window.scroll(0, 0);
-    }, 1000 * 2);
-  }, [status, createTxHash, isConfirming, isConfirmed]);
+  const { writeContract: createProposalWrite, isConfirming } = useTransactionManager({
+    onSuccessMessage: "Proposal created",
+    onSuccess() {
+      setTimeout(() => {
+        push("#/");
+        window.scroll(0, 0);
+      }, 1000 * 2);
+    },
+    onErrorMessage: "Could not create the proposal",
+    onError: () => setIsCreating(false),
+  });
 
   const submitProposal = async () => {
     // Check metadata

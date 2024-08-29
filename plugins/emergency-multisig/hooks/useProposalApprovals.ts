@@ -1,27 +1,24 @@
 import { useState, useEffect } from "react";
 import { Address, getAbiItem } from "viem";
-import { PublicClient } from "viem";
-import { ApprovedEvent, ApprovedEventResponse, EmergencyProposal } from "@/plugins/emergency-multisig/utils/types";
+import { usePublicClient } from "wagmi";
+import { ApprovedEvent, ApprovedEventResponse, EmergencyProposal } from "../utils/types";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
+import { PUB_CHAIN } from "@/constants";
 
 const event = getAbiItem({
   abi: EmergencyMultisigPluginAbi,
   name: "Approved",
 });
 
-export function useProposalApprovals(
-  publicClient: PublicClient,
-  address: Address,
-  proposalId: string,
-  proposal: EmergencyProposal | null
-) {
+export function useProposalApprovals(pluginAddress: Address, proposalId: string, proposal: EmergencyProposal | null) {
+  const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
   const [proposalLogs, setLogs] = useState<ApprovedEvent[]>([]);
 
   async function getLogs() {
-    if (!proposal?.parameters?.snapshotBlock) return;
+    if (!publicClient || !proposal?.parameters?.snapshotBlock) return;
 
     const logs: ApprovedEventResponse[] = (await publicClient.getLogs({
-      address,
+      address: pluginAddress,
       event: event,
       args: {
         proposalId: BigInt(proposalId),
@@ -36,7 +33,7 @@ export function useProposalApprovals(
 
   useEffect(() => {
     getLogs();
-  }, [proposal?.parameters?.snapshotBlock]);
+  }, [!!publicClient, proposal?.parameters?.snapshotBlock]);
 
   return proposalLogs;
 }

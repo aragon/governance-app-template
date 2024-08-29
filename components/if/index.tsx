@@ -1,105 +1,112 @@
-import React, { type ReactElement, type ReactNode } from "react";
-
-type Booleanish = any;
-type IfProps = { condition: Booleanish; children?: ReactNode } | { not: Booleanish; children?: ReactNode };
+import React, { ReactElement, ReactNode } from "react";
+import { IfProps } from "./types";
 
 /**
- * Renders the block where the condition evaluates to true
+ * Renders the inner children or the first Then child when the condition evaluates to true
  *
  * ```
- * <If condition={a && b && c}>
- *    <p>The condition is true</p>
- * </If>
+ * <If true={age === 18}> rendered </If>
+ * <If not={age === 18}> rendered </If>
  *
- * <If not={a && b && c}>
- *    <p>The condition is false</p>
- * </If>
+ * <If all={[age > 18, name.includes("John"), height >= 180]}> rendered </If>
+ * <If some={[age > 18, name.includes("John"), height >= 180]}> rendered </If>
+ * <If notAll={[age > 18, name.includes("John"), height >= 180]}> rendered </If>
+ * <If none={[age > 18, name.includes("John"), height >= 180]}> rendered </If>
  *
- * <If condition={a && b && c}>
+ * <If val={age} is={18}> rendered </If>
+ * <If val={age} isNot={18}> rendered </If>
+ * <If val={age} above={18}> rendered </If>
+ * <If val={age} below={18}> rendered </If>
+ * <If val={age} atLeast={18}> rendered </If>
+ * <If val={age} atMost={18}> rendered </If>
+ *
+ * <If lengthOf={["a", "b", "c"]} is={3}> rendered </If>
+ * <If lengthOf={["a", "b", "c"]} isNot={3}> rendered </If>
+ * <If lengthOf={["a", "b", "c"]} above={3}> rendered </If>
+ * <If lengthOf={["a", "b", "c"]} below={3}> rendered </If>
+ * <If lengthOf={["a", "b", "c"]} atLeast={3}> rendered </If>
+ * <If lengthOf={["a", "b", "c"]} atMost={3}> rendered </If>
+ *
+ * <If val={age} atLeast={18}>
  *   <Then>
- *     <p>Condition 1 is true</p>
+ *     <p>Of legal age</p>
  *   </Then>
- *   <ElseIf condition={ d && e }>
- *     <p>Condition 2 is true</p>
+ *   <ElseIf val={age} atLeast={16}>
+ *     <p>Can drive but not vote</p>
  *   </ElseIf>
- *   <ElseIf not={ f || g }>
- *     <p>Condition 3 is false</p>
+ *   <ElseIf val={age} atLeast={14}>
+ *     <p>Can drive a small scooter</p>
  *   </ElseIf>
  *   <Else>
- *     <p>All conditions are false</p>
- *   </Else>
- * </If>
- *
- * <If not={a && b && c}>
- *   <Then>
- *     <p>Condition 1 is false</p>
- *   </Then>
- *   <ElseIf condition={ d && e }>
- *     <p>Condition 2 is true</p>
- *   </ElseIf>
- *   <ElseIf not={ f || g }>
- *     <p>Condition 3 is false</p>
- *   </ElseIf>
- *   <Else>
- *     <p>All conditions are false</p>
+ *     <p>Still too young</p>
  *   </Else>
  * </If>
  * ```
  *
- * @param props {condition, children}
+ * @param props {IfProps}
  * @returns
  */
 export const If = (props: IfProps) => {
   const { children } = props;
   if (!children) return <></>;
 
-  const mainCondition = resolveCondition(props);
+  const mainConditionValue = resolveCondition(props);
 
   // Many children
   if (Array.isArray(children) && hasConditionalChildren(children)) {
-    for (const child of children) {
-      // Match the Then/ElseIf/Else elements only
-      if (child.type === Then) {
-        if (mainCondition) return child.props?.children;
-      } else if (child.type === ElseIf) {
-        if (!mainCondition) {
-          const subCondition = resolveCondition(child.props);
-          if (subCondition) return child.props?.children;
+    if (mainConditionValue) {
+      // Match Then elements only
+      for (const child of children) {
+        if (child.type === Then) {
+          return child.props?.children;
         }
-        // Continue trying other ElseIf's
-      } else if (child.type === Else) {
-        if (!mainCondition) return child.props?.children;
+      }
+    } else {
+      for (const child of children) {
+        // Match ElseIf elements only
+        if (child.type === ElseIf) {
+          const subConditionValue = resolveCondition(child.props);
+          if (subConditionValue) return child.props?.children;
+          // Continue trying other ElseIf's
+        }
+      }
+
+      for (const child of children) {
+        // Match Else elements only
+        if (child.type === Else) {
+          return child.props?.children;
+        }
       }
       // Do not render unknown nodes within an array of children
     }
     // No match
     return <></>;
   }
-  // One child
+  // Single child
   else if (typeof children !== "object") {
-    if (!mainCondition) return <></>;
+    if (!mainConditionValue) return <></>;
 
+    // Basic types (string, number, boolean)
     return children;
   }
 
   const child = children as ReactElement;
   // Match the Then/ElseIf/Else elements first
   if (child.type === Then) {
-    if (mainCondition) return child.props?.children;
+    if (mainConditionValue) return child.props?.children;
     return <></>;
   } else if (child.type === ElseIf) {
-    if (!mainCondition) {
-      const subCondition = resolveCondition(child.props);
-      if (subCondition) return child.props?.children;
-    }
-    return <></>;
+    if (mainConditionValue) return <></>;
+
+    const subConditionValue = resolveCondition(child.props);
+    if (subConditionValue) return child.props?.children;
   } else if (child.type === Else) {
-    if (!mainCondition) return child.props?.children;
+    if (!mainConditionValue) return child.props?.children;
     return <></>;
   }
 
   // Fallback for extraneous cases
-  if (!mainCondition) return <></>;
+  if (!mainConditionValue) return <></>;
 
   return children;
 };
@@ -108,9 +115,9 @@ export const If = (props: IfProps) => {
  * Renders when the parent If condition is true
  *
  * ```
- * <If condition={a && b && c}>
+ * <If all={[a, b, c]}>
  *   <Then>
- *     <p>Condition 1 is true</p>
+ *     <p>a, b, and c are true</p>
  *   </Then>
  *   <Else>
  *     <p>All conditions are false</p>
@@ -126,18 +133,18 @@ export const Then = ({ children }: { children?: ReactNode }) => {
 };
 
 /**
- * Renders when the parent If condition is false
+ * Renders when the preceding If or ElseIf conditions are false and the current condition matches
  *
  * ```
- * <If condition={a && b && c}>
+ * <If val={age} atLeast={18}>
  *   <Then>
- *     <p>Condition 1 is true</p>
+ *     <p>Of legal age</p>
  *   </Then>
- *   <ElseIf condition={ d && e }>
- *     <p>Condition 2 is true</p>
+ *   <ElseIf val={age} atLeast={16}>
+ *     <p>Can drive but not vote</p>
  *   </ElseIf>
- *   <ElseIf not={ d && e }>
- *     <p>Condition 3 is false</p>
+ *   <ElseIf val={age} atLeast={14}>
+ *     <p>Can drive a small scooter</p>
  *   </ElseIf>
  * </If>
  * ```
@@ -150,18 +157,21 @@ export const ElseIf = ({ children }: IfProps) => {
 };
 
 /**
- * Renders when the parent If condition is false
+ * Renders when the parent If and ElseIf conditions are false
  *
  * ```
- * <If condition={a && b && c}>
+ * <If val={age} below={14}>
  *   <Then>
- *     <p>Condition 1 is true</p>
+ *     <p>You are too young</p>
  *   </Then>
- *   <ElseIf condition={ d && e }>
- *     <p>Condition 2 is true</p>
+ *   <ElseIf val={age} below={16}>
+ *     <p>Can drive a small scooter</p>
+ *   </ElseIf>
+ *   <ElseIf val={age} below={18}>
+ *     <p>Can drive but not vote</p>
  *   </ElseIf>
  *   <Else>
- *     <p>All conditions are false</p>
+ *     <p>You are of legal age</p>
  *   </Else>
  * </If>
  * ```
@@ -173,16 +183,7 @@ export const Else = ({ children }: { children?: ReactNode }) => {
   return children;
 };
 
-// Helpers
-
-function resolveCondition(props: IfProps): boolean {
-  if (typeof (props as any).condition !== "undefined" && typeof (props as any).not !== "undefined") {
-    throw new Error("Either 'condition' or 'not' are required as an <If> prop, but not both");
-  } else if (typeof (props as any).condition !== "undefined") {
-    return (props as any).condition;
-  }
-  return !(props as any).not;
-}
+// Internal
 
 function hasConditionalChildren(children: ReactNode): boolean {
   if (!Array.isArray(children)) {
@@ -196,4 +197,51 @@ function hasConditionalChildren(children: ReactNode): boolean {
 
 function isConditionalChild(node: ReactElement) {
   return node.type === Then || node.type === ElseIf || node.type === Else;
+}
+
+function resolveCondition(props: IfProps): boolean {
+  if ("true" in props) return !!props.true;
+  else if ("not" in props) return !props.not;
+  else if ("val" in props) {
+    if ("is" in props) return props.val === props.is;
+    else if ("isNot" in props) return props.val !== props.isNot;
+    else if ("above" in props) return (props.val as number) > props.above;
+    else if ("below" in props) return (props.val as number) < props.below;
+    else if ("atLeast" in props) return (props.val as number) >= props.atLeast;
+    else if ("atMost" in props) return (props.val as number) <= props.atMost;
+  } else if ("lengthOf" in props) {
+    if ("is" in props) {
+      if (!props.lengthOf) return 0 === props.is;
+      return props.lengthOf.length === props.is;
+    } else if ("isNot" in props) {
+      if (!props.lengthOf) return 0 !== props.isNot;
+      return props.lengthOf.length !== props.isNot;
+    } else if ("above" in props) {
+      if (!props.lengthOf) return 0 > props.above;
+      return props.lengthOf.length > props.above;
+    } else if ("below" in props) {
+      if (!props.lengthOf) return 0 < props.below;
+      return props.lengthOf.length < props.below;
+    } else if ("atLeast" in props) {
+      if (!props.lengthOf) return 0 >= props.atLeast;
+      return props.lengthOf.length >= props.atLeast;
+    } else if ("atMost" in props) {
+      if (!props.lengthOf) return 0 <= props.atMost;
+      return props.lengthOf.length <= props.atMost;
+    }
+  } else if ("all" in props) {
+    for (const c of props.all) if (!c) return false;
+    return true;
+  } else if ("some" in props) {
+    for (const c of props.some) if (c) return true;
+    return false;
+  } else if ("notAll" in props) {
+    for (const c of props.notAll) if (!c) return true;
+    return false;
+  } else if ("none" in props) {
+    for (const c of props.none) if (c) return false;
+    return true;
+  }
+
+  return false;
 }

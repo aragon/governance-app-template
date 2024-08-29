@@ -1,265 +1,283 @@
-import { create } from "ipfs-http-client";
-import { Button, IconType, Icon, InputText, TextAreaRichText } from "@aragon/ods";
-import React, { useEffect, useState } from "react";
-import { uploadToIPFS } from "@/utils/ipfs";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { toHex } from "viem";
-import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
-import { useAlerts } from "@/context/Alerts";
-import WithdrawalInput from "@/components/input/withdrawal";
-import { FunctionCallForm } from "@/components/input/function-call-form";
-import { Action } from "@/utils/types";
-import { getPlainText } from "@/utils/html";
-import { useRouter } from "next/router";
+import { Button, IconType, InputText, TextAreaRichText, Tag } from "@aragon/ods";
+import React, { ReactNode, useState } from "react";
+import { RawAction } from "@/utils/types";
 import { Else, ElseIf, If, Then } from "@/components/if";
-import { PleaseWaitSpinner } from "@/components/please-wait";
-import { PUB_CHAIN, PUB_IPFS_API_KEY, PUB_IPFS_ENDPOINT, PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
-import { ActionCard } from "@/components/actions/action";
-
-enum ActionType {
-  Signaling,
-  Withdrawal,
-  Custom,
-}
-
-const ipfsClient = create({
-  url: PUB_IPFS_ENDPOINT,
-  headers: { "X-API-KEY": PUB_IPFS_API_KEY, Accept: "application/json" },
-});
+import { MainSection } from "@/components/layout/main-section";
+import { useCreateProposal } from "../hooks/useCreateProposal";
+import { useAccount } from "wagmi";
+import { useCanCreateProposal } from "../hooks/useCanCreateProposal";
+import { MissingContentView } from "@/components/MissingContentView";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { Address } from "viem";
+import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDialog";
+import { AddActionCard } from "@/components/cards/AddActionCard";
+import { ProposalActions } from "@/components/proposalActions/proposalActions";
+import { downloadAsFile } from "@/utils/download-as-file";
+import { encodeActionsAsJson } from "@/utils/json-actions";
 
 export default function Create() {
-  const { push } = useRouter();
-  const [title, setTitle] = useState<string>("");
-  const [summary, setSummary] = useState<string>("");
-  const [actions, setActions] = useState<Action[]>([]);
-  const { addAlert } = useAlerts();
-  const { writeContract: createProposalWrite, data: createTxHash, status, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: createTxHash });
-  const [actionType, setActionType] = useState<ActionType>(ActionType.Signaling);
-
-  const changeActionType = (actionType: ActionType) => {
-    setActions([]);
-    setActionType(actionType);
-  };
-
-  useEffect(() => {
-    if (status === "idle" || status === "pending") return;
-    else if (status === "error") {
-      if (error?.message?.startsWith("User rejected the request")) {
-        addAlert("Transaction rejected by the user", {
-          timeout: 4 * 1000,
-        });
-      } else {
-        console.error(error);
-        addAlert("Could not create the proposal", { type: "error" });
-      }
-      return;
-    }
-
-    // success
-    if (!createTxHash) return;
-    else if (isConfirming) {
-      addAlert("Proposal submitted", {
-        description: "Waiting for the transaction to be validated",
-        txHash: createTxHash,
-      });
-      return;
-    } else if (!isConfirmed) return;
-
-    addAlert("Proposal created", {
-      description: "The transaction has been validated",
-      type: "success",
-      txHash: createTxHash,
-    });
-
-    setTimeout(() => {
-      push("#/");
-    }, 1000 * 2);
-  }, [status, createTxHash, isConfirming, isConfirmed]);
-
-  const submitProposal = async () => {
-    // Check metadata
-    if (!title.trim())
-      return addAlert("Invalid proposal details", {
-        description: "Please, enter a title",
-        type: "error",
-      });
-
-    const plainSummary = getPlainText(summary).trim();
-    if (!plainSummary.trim())
-      return addAlert("Invalid proposal details", {
-        description: "Please, enter a summary of what the proposal is about",
-        type: "error",
-      });
-
-    // Check the action
-    switch (actionType) {
-      case ActionType.Signaling:
-        break;
-      case ActionType.Withdrawal:
-        if (!actions.length) {
-          return addAlert("Invalid proposal details", {
-            description: "Please ensure that the withdrawal address and the amount to transfer are valid",
-            type: "error",
-          });
-        }
-        break;
-      default:
-        if (!actions.length || !actions[0].data || actions[0].data === "0x") {
-          return addAlert("Invalid proposal details", {
-            description: "Please ensure that the values of the action to execute are complete and correct",
-            type: "error",
-          });
-        }
-    }
-
-    const proposalMetadataJsonObject = { title, summary };
-    const blob = new Blob([JSON.stringify(proposalMetadataJsonObject)], {
-      type: "application/json",
-    });
-
-    const ipfsPin = await uploadToIPFS(ipfsClient, blob);
-    createProposalWrite({
-      chainId: PUB_CHAIN.id,
-      abi: TokenVotingAbi,
-      address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
-      functionName: "createProposal",
-      args: [toHex(ipfsPin), actions, BigInt(0), BigInt(0), BigInt(0), 0, false],
-    });
-  };
+  const { address: selfAddress, isConnected } = useAccount();
+  const canCreate = useCanCreateProposal();
+  const [addActionType, setAddActionType] = useState<NewActionType>("");
+  const {
+    title,
+    summary,
+    description,
+    actions,
+    resources,
+    setTitle,
+    setSummary,
+    setDescription,
+    setActions,
+    setResources,
+    isCreating,
+    submitProposal,
+  } = useCreateProposal();
 
   const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event?.target?.value);
   };
+  const handleSummaryInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSummary(event?.target?.value);
+  };
+  const handleNewActionDialogClose = (newAction: RawAction[] | null) => {
+    if (!newAction) {
+      setAddActionType("");
+      return;
+    }
 
-  const showLoading = status === "pending" || isConfirming;
+    setActions(actions.concat(newAction));
+    setAddActionType("");
+  };
+  const onRemoveAction = (idx: number) => {
+    actions.splice(idx, 1);
+    setActions([].concat(actions as any));
+  };
+  const removeResource = (idx: number) => {
+    resources.splice(idx, 1);
+    setResources([].concat(resources as any));
+  };
+  const onResourceNameChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    resources[idx].name = event.target.value;
+    setResources([].concat(resources as any));
+  };
+  const onResourceUrlChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    resources[idx].url = event.target.value;
+    setResources([].concat(resources as any));
+  };
+
+  const exportAsJson = () => {
+    if (!actions.length) return;
+
+    const strResult = encodeActionsAsJson(actions);
+    downloadAsFile("actions.json", strResult, "text/json");
+  };
 
   return (
-    <section className="flex w-screen min-w-full max-w-full flex-col items-center">
-      <div className="w-full justify-between py-5">
-        <h1 className="mb-10 text-3xl font-semibold text-neutral-900">Create Proposal</h1>
-        <div className="mb-6">
-          <InputText
-            className=""
-            label="Title"
-            maxLength={100}
-            placeholder="A short title that describes the main purpose"
-            variant="default"
-            value={title}
-            onChange={handleTitleInput}
-          />
-        </div>
-        <div className="mb-6">
-          <TextAreaRichText
-            label="Summary"
-            className="pt-2"
-            value={summary}
-            onChange={setSummary}
-            placeholder="A description for what the proposal is all about"
-          />
-        </div>
-        <div className="mb-6">
-          <span className="mb-2 block text-lg font-normal text-neutral-900 ">Select the type of proposal</span>
-          <div className="mt-2 grid h-24 grid-cols-3 gap-5">
-            <div
-              onClick={() => {
-                changeActionType(ActionType.Signaling);
-              }}
-              className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
-                actionType === ActionType.Signaling ? "border-primary-300" : "border-neutral-100"
-              }`}
-            >
-              <Icon
-                className={
-                  "mt-2 !h-12 !w-10 p-2 " +
-                  (actionType === ActionType.Signaling ? "text-primary-400" : "text-neutral-400")
-                }
-                icon={IconType.INFO}
-                size="lg"
-              />
-              <span className="text-center text-sm text-neutral-400">Signaling</span>
-            </div>
-            <div
-              onClick={() => changeActionType(ActionType.Withdrawal)}
-              className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
-                actionType === ActionType.Withdrawal ? "border-primary-300" : "border-neutral-100"
-              }`}
-            >
-              <Icon
-                className={
-                  "mt-2 !h-12 !w-10 p-2 " +
-                  (actionType === ActionType.Withdrawal ? "text-primary-400" : "text-neutral-400")
-                }
-                icon={IconType.WITHDRAW}
-                size="lg"
-              />
-              <span className="text-center text-sm text-neutral-400">DAO Payment</span>
-            </div>
-            <div
-              onClick={() => changeActionType(ActionType.Custom)}
-              className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
-                actionType === ActionType.Custom ? "border-primary-300" : "border-neutral-100"
-              }`}
-            >
-              <Icon
-                className={
-                  "mt-2 !h-12 !w-10 p-2 " + (actionType === ActionType.Custom ? "text-primary-400" : "text-neutral-400")
-                }
-                icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
-                size="lg"
-              />
-              <span className="text-center text-sm text-neutral-400">Custom action</span>
-            </div>
+    <MainSection narrow>
+      <div className="w-full justify-between">
+        <h1 className="mb-8 line-clamp-1 flex flex-1 shrink-0 text-2xl font-normal leading-tight text-neutral-800 md:text-3xl">
+          Create Proposal
+        </h1>
+
+        <PlaceHolderOr selfAddress={selfAddress} canCreate={canCreate} isConnected={isConnected}>
+          <div className="mb-6">
+            <InputText
+              className=""
+              label="Title"
+              maxLength={100}
+              placeholder="A short title that describes the main purpose"
+              variant="default"
+              value={title}
+              readOnly={isCreating}
+              onChange={handleTitleInput}
+            />
           </div>
           <div className="mb-6">
-            {actionType === ActionType.Withdrawal && <WithdrawalInput setActions={setActions} />}
-            {actionType === ActionType.Custom && (
-              <FunctionCallForm onAddAction={(action) => setActions(actions.concat([action]))} />
-            )}
+            <InputText
+              className=""
+              label="Summary"
+              maxLength={280}
+              placeholder="A short summary that outlines the main purpose of the proposal"
+              variant="default"
+              value={summary}
+              readOnly={isCreating}
+              onChange={handleSummaryInput}
+            />
           </div>
-        </div>
+          <div className="mb-6">
+            <TextAreaRichText
+              label="Body"
+              className="pt-2"
+              value={description}
+              onChange={setDescription}
+              placeholder="A description of what the proposal is all about"
+            />
+          </div>
 
-        <If condition={showLoading}>
-          <Then>
-            <div className="mb-6 mt-14">
-              <PleaseWaitSpinner fullMessage="Confirming transaction..." />
+          <div className="mb-6 flex flex-col gap-y-2 md:gap-y-3">
+            <div className="flex flex-col gap-0.5 md:gap-1">
+              <div className="flex gap-x-3">
+                <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg">Resources</p>
+                <Tag label="Optional" />
+              </div>
+              <p className="text-sm font-normal leading-normal text-neutral-500 md:text-base">
+                Add links to external resources
+              </p>
             </div>
-          </Then>
-          <ElseIf condition={actionType !== ActionType.Custom}>
-            <Button className="mb-6 mt-14" size="lg" variant="primary" onClick={() => submitProposal()}>
-              Submit proposal
-            </Button>
-          </ElseIf>
-          <Else>
-            <div className="mb-6 mt-14">
-              <If not={actions.length}>
-                <Then>
-                  <p>Add the first action to continue</p>
-                </Then>
-                <Else>
-                  <p className="flex-grow pb-3 text-lg font-semibold text-neutral-900">Actions</p>
-                  <div className="mb-10">
-                    {actions?.map?.((action, i) => (
-                      <div className="mb-3" key={`${i}-${action.to}-${action.data}`}>
-                        <ActionCard action={action} idx={i} />
-                      </div>
-                    ))}
-                  </div>
-                </Else>
+            <div className="flex flex-col gap-y-4 rounded-xl border border-neutral-100 bg-neutral-0 p-4">
+              <If lengthOf={resources} is={0}>
+                <p className="text-sm font-normal leading-normal text-neutral-500 md:text-base">
+                  There are no resources yet. Click the button below to add the first one.
+                </p>
               </If>
-              <Button
-                className="mt-3"
-                size="lg"
-                variant="primary"
-                disabled={!actions.length}
-                onClick={() => submitProposal()}
-              >
-                Submit proposal
-              </Button>
+              {resources.map((resource, idx) => {
+                return (
+                  <div key={idx} className="flex flex-col gap-y-3 py-3 md:py-4">
+                    <div className="flex items-end gap-x-3">
+                      <InputText
+                        label="Resource name"
+                        readOnly={isCreating}
+                        value={resource.name}
+                        onChange={(e) => onResourceNameChange(e, idx)}
+                        placeholder="GitHub, Twitter, etc."
+                      />
+                      <Button
+                        size="lg"
+                        variant="tertiary"
+                        onClick={() => removeResource(idx)}
+                        iconLeft={IconType.MINUS}
+                      />
+                    </div>
+                    <InputText
+                      label="URL"
+                      value={resource.url}
+                      onChange={(e) => onResourceUrlChange(e, idx)}
+                      placeholder="https://..."
+                      readOnly={isCreating}
+                    />
+                  </div>
+                );
+              })}
             </div>
-          </Else>
-        </If>
+            <span className="mt-3">
+              <Button
+                variant="tertiary"
+                size="lg"
+                iconLeft={IconType.PLUS}
+                disabled={isCreating}
+                onClick={() => {
+                  setResources(resources.concat({ url: "", name: "" }));
+                }}
+              >
+                Add resource
+              </Button>
+            </span>
+          </div>
+
+          {/* Actions */}
+
+          <ProposalActions
+            actions={actions}
+            emptyListDescription="The proposal has no actions defined yet. Select a type of action to add to the proposal."
+            onRemove={(idx) => onRemoveAction(idx)}
+          />
+
+          <If lengthOf={actions} above={0}>
+            <Button
+              className="mt-6"
+              iconLeft={IconType.RICHTEXT_LIST_UNORDERED}
+              size="lg"
+              variant="tertiary"
+              onClick={() => exportAsJson()}
+            >
+              Export actions as JSON
+            </Button>
+          </If>
+
+          <div className="mt-8 grid w-full grid-cols-2 gap-4 md:grid-cols-4">
+            <AddActionCard
+              title="Add a payment"
+              icon={IconType.WITHDRAW}
+              disabled={isCreating}
+              onClick={() => setAddActionType("withdrawal")}
+            />
+            <AddActionCard
+              title="Add a function call"
+              icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
+              disabled={isCreating}
+              onClick={() => setAddActionType("select-abi-function")}
+            />
+            <AddActionCard
+              title="Add raw calldata"
+              icon={IconType.COPY}
+              disabled={isCreating}
+              onClick={() => setAddActionType("calldata")}
+            />
+            <AddActionCard
+              title="Import JSON actions"
+              disabled={isCreating}
+              icon={IconType.RICHTEXT_LIST_UNORDERED}
+              onClick={() => setAddActionType("import-json")}
+            />
+          </div>
+
+          {/* Dialog */}
+
+          <NewActionDialog
+            newActionType={addActionType}
+            onClose={(newActions) => handleNewActionDialogClose(newActions)}
+          />
+
+          {/* Submit */}
+
+          <div className="mt-6 flex w-full flex-col items-center">
+            <Button
+              isLoading={isCreating}
+              className="mt-3 border-primary-400"
+              size="lg"
+              variant={actions.length ? "primary" : "secondary"}
+              onClick={() => submitProposal()}
+            >
+              <If lengthOf={actions} above={0}>
+                <Then>Submit proposal</Then>
+                <Else>Submit signaling proposal</Else>
+              </If>
+            </Button>
+          </div>
+        </PlaceHolderOr>
       </div>
-    </section>
+    </MainSection>
   );
 }
+
+const PlaceHolderOr = ({
+  selfAddress,
+  isConnected,
+  canCreate,
+  children,
+}: {
+  selfAddress: Address | undefined;
+  isConnected: boolean;
+  canCreate: boolean | undefined;
+  children: ReactNode;
+}) => {
+  const { open } = useWeb3Modal();
+  return (
+    <If true={!selfAddress || !isConnected}>
+      <Then>
+        {/* Not connected */}
+        <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
+          Please connect your wallet to continue.
+        </MissingContentView>
+      </Then>
+      <ElseIf true={!canCreate}>
+        {/* Not a member */}
+        <MissingContentView>
+          You cannot create proposals on the multisig because you are not currently defined as a member.
+        </MissingContentView>
+      </ElseIf>
+      <Else>{children}</Else>
+    </If>
+  );
+};

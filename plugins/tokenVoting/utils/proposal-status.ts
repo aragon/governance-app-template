@@ -1,4 +1,4 @@
-import { Proposal, VotingMode } from "@/plugins/tokenVoting/utils/types";
+import { Proposal, VotingMode } from "./types";
 export const RATIO_BASE = 1_000_000;
 
 export function getProposalStatusVariant(proposal: Proposal, tokenSupply: bigint) {

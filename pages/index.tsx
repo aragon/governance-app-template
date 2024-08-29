@@ -1,17 +1,21 @@
+import { MainSection } from "@/components/layout/main-section";
 import { Button, IllustrationHuman } from "@aragon/ods";
 import { type ReactNode } from "react";
 import { useAccount } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Else, If, Then } from "@/components/if";
+import { PUB_APP_NAME } from "@/constants";
 
-export default function Home() {
+export default function StandardHome() {
   const { isConnected } = useAccount();
   const { open } = useWeb3Modal();
 
   return (
-    <main className="w-screen max-w-full flex-col">
+    <MainSection narrow>
       <Card>
-        <h1 className="text-2xl font-[700] text-neutral-800">Welcome to Aragonette!</h1>
+        <h1 className="line-clamp-1 flex flex-1 shrink-0 text-2xl font-normal leading-tight text-neutral-800 md:text-3xl">
+          Welcome to {PUB_APP_NAME}
+        </h1>
         <p className="text-md text-neutral-400">
           A beaufitul DAO experience in a simple template that you can customize. Get started by connecting your wallet
           and selecting a plugin from the menu.
@@ -19,9 +23,9 @@ export default function Home() {
         <div className="">
           <IllustrationHuman className="mx-auto mb-10 max-w-96" body="BLOCKS" expression="SMILE_WINK" hairs="CURLY" />
           <div className="flex justify-center">
-            <If condition={isConnected}>
+            <If true={isConnected}>
               <Then>
-                <Button className="mb-2" variant="primary" href="https://devs.aragon.org/docs/osx/" target="_blank">
+                <Button className="mb-2" variant="primary" href="https://devs.aragon.org/" target="_blank">
                   Learn more about OSx
                 </Button>
               </Then>
@@ -34,11 +38,11 @@ export default function Home() {
           </div>
         </div>
       </Card>
-    </main>
+    </MainSection>
   );
 }
 
-// This should be encapsulated as soon as ODS exports this widget
+// This should be encapsulated
 const Card = function ({ children }: { children: ReactNode }) {
   return (
     <div

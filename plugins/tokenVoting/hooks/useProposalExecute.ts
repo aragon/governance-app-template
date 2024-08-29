@@ -5,7 +5,7 @@ import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
-export function useProposalExecute(proposalId: string) {
+export function useProposalExecute(proposalId: number) {
   const { reload } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
 

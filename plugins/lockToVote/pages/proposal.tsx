@@ -1,38 +1,118 @@
-import { useProposal } from "@/plugins/lockToVote/hooks/useProposal";
-import { ToggleGroup, Toggle } from "@aragon/ods";
-import ProposalDescription from "@/plugins/lockToVote/components/proposal/description";
-import VetoesSection from "@/plugins/dualGovernance/components/vote/vetoes-section";
-import ProposalHeader from "@/plugins/lockToVote/components/proposal/header";
-import VetoTally from "@/plugins/lockToVote/components/vote/tally";
-import ProposalDetails from "@/plugins/lockToVote/components/proposal/details";
-import { Else, If, Then } from "@/components/if";
+import type { useProposal } from "../hooks/useProposal";
+import ProposalHeader from "../components/proposal/header";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useState } from "react";
-import { useProposalVeto } from "@/plugins/lockToVote/hooks/useProposalVeto";
-import { useProposalExecute } from "@/plugins/lockToVote/hooks/useProposalExecute";
-import { useProposalClaimLock } from "@/plugins/lockToVote/hooks/useProposalClaimLock";
+import { useProposalVeto } from "../hooks/useProposalVeto";
+import { useProposalExecute } from "../hooks/useProposalExecute";
+import { BodySection } from "@/components/proposal/proposalBodySection";
+import { IBreakdownMajorityVotingResult, ProposalVoting } from "@/components/proposalVoting";
+import type { ITransformedStage, IVote } from "@/utils/types";
+import { ProposalStages } from "@/utils/types";
+import { useProposalStatus } from "../hooks/useProposalVariantStatus";
+import dayjs from "dayjs";
+import { ProposalActions } from "@/components/proposalActions/proposalActions";
+import { CardResources } from "@/components/proposal/cardResources";
+import { Address, formatEther } from "viem";
+import { useToken } from "../hooks/useToken";
+import { usePastSupply } from "../hooks/usePastSupply";
+import { ElseIf, If, Then } from "@/components/if";
+import { AlertCard, ProposalStatus } from "@aragon/ods";
+import { PUB_TOKEN_SYMBOL } from "@/constants";
 import { useAccount } from "wagmi";
+import { useTokenVotes } from "@/hooks/useTokenVotes";
+import { ADDRESS_ZERO } from "@/utils/evm";
+import { AddressText } from "@/components/text/address";
+import Link from "next/link";
 
-type BottomSection = "description" | "vetoes";
+const ZERO = BigInt(0);
 
-export default function ProposalDetail({ id: proposalId }: { id: string }) {
-  const account = useAccount();
-  const [bottomSection, setBottomSection] = useState<BottomSection>("description");
-
+export default function ProposalDetail({ index: proposalIdx }: { index: number }) {
+  const { address } = useAccount();
   const {
     proposal,
     proposalFetchStatus,
-    vetoes,
     canVeto,
+    vetoes,
     isConfirming: isConfirmingVeto,
     vetoProposal,
-  } = useProposalVeto(proposalId);
+  } = useProposalVeto(proposalIdx);
+  const pastSupply = usePastSupply(proposal?.parameters.snapshotBlock);
+  const { symbol: tokenSymbol } = useToken();
+  const { balance, delegatesTo } = useTokenVotes(address);
+
+  const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalIdx);
+
+  const startDate = dayjs(Number(proposal?.parameters.startDate) * 1000).toString();
+  const endDate = dayjs(Number(proposal?.parameters.endDate) * 1000).toString();
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
+  const proposalStatus = useProposalStatus(proposal!);
+  let vetoPercentage = 0;
+  if (proposal?.vetoTally && pastSupply && proposal.parameters.minVetoVotingPower) {
+    vetoPercentage = Number(
+      (BigInt(1000) * proposal.vetoTally) /
+        ((pastSupply * BigInt(proposal.parameters.minVetoVotingPower)) / BigInt(10000000))
+    );
+  }
 
-  const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
+  let cta: IBreakdownMajorityVotingResult["cta"];
+  if (proposal?.executed) {
+    cta = {
+      disabled: true,
+      label: "Executed",
+    };
+  } else if (proposalStatus === ProposalStatus.ACCEPTED) {
+    cta = {
+      disabled: !canExecute || !proposal?.actions.length,
+      isLoading: isConfirmingExecution,
+      label: proposal?.actions.length ? "Execute" : "No actions to execute",
+      onClick: executeProposal,
+    };
+  } else if (proposalStatus === ProposalStatus.ACTIVE) {
+    cta = {
+      disabled: !canVeto,
+      isLoading: isConfirmingVeto,
+      label: "Veto",
+      onClick: vetoProposal,
+    };
+  }
+  // TODO: CHECK has claimed + add claim()
 
-  const { claimLockProposal, isConfirming: isConfirmingClaimLock, hasClaimed } = useProposalClaimLock(proposalId);
+  const proposalStage: ITransformedStage[] = [
+    {
+      id: "1",
+      type: ProposalStages.OPTIMISTIC_EXECUTION,
+      variant: "majorityVoting",
+      title: "Optimistic voting",
+      status: proposalStatus!,
+      disabled: false,
+      proposalId: proposalIdx.toString(),
+      providerId: "1",
+      result: {
+        cta,
+        votingScores: [
+          {
+            option: "Veto",
+            voteAmount: formatEther(proposal?.vetoTally || BigInt(0)),
+            votePercentage: vetoPercentage,
+            tokenSymbol: tokenSymbol || PUB_TOKEN_SYMBOL,
+          },
+        ],
+        proposalId: proposalIdx.toString(),
+      },
+      details: {
+        censusTimestamp: Number(proposal?.parameters.snapshotBlock || 0) || 0,
+        startDate,
+        endDate,
+        strategy: "Optimistic voting",
+        options: "Veto",
+      },
+      votes: vetoes.map(({ voter }) => ({ address: voter, variant: "no" }) as IVote),
+    },
+  ];
+
+  const hasBalance = !!balance && balance > ZERO;
+  const delegatingToSomeoneElse = !!delegatesTo && delegatesTo !== address && delegatesTo !== ADDRESS_ZERO;
+  const delegatedToZero = !!delegatesTo && delegatesTo === ADDRESS_ZERO;
 
   if (!proposal || showProposalLoading) {
     return (
@@ -44,59 +124,81 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
 
   return (
     <section className="flex w-screen min-w-full max-w-full flex-col items-center">
-      <div className="flex w-full justify-between py-5">
-        <ProposalHeader
-          proposalNumber={Number(proposalId) + 1}
-          proposal={proposal}
-          transactionConfirming={isConfirmingVeto || isConfirmingExecution}
-          canVeto={canVeto}
-          canExecute={canExecute}
-          hasClaimed={hasClaimed}
-          addressLockedTokens={vetoes.some((veto) => veto.voter === account.address)}
-          onVetoPressed={() => vetoProposal()}
-          onExecutePressed={() => executeProposal()}
-          onClaimLockPressed={() => claimLockProposal()}
-        />
-      </div>
+      <ProposalHeader proposalIdx={proposalIdx} proposal={proposal} />
 
-      <div className="my-10 grid w-full gap-10 lg:grid-cols-2 xl:grid-cols-3">
-        <VetoTally
-          voteCount={proposal?.vetoTally}
-          votePercentage={Number(proposal?.vetoTally / proposal?.parameters?.minVetoVotingPower) * 100}
-        />
-        <ProposalDetails
-          endDate={proposal?.parameters?.endDate}
-          minVetoVotingPower={proposal?.parameters?.minVetoVotingPower}
-        />
-      </div>
-      <div className="w-full py-12">
-        <div className="space-between flex flex-row">
-          <h2 className="flex-grow text-3xl font-semibold text-neutral-900">
-            {bottomSection === "description" ? "Description" : "Vetoes"}
-          </h2>
-          <ToggleGroup
-            className="justify-end"
-            value={bottomSection}
-            isMultiSelect={false}
-            onChange={(val: string | undefined) => (val ? setBottomSection(val as BottomSection) : "")}
-          >
-            <Toggle label="Description" value="description" />
-            <Toggle label="Vetoes" value="vetoes" />
-          </ToggleGroup>
+      <div className="mx-auto w-full max-w-screen-xl px-4 py-6 md:px-16 md:pb-20 md:pt-10">
+        <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
+          <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
+            <BodySection body={proposal.description || "No description was provided"} />
+            <If all={[hasBalance, delegatingToSomeoneElse || delegatedToZero]}>
+              <NoVetoPowerWarning
+                delegatingToSomeoneElse={delegatingToSomeoneElse}
+                delegatesTo={delegatesTo}
+                delegatedToZero={delegatedToZero}
+                address={address}
+                canVeto={canVeto}
+              />
+            </If>
+            <ProposalVoting
+              stages={proposalStage}
+              description="Proposals become eventually executable, unless the community reaches the veto threshold during the community veto stage."
+            />
+            <ProposalActions actions={proposal.actions} />
+          </div>
+          <div className="flex flex-col gap-y-6 md:w-[33%]">
+            <CardResources resources={proposal.resources} title="Resources" />
+          </div>
         </div>
-
-        <If condition={bottomSection === "description"}>
-          <Then>
-            <ProposalDescription {...proposal} />
-          </Then>
-          <Else>
-            <VetoesSection vetoes={vetoes} />
-          </Else>
-        </If>
       </div>
     </section>
   );
 }
+
+const NoVetoPowerWarning = ({
+  delegatingToSomeoneElse,
+  delegatesTo,
+  delegatedToZero,
+  address,
+  canVeto,
+}: {
+  delegatingToSomeoneElse: boolean;
+  delegatesTo: Address | undefined;
+  delegatedToZero: boolean;
+  address: Address | undefined;
+  canVeto: boolean;
+}) => {
+  return (
+    <AlertCard
+      description={
+        <span className="text-sm">
+          <If true={delegatingToSomeoneElse}>
+            <Then>
+              You are currently delegating your voting power to <AddressText bold={false}>{delegatesTo}</AddressText>.
+              If you wish to participate by yourself in future proposals,
+            </Then>
+            <ElseIf true={delegatedToZero}>
+              You have not self delegated your voting power to participate in the DAO. If you wish to participate in
+              future proposals,
+            </ElseIf>
+          </If>
+          &nbsp;make sure that{" "}
+          <Link href={"/plugins/members/#/delegates/" + address} className="!text-sm text-primary-400 hover:underline">
+            your voting power is self delegated
+          </Link>
+          .
+        </span>
+      }
+      message={
+        delegatingToSomeoneElse
+          ? "Your voting power is currently delegated"
+          : canVeto
+            ? "You cannot veto on new proposals"
+            : "You cannot veto"
+      }
+      variant="info"
+    />
+  );
+};
 
 function getShowProposalLoading(
   proposal: ReturnType<typeof useProposal>["proposal"],

@@ -1,14 +1,18 @@
 import Blockies from "react-blockies";
-import { VetoCastEvent } from "@/plugins/lockToVote/utils/types";
+import { VetoCastEvent } from "../../utils/types";
 import { formatUnits } from "viem";
 import { AddressText } from "@/components/text/address";
-import { Card, Tag } from "@aragon/ods";
+import { Card } from "@aragon/ods";
 import { compactNumber } from "@/utils/numbers";
+import { If } from "@/components/if";
 
 export default function VetoesSection({ vetoes }: { vetoes: Array<VetoCastEvent> }) {
   return (
-    <div className="mb-14 mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <div className="mb-14 mt-2 grid grid-cols-1 lg:grid-cols-3">
       <div>
+        <If not={vetoes.length}>
+          <p>The proposal has no vetoes</p>
+        </If>
         <div className="grid gap-2">
           {vetoes.map((veto, i) => (
             <VetoCard key={i} veto={veto} />
@@ -30,7 +34,6 @@ const VetoCard = function ({ veto }: { veto: VetoCastEvent }) {
             <p className="text-sm text-neutral-600">{compactNumber(formatUnits(veto.votingPower, 18))} votes</p>
           </div>
         </div>
-        <Tag className="!text-sm" variant="critical" label="Veto" />
       </div>
     </Card>
   );

@@ -31,9 +31,13 @@ export const InputParameterText = ({ abi, idx, onChange }: IInputParameterTextPr
     <div className="flex">
       <InputText
         name={`abi-input-${idx}-${abi.name ?? abi.internalType ?? abi.type}`}
-        addon={abi.name ? decodeCamelCase(abi.name) : `Parameter ${idx + 1}`}
+        label={abi.name ? decodeCamelCase(abi.name) : `Parameter ${idx + 1}`}
         placeholder={abi.type ? readableTypeName(abi.type) : decodeCamelCase(abi.name) || ""}
-        variant={value === null || isValidStringValue(value, abi.type) ? "default" : "critical"}
+        alert={
+          value === null || isValidStringValue(value, abi.type)
+            ? undefined
+            : { message: "The given value is not a valid " + abi.type, variant: "critical" }
+        }
         value={value ?? ""}
         onChange={(e) => handleValue(e.target.value)}
       />

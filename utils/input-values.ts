@@ -2,6 +2,14 @@ import { decodeCamelCase } from "./case";
 
 export type InputValue = string | boolean | number | bigint | Array<InputValue> | { [k: string]: InputValue };
 
+export const URL_PATTERN =
+  /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]+(:[0-9]{1,5})?(\/.*)?$/i;
+
+export const URL_WITH_PROTOCOL_PATTERN =
+  /^(http:\/\/|https:\/\/)[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]+(:[0-9]{1,5})?(\/.*)?$/i;
+
+export const EMAIL_PATTERN = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]+(?:\.[a-z]+)?)$/i;
+
 export function isValidStringValue(value: string, paramType: string): boolean {
   if (!value || !paramType) return false;
 

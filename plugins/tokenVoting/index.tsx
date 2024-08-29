@@ -13,7 +13,7 @@ export default function PluginPage() {
   else if (hash.startsWith("#/proposals/")) {
     const id = hash.replace("#/proposals/", "");
 
-    return <ProposalDetail id={id} />;
+    return <ProposalDetail index={parseInt(id)} />;
   }
 
   // Default not found page

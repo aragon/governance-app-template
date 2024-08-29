@@ -2,15 +2,13 @@ import { Address } from "viem";
 import { DEPLOYMENT_TARGET_CHAIN_ID } from "./deploy/priv-constants.js";
 import { deploymentPublicClient as publicClient } from "./lib/util/client";
 import { checkDependencies } from "./deploy/0-checks.js";
-import { deployTokenContracts } from "./deploy/1-governance-erc20-token.js";
+import { deployTokenContracts } from "./deploy/1-gov-erc20-token.js";
 import { ensurePluginRepo as ensureTokenVoting } from "./deploy/2-token-voting.js";
-import { deployContract as deployDelegationAnnouncer } from "./deploy/3-delegate-announcer.js";
 import { deployPlugin as deployDualGovernance } from "./deploy/4-dual-governance.js";
 import { deployDao } from "./deploy/5-dao.js";
 
 async function main() {
   let tokenVotingPluginRepo: Address;
-  let delegationAnnouncer: Address;
   let dualGovernancePluginRepo: Address;
 
   try {
@@ -24,7 +22,6 @@ async function main() {
 
     console.log("\nPlugins and helpers");
     tokenVotingPluginRepo = await ensureTokenVoting();
-    delegationAnnouncer = await deployDelegationAnnouncer();
     dualGovernancePluginRepo = await deployDualGovernance(governanceErc20Base, governanceWrappedErc20Base);
 
     const { daoAddress, subdomain, installedPlugins } = await deployDao(
@@ -50,7 +47,6 @@ NEXT_PUBLIC_DELEGATION_ANNOUNCEMENTS_START_BLOCK=${currentBlock}
 
 # Plugin addresses
 NEXT_PUBLIC_TOKEN_VOTING_PLUGIN_ADDRESS=${installedPlugins[0]} 
-NEXT_PUBLIC_DELEGATION_CONTRACT_ADDRESS=${delegationAnnouncer}
 NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS=${installedPlugins[1]}
 
 # Network and services

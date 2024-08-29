@@ -1,5 +1,5 @@
 import { Address } from "viem";
-import { Action } from "@/utils/types";
+import type { IProposalResource, RawAction } from "@/utils/types";
 
 export type ProposalInputs = {
   proposalId: bigint;
@@ -17,18 +17,13 @@ export type Proposal = {
   executed: boolean;
   parameters: ProposalParameters;
   vetoTally: bigint;
-  actions: Action[];
+  actions: RawAction[];
   allowFailureMap: bigint;
   creator: string;
   title: string;
   summary: string;
-  resources: string[];
-};
-
-export type ProposalMetadata = {
-  title: string;
-  summary: string;
-  resources: string[];
+  description: string;
+  resources: IProposalResource[];
 };
 
 export type VoteCastResponse = {

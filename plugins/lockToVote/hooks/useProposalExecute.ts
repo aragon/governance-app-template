@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
-import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { AlertContextProps, useAlerts } from "@/context/Alerts";
+import { useState } from "react";
+import { useReadContract } from "wagmi";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS } from "@/constants";
 import { LockToVetoPluginAbi } from "../artifacts/LockToVetoPlugin.sol";
+import { useTransactionManager } from "@/hooks/useTransactionManager";
 
 export function useProposalExecute(proposalIdx: number) {
   const { reload } = useRouter();
-  const { addAlert } = useAlerts() as AlertContextProps;
   const [isExecuting, setIsExecuting] = useState(false);
 
   const {
@@ -21,13 +20,18 @@ export function useProposalExecute(proposalIdx: number) {
     functionName: "canExecute",
     args: [BigInt(proposalIdx)],
   });
-  const {
-    writeContract: executeWrite,
-    data: executeTxHash,
-    error: executingError,
-    status: executingStatus,
-  } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: executeTxHash });
+
+  const { writeContract, isConfirming, isConfirmed } = useTransactionManager({
+    onSuccessMessage: "Proposal executed",
+    onSuccess() {
+      setTimeout(() => reload(), 1000 * 2);
+    },
+    onErrorMessage: "Could not execute the proposal",
+    onErrorDescription: "The proposal may contain actions with invalid operations",
+    onError() {
+      setIsExecuting(false);
+    },
+  });
 
   const executeProposal = () => {
     if (!canExecute) return;
@@ -35,7 +39,7 @@ export function useProposalExecute(proposalIdx: number) {
 
     setIsExecuting(true);
 
-    executeWrite({
+    writeContract({
       chainId: PUB_CHAIN.id,
       abi: LockToVetoPluginAbi,
       address: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
@@ -43,45 +47,6 @@ export function useProposalExecute(proposalIdx: number) {
       args: [BigInt(proposalIdx)],
     });
   };
-
-  useEffect(() => {
-    if (executingStatus === "idle" || executingStatus === "pending") return;
-    else if (executingStatus === "error") {
-      if (executingError?.message?.startsWith("User rejected the request")) {
-        addAlert("The transaction signature was declined", {
-          description: "Nothing will be sent to the network",
-          timeout: 4 * 1000,
-        });
-      } else {
-        console.error(executingError);
-        addAlert("Could not execute the proposal", {
-          type: "error",
-          description: "The proposal may contain actions with invalid operations",
-        });
-      }
-      setIsExecuting(false);
-      return;
-    }
-
-    // success
-    if (!executeTxHash) return;
-    else if (isConfirming) {
-      addAlert("Transaction submitted", {
-        description: "Waiting for the transaction to be validated",
-        type: "info",
-        txHash: executeTxHash,
-      });
-      return;
-    } else if (!isConfirmed) return;
-
-    addAlert("Proposal executed", {
-      description: "The transaction has been validated",
-      type: "success",
-      txHash: executeTxHash,
-    });
-
-    setTimeout(() => reload(), 1000 * 2);
-  }, [executingStatus, executeTxHash, isConfirming, isConfirmed]);
 
   return {
     executeProposal,

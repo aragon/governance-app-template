@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useState } from "react";
+import { useReadContract } from "wagmi";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
@@ -7,6 +7,7 @@ import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin
 import { toHex } from "viem";
 import { useProposal } from "./useProposal";
 import { getContentCid, uploadToPinata } from "@/utils/ipfs";
+import { useTransactionManager } from "@/hooks/useTransactionManager";
 
 export function useProposalExecute(proposalId: string) {
   const { push } = useRouter();
@@ -28,13 +29,21 @@ export function useProposalExecute(proposalId: string) {
     functionName: "canExecute",
     args: [BigInt(proposalId)],
   });
-  const {
-    writeContract: executeWrite,
-    data: executeTxHash,
-    error: executingError,
-    status: executingStatus,
-  } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: executeTxHash });
+
+  const { writeContract, isConfirming, isConfirmed } = useTransactionManager({
+    onSuccessMessage: "Proposal executed",
+    onSuccess() {
+      setTimeout(() => {
+        push("#/");
+        window.scroll(0, 0);
+      }, 1000 * 2);
+    },
+    onErrorMessage: "Could not execute the proposal",
+    onErrorDescription: "The proposal may contain actions with invalid operations",
+    onError() {
+      setIsExecuting(false);
+    },
+  });
 
   const executeProposal = () => {
     let actualMetadataUri: string;
@@ -55,7 +64,7 @@ export function useProposalExecute(proposalId: string) {
           throw new Error("The uploaded metadata URI doesn't match");
         }
 
-        executeWrite({
+        writeContract({
           chainId: PUB_CHAIN.id,
           abi: EmergencyMultisigPluginAbi,
           address: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
@@ -69,48 +78,6 @@ export function useProposalExecute(proposalId: string) {
         addAlert("Could not recover the details to execute the transaction");
       });
   };
-
-  useEffect(() => {
-    if (executingStatus === "idle" || executingStatus === "pending") return;
-    else if (executingStatus === "error") {
-      if (executingError?.message?.startsWith("User rejected the request")) {
-        addAlert("The transaction signature was declined", {
-          description: "Nothing will be sent to the network",
-          timeout: 4 * 1000,
-        });
-      } else {
-        console.error(executingError);
-        addAlert("Could not execute the proposal", {
-          type: "error",
-          description: "The proposal may contain actions with invalid operations",
-        });
-      }
-      setIsExecuting(false);
-      return;
-    }
-
-    // success
-    if (!executeTxHash) return;
-    else if (isConfirming) {
-      addAlert("Transaction submitted", {
-        description: "Waiting for the transaction to be validated",
-        type: "info",
-        txHash: executeTxHash,
-      });
-      return;
-    } else if (!isConfirmed) return;
-
-    addAlert("Proposal executed", {
-      description: "The transaction has been validated",
-      type: "success",
-      txHash: executeTxHash,
-    });
-
-    setTimeout(() => {
-      push("#/");
-      window.scroll(0, 0);
-    }, 1000 * 2);
-  }, [executingStatus, executeTxHash, isConfirming, isConfirmed]);
 
   return {
     executeProposal,

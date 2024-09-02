@@ -1,56 +1,27 @@
 import { DelegateAnnouncerAbi } from "../artifacts/DelegationWall.sol";
 import { PUB_DELEGATION_WALL_CONTRACT_ADDRESS } from "@/constants";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { toHex } from "viem";
 import { useAlerts } from "@/context/Alerts";
 import { uploadToPinata } from "@/utils/ipfs";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { type IAnnouncementMetadata } from "../utils/types";
 import { useDelegates } from "./useDelegates";
+import { useTransactionManager } from "@/hooks/useTransactionManager";
 
 export function useAnnounceDelegation(onSuccess?: () => void) {
   const { addAlert } = useAlerts();
-  const { writeContract, data: hash, error, status } = useWriteContract();
   const { refetch } = useDelegates();
   const [uploading, setUploading] = useState(false);
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
-  useEffect(() => {
-    if (status === "idle" || status === "pending") return;
-    else if (status === "error") {
-      if (error?.message?.startsWith("User rejected the request")) {
-        addAlert("The transaction signature was declined", {
-          description: "Nothing will be sent to the network",
-          timeout: 4 * 1000,
-        });
-      } else {
-        console.error("Could not create delegate profile", error);
-        addAlert("Could not create your delegate profile", { type: "error" });
-      }
-      return;
-    }
-
-    // success
-    if (!hash) return;
-    else if (isConfirming) {
-      addAlert("Delegate profile submitted", {
-        description: "Waiting for the transaction to be validated",
-        txHash: hash,
-      });
-      return;
-    } else if (!isConfirmed) return;
-
-    addAlert("Delegate profile registered", {
-      description: "The transaction has been validated",
-      type: "success",
-      txHash: hash,
-    });
-
-    // Force a refresh of the delegates list
-    refetch();
-
-    onSuccess?.();
-  }, [status, hash, isConfirming, isConfirmed]);
+  const { writeContract, status, isConfirming, isConfirmed } = useTransactionManager({
+    onSuccessMessage: "Delegate profile registered",
+    onSuccess() {
+      // Force a refresh of the delegates list
+      refetch();
+      onSuccess?.();
+    },
+    onErrorMessage: "Could not create your delegate profile",
+  });
 
   const announceDelegation = useCallback(
     async (metadata: IAnnouncementMetadata) => {

@@ -12,7 +12,7 @@ export const Navbar: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   const navLinks: INavLink[] = [
-    { path: "/", id: "dashboard", name: "Dashboard", icon: IconType.APP_DASHBOARD },
+    // { path: "/", id: "dashboard", name: "Dashboard", icon: IconType.APP_DASHBOARD },
     ...plugins.map((p) => ({
       id: p.id,
       name: p.title,

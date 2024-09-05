@@ -41,7 +41,7 @@ export const NavLink: React.FC<INavLinkProps> = (props) => {
     "group relative md:-mb-0.25 md:border-b md:hover:border-b-neutral-800", // base styles
     {
       "md:border-b-transparent md:active:border-b-primary-400": !selected, // unselected link styles
-      "md:border-b-primary-400 md:hover:border-b-primary-400": selected, // base selected link styles
+      "md:border-b-transparent md:hover:border-b-primary-400": selected, // base selected link styles
 
       // using after so that the size of the links don't change when one is selected and active
       "md:after:bg-primary-400 md:after:content-[attr(aria-current)] md:active:after:hidden": selected,
@@ -54,10 +54,7 @@ export const NavLink: React.FC<INavLinkProps> = (props) => {
     "group-hover:text-neutral-800", // hover styles
     "outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset", // focus styles
     "flex h-12 flex-1 items-center justify-between gap-3 rounded-xl px-4 leading-tight", // mobile styles
-    "md:h-11 md:rounded-none md:px-0 md:leading-normal", // desktop nav styles
-    {
-      "bg-neutral-50 md:bg-neutral-0": selected,
-    }
+    "md:h-11 md:rounded-none md:px-0 md:leading-normal" // desktop nav styles
   );
 
   return (

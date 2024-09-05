@@ -23,7 +23,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="h-30 sticky top-0 w-full flex-col gap-2 border-b border-b-neutral-100 bg-neutral-0 p-3 md:px-6 md:pb-0 md:pt-5 lg:gap-3">
+      <nav className="h-30 sticky top-0 w-full flex-col gap-2 border-b border-b-neutral-100 bg-[#000] bg-neutral-0 p-3 md:px-6 md:pb-0 md:pt-5 lg:gap-3">
         <div className="flex w-full items-center justify-between">
           <Link
             href="/"
@@ -32,28 +32,13 @@ export const Navbar: React.FC = () => {
               "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
             )}
           >
-            <Image src="/logo-bw-lg.png" width="36" height="36" className="shrink-0" alt="Aragonette" />
-            <span className="hidden py-1 text-lg font-semibold leading-tight text-neutral-700 sm:block md:text-xl">
+            <Image src="/images/logo-icon.png" width="36" height="36" className="shrink-0" alt="Ring Dao" />
+            <Image src="/images/logo.png" width="100" height="36" className="shrink-0" alt="Ring Dao" />
+
+            {/* <span className="hidden py-1 text-lg font-semibold leading-tight text-neutral-700 sm:block md:text-xl">
               Aragonette
-            </span>
+            </span> */}
           </Link>
-
-          <div className="flex items-center gap-x-2">
-            <div className="shrink-0">
-              <WalletContainer />
-            </div>
-
-            {/* Nav Trigger */}
-            <button
-              onClick={() => setOpen(true)}
-              className={classNames(
-                "rounded-full border border-neutral-100 bg-neutral-0 p-1 md:hidden",
-                "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
-              )}
-            >
-              <AvatarIcon size="lg" icon={IconType.MENU} />
-            </button>
-          </div>
         </div>
 
         {/* Tab wrapper */}

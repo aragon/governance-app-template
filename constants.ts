@@ -29,7 +29,7 @@ export const PUB_IPFS_ENDPOINT = process.env.NEXT_PUBLIC_IPFS_ENDPOINT ?? "";
 export const PUB_IPFS_API_KEY = process.env.NEXT_PUBLIC_IPFS_API_KEY ?? "";
 
 // General
-export const PUB_APP_NAME = "Aragonette";
+export const PUB_APP_NAME = "Ring DAO";
 export const PUB_APP_DESCRIPTION = "Simplified user interface for Aragon DAO's";
 
 export const PUB_PROJECT_URL = "https://aragon.org/";

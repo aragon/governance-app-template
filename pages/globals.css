@@ -19,10 +19,13 @@
   }
 }
 
+html {
+  background: #000;
+}
+
 body {
   /* Variables imported from layout.tsx > @aragon/ods */
-  color: var(--ods-color-neutral-800);
-  background-color: var(--ods-color-neutral-50);
+  color: #fff;
   font-family: var(--ods-font-family);
 }
 
@@ -33,14 +36,14 @@ h4,
 h5,
 h6 {
   /* Variables imported from layout.tsx > @aragon/ods */
-  color: var(--ods-color-neutral-800);
+  color: #fff;
 }
 
 p,
 ul,
 ol {
   /* Variables imported from layout.tsx > @aragon/ods */
-  color: var(--ods-color-neutral-600);
+  color: #fff;
 }
 
 /* Inline alerts */

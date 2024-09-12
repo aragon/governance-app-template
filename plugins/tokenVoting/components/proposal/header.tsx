@@ -55,7 +55,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 )}
               </div>
             </If>
-            <span className="pt-1 text-xl font-semibold text-neutral-700">Proposal {proposalNumber}</span>
+            <span className="pt-1 text-xl font-semibold text-[#fff]">Proposal {proposalNumber}</span>
           </div>
         </div>
         <div className="flex">

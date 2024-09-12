@@ -23,7 +23,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="h-30 sticky top-0 w-full flex-col gap-2 border-b border-b-neutral-100 bg-[#000] bg-neutral-0 p-3 md:px-6 md:pb-0 md:pt-5 lg:gap-3">
+      <nav className="h-30 sticky top-0 w-full flex-col gap-2 border-b border-b-neutral-100 p-3 md:px-6 md:pb-0 md:pt-5 lg:gap-3">
         <div className="flex w-full items-center justify-between">
           <Link
             href="/"
@@ -35,7 +35,7 @@ export const Navbar: React.FC = () => {
             <Image src="/images/logo-icon.png" width="36" height="36" className="shrink-0" alt="Ring Dao" />
             <Image src="/images/logo.png" width="100" height="36" className="shrink-0" alt="Ring Dao" />
 
-            {/* <span className="hidden py-1 text-lg font-semibold leading-tight text-neutral-700 sm:block md:text-xl">
+            {/* <span className="hidden py-1 text-lg font-semibold leading-tight text-[#fff] sm:block md:text-xl">
               Aragonette
             </span> */}
           </Link>

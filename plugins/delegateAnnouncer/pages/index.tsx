@@ -28,7 +28,7 @@ export default function DelegateAnnouncements() {
     <MainSection>
       <If condition={account?.address}>
         <SectionView>
-          <h2 className="pb-3 text-xl font-semibold text-neutral-700">Your profile</h2>
+          <h2 className="pb-3 text-xl font-semibold text-[#fff]">Your profile</h2>
           <SelfDelegationProfileCard
             address={account.address!}
             tokenAddress={PUB_TOKEN_ADDRESS}
@@ -39,7 +39,7 @@ export default function DelegateAnnouncements() {
         </SectionView>
       </If>
 
-      <h2 className="text-3xl font-semibold text-neutral-700">Delegates</h2>
+      <h2 className="text-3xl font-semibold text-[#fff]">Delegates</h2>
       <If condition={delegateAnnouncements.length}>
         <Then>
           <div className="mb-14 mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">

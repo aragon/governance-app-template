@@ -24,7 +24,7 @@ const VotingModal: React.FC<VotingModalProps> = ({ onDismissModal, selectedVote 
           <div className="relative flex w-full flex-col rounded-lg bg-neutral-100 outline-none focus:outline-none">
             {/*header*/}
             <div className="flex items-start justify-between rounded-t p-3">
-              <h3 className="pr-4 text-lg font-semibold text-neutral-700">Vote submission</h3>
+              <h3 className="pr-4 text-lg font-semibold text-[#fff]">Vote submission</h3>
               <button
                 className="opacity-1 float-right rounded-lg bg-transparent text-3xl text-neutral-800 hover:bg-neutral-200 active:bg-neutral-200"
                 onClick={() => onDismissModal()}

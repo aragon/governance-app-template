@@ -21,6 +21,13 @@ type PluginItem = {
 
 export const plugins: PluginItem[] = [
   {
+    id: "multisig",
+    folderName: "multisig",
+    title: "Multisig",
+    // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
+    pluginAddress: PUB_MULTISIG_PLUGIN_ADDRESS,
+  },
+  {
     id: "token-voting",
     folderName: "tokenVoting",
     title: "Token Voting",
@@ -42,9 +49,9 @@ export const plugins: PluginItem[] = [
     pluginAddress: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   },
   {
-    id: "multisig",
-    folderName: "multisig",
-    title: "Multisig",
+    id: "opt-multisig",
+    folderName: "opt-multisig",
+    title: "Multisig (Optimistic)",
     // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_MULTISIG_PLUGIN_ADDRESS,
   },

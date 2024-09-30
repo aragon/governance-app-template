@@ -6,18 +6,18 @@ export type ProposalInputs = {
 };
 
 export type MultisigProposalResultType = readonly [
-  boolean,
-  number,
-  MultisigProposalParameters,
-  string,
-  readonly RawAction[],
-  Address,
+  boolean, // executed
+  number, // approvals
+  MultisigProposalParameters, // proposalParameters
+  readonly RawAction[], // actions
+  bigint, // allowFailureMap
 ];
 
 export type MultisigProposalParameters = {
-  expirationDate: bigint;
-  snapshotBlock: bigint;
   minApprovals: number;
+  snapshotBlock: bigint;
+  startDate: bigint;
+  endDate: bigint;
 };
 
 export type MultisigProposal = {
@@ -33,11 +33,7 @@ export type MultisigProposal = {
   resources: IProposalResource[];
 };
 
-export type ApprovedEventResponse = {
-  args: ApprovedEvent[];
-};
-
 export type ApprovedEvent = {
-  proposalId: bigint;
-  approver: Address;
+  proposalId?: bigint;
+  approver?: Address;
 };

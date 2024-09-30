@@ -26,6 +26,14 @@ export const MultisigPluginAbi = [
     type: "error",
   },
   {
+    inputs: [
+      { internalType: "uint64", name: "limit", type: "uint64" },
+      { internalType: "uint64", name: "actual", type: "uint64" },
+    ],
+    name: "DateOutOfBounds",
+    type: "error",
+  },
+  {
     inputs: [{ internalType: "address", name: "member", type: "address" }],
     name: "InvalidAddresslistUpdate",
     type: "error",
@@ -74,12 +82,6 @@ export const MultisigPluginAbi = [
   },
   {
     anonymous: false,
-    inputs: [{ indexed: true, internalType: "uint256", name: "proposalId", type: "uint256" }],
-    name: "Executed",
-    type: "event",
-  },
-  {
-    anonymous: false,
     inputs: [{ indexed: false, internalType: "uint8", name: "version", type: "uint8" }],
     name: "Initialized",
     type: "event",
@@ -107,7 +109,6 @@ export const MultisigPluginAbi = [
     inputs: [
       { indexed: false, internalType: "bool", name: "onlyListed", type: "bool" },
       { indexed: true, internalType: "uint16", name: "minApprovals", type: "uint16" },
-      { indexed: false, internalType: "uint64", name: "destinationProposalDuration", type: "uint64" },
     ],
     name: "MultisigSettingsUpdated",
     type: "event",
@@ -220,11 +221,14 @@ export const MultisigPluginAbi = [
           { internalType: "bytes", name: "data", type: "bytes" },
         ],
         internalType: "struct IDAO.Action[]",
-        name: "_destinationActions",
+        name: "_actions",
         type: "tuple[]",
       },
-      { internalType: "contract OptimisticTokenVotingPlugin", name: "_destinationPlugin", type: "address" },
+      { internalType: "uint256", name: "_allowFailureMap", type: "uint256" },
       { internalType: "bool", name: "_approveProposal", type: "bool" },
+      { internalType: "bool", name: "_tryExecution", type: "bool" },
+      { internalType: "uint64", name: "_startDate", type: "uint64" },
+      { internalType: "uint64", name: "_endDate", type: "uint64" },
     ],
     name: "createProposal",
     outputs: [{ internalType: "uint256", name: "proposalId", type: "uint256" }],
@@ -255,13 +259,13 @@ export const MultisigPluginAbi = [
         components: [
           { internalType: "uint16", name: "minApprovals", type: "uint16" },
           { internalType: "uint64", name: "snapshotBlock", type: "uint64" },
-          { internalType: "uint64", name: "expirationDate", type: "uint64" },
+          { internalType: "uint64", name: "startDate", type: "uint64" },
+          { internalType: "uint64", name: "endDate", type: "uint64" },
         ],
         internalType: "struct Multisig.ProposalParameters",
         name: "parameters",
         type: "tuple",
       },
-      { internalType: "bytes", name: "metadataURI", type: "bytes" },
       {
         components: [
           { internalType: "address", name: "to", type: "address" },
@@ -269,10 +273,10 @@ export const MultisigPluginAbi = [
           { internalType: "bytes", name: "data", type: "bytes" },
         ],
         internalType: "struct IDAO.Action[]",
-        name: "destinationActions",
+        name: "actions",
         type: "tuple[]",
       },
-      { internalType: "contract OptimisticTokenVotingPlugin", name: "destinationPlugin", type: "address" },
+      { internalType: "uint256", name: "allowFailureMap", type: "uint256" },
     ],
     stateMutability: "view",
     type: "function",
@@ -302,7 +306,6 @@ export const MultisigPluginAbi = [
         components: [
           { internalType: "bool", name: "onlyListed", type: "bool" },
           { internalType: "uint16", name: "minApprovals", type: "uint16" },
-          { internalType: "uint64", name: "destinationProposalDuration", type: "uint64" },
         ],
         internalType: "struct Multisig.MultisigSettings",
         name: "_multisigSettings",
@@ -351,7 +354,6 @@ export const MultisigPluginAbi = [
     outputs: [
       { internalType: "bool", name: "onlyListed", type: "bool" },
       { internalType: "uint16", name: "minApprovals", type: "uint16" },
-      { internalType: "uint64", name: "destinationProposalDuration", type: "uint64" },
     ],
     stateMutability: "view",
     type: "function",
@@ -397,7 +399,6 @@ export const MultisigPluginAbi = [
         components: [
           { internalType: "bool", name: "onlyListed", type: "bool" },
           { internalType: "uint16", name: "minApprovals", type: "uint16" },
-          { internalType: "uint64", name: "destinationProposalDuration", type: "uint64" },
         ],
         internalType: "struct Multisig.MultisigSettings",
         name: "_multisigSettings",

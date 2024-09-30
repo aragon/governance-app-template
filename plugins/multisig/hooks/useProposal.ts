@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { getAbiItem } from "viem";
-import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
+import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin.sol";
 import { RawAction, ProposalMetadata } from "@/utils/types";
 import {
   MultisigProposal,
@@ -108,8 +108,8 @@ function decodeProposalResultData(data?: MultisigProposalResultType) {
     executed: data[0] as boolean,
     approvals: data[1] as number,
     parameters: data[2] as MultisigProposalParameters,
-    metadataUri: data[3] as string,
-    actions: data[4] as Array<RawAction>,
+    actions: data[3] as Array<RawAction>,
+    allowFailureMap: data[4],
   };
 }
 
@@ -124,9 +124,10 @@ function arrangeProposalData(
     actions: proposalData.actions,
     executed: proposalData.executed,
     parameters: {
-      expirationDate: proposalData.parameters.expirationDate,
       snapshotBlock: proposalData.parameters.snapshotBlock,
       minApprovals: proposalData.parameters.minApprovals,
+      startDate: proposalData.parameters.startDate,
+      endDate: proposalData.parameters.endDate,
     },
     approvals: proposalData.approvals,
     allowFailureMap: BigInt(0),

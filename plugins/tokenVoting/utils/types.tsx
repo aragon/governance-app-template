@@ -40,13 +40,9 @@ export type Proposal = {
   resources: IProposalResource[];
 };
 
-export type VoteCastResponse = {
-  args: VoteCastEvent[];
-};
-
 export type VoteCastEvent = {
-  voter: Address;
-  proposalId: bigint;
-  voteOption: number;
-  votingPower: bigint;
+  voter?: Address;
+  proposalId?: bigint;
+  voteOption?: number;
+  votingPower?: bigint;
 };

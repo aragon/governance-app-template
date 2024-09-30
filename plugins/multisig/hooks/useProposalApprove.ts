@@ -1,6 +1,6 @@
 import { useProposal } from "./useProposal";
 import { useUserCanApprove } from "./useUserCanApprove";
-import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
+import { MultisigPluginAbi } from "../artifacts/MultisigPlugin.sol";
 import { PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useProposalApprovals } from "./useProposalApprovals";
 import { useRouter } from "next/router";

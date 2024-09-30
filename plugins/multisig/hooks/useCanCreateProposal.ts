@@ -1,6 +1,6 @@
 import { useAccount, useReadContract } from "wagmi";
 import { PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
-import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
+import { MultisigPluginAbi } from "../artifacts/MultisigPlugin.sol";
 
 export function useCanCreateProposal() {
   const { address } = useAccount();

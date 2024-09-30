@@ -33,11 +33,7 @@ export type MultisigProposal = {
   resources: IProposalResource[];
 };
 
-export type ApprovedEventResponse = {
-  args: ApprovedEvent[];
-};
-
 export type ApprovedEvent = {
-  proposalId: bigint;
-  approver: Address;
+  proposalId?: bigint;
+  approver?: Address;
 };

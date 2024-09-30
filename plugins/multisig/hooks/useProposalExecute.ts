@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useReadContract } from "wagmi";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
-import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
+import { MultisigPluginAbi } from "../artifacts/MultisigPlugin.sol";
 import { useTransactionManager } from "@/hooks/useTransactionManager";
 
 export function useProposalExecute(proposalId: string) {

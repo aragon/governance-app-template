@@ -1,7 +1,7 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { useEffect } from "react";
 import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
-import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
+import { MultisigPluginAbi } from "../artifacts/MultisigPlugin.sol";
 
 export function useUserCanApprove(proposalId: string | bigint | number) {
   const { address } = useAccount();

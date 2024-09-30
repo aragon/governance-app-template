@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Address, getAbiItem } from "viem";
 import { LockToVetoPluginAbi } from "../artifacts/LockToVetoPlugin.sol";
-import { Proposal, VetoCastEvent, VoteCastResponse } from "../utils/types";
+import { Proposal, VetoCastEvent } from "../utils/types";
 import { usePublicClient } from "wagmi";
 import { PUB_CHAIN } from "@/constants";
 
@@ -17,7 +17,7 @@ export function useProposalVetoes(pluginAddress: Address, proposalId: number, pr
   async function getLogs() {
     if (!publicClient || !proposal?.parameters?.snapshotBlock) return;
 
-    const logs: VoteCastResponse[] = (await publicClient.getLogs({
+    const logs = await publicClient.getLogs({
       address: pluginAddress,
       event,
       args: {
@@ -25,7 +25,7 @@ export function useProposalVetoes(pluginAddress: Address, proposalId: number, pr
       },
       fromBlock: proposal.parameters.snapshotBlock,
       toBlock: "latest", // TODO: Make this variable between 'latest' and proposal last block
-    })) as any;
+    });
 
     const newLogs = logs.flatMap((log) => log.args);
     if (newLogs.length > proposalLogs.length) setLogs(newLogs);

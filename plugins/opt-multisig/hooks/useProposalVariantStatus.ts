@@ -1,22 +1,26 @@
 import { useState, useEffect } from "react";
-import { MultisigProposal } from "@/plugins/opt-multisig/utils/types";
+import { MultisigProposal } from "@/plugins/multisig/utils/types";
 import { ProposalStatus } from "@aragon/ods";
-import dayjs from "dayjs";
 
 export const useProposalVariantStatus = (proposal: MultisigProposal) => {
   const [status, setStatus] = useState({ variant: "", label: "" });
 
   useEffect(() => {
     if (!proposal || !proposal?.parameters) return;
-    setStatus(
-      proposal?.approvals >= proposal?.parameters?.minApprovals
-        ? proposal?.executed
-          ? { variant: "success", label: "Sent to optimistic approval" }
-          : { variant: "success", label: "Executable" }
-        : dayjs().isAfter(dayjs(Number(proposal?.parameters.expirationDate) * 1000))
-          ? { variant: "critical", label: "Failed" }
-          : { variant: "info", label: "Active" }
-    );
+
+    if (proposal?.executed) {
+      setStatus({ variant: "primary", label: "Executed" });
+    } else if (Math.floor(Date.now() / 1000) >= proposal.parameters.endDate) {
+      if (proposal.approvals < proposal.parameters.minApprovals) {
+        setStatus({ variant: "critical", label: "Defeated" });
+      } else {
+        setStatus({ variant: "critical", label: "Expired" });
+      }
+    } else if (proposal.approvals >= proposal.parameters.minApprovals) {
+      setStatus({ variant: "success", label: "Executable" });
+    } else {
+      setStatus({ variant: "info", label: "Active" });
+    }
   }, [proposal, proposal?.approvals, proposal?.executed, proposal?.parameters?.minApprovals]);
 
   return status;
@@ -27,15 +31,20 @@ export const useProposalStatus = (proposal: MultisigProposal) => {
 
   useEffect(() => {
     if (!proposal || !proposal?.parameters) return;
-    setStatus(
-      proposal?.approvals >= proposal?.parameters?.minApprovals
-        ? proposal?.executed
-          ? ProposalStatus.EXECUTED
-          : ProposalStatus.ACCEPTED
-        : dayjs().isAfter(dayjs(Number(proposal?.parameters.expirationDate) * 1000))
-          ? ProposalStatus.FAILED
-          : ProposalStatus.ACTIVE
-    );
+
+    if (proposal?.executed) {
+      setStatus(ProposalStatus.EXECUTED);
+    } else if (Math.floor(Date.now() / 1000) >= proposal.parameters.endDate) {
+      if (proposal.approvals < proposal.parameters.minApprovals) {
+        setStatus(ProposalStatus.REJECTED);
+      } else {
+        setStatus(ProposalStatus.EXPIRED);
+      }
+    } else if (proposal.approvals >= proposal.parameters.minApprovals) {
+      setStatus(ProposalStatus.EXECUTABLE);
+    } else {
+      setStatus(ProposalStatus.ACTIVE);
+    }
   }, [proposal, proposal?.approvals, proposal?.executed, proposal?.parameters?.minApprovals]);
 
   return status;

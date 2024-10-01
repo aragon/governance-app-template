@@ -6,18 +6,18 @@ export type ProposalInputs = {
 };
 
 export type MultisigProposalResultType = readonly [
-  boolean, // executed
-  number, // approvals
-  MultisigProposalParameters, // proposalParameters
-  readonly RawAction[], // actions
-  bigint, // allowFailureMap
+  boolean,
+  number,
+  MultisigProposalParameters,
+  string,
+  readonly RawAction[],
+  Address,
 ];
 
 export type MultisigProposalParameters = {
-  minApprovals: number;
+  expirationDate: bigint;
   snapshotBlock: bigint;
-  startDate: bigint;
-  endDate: bigint;
+  minApprovals: number;
 };
 
 export type MultisigProposal = {

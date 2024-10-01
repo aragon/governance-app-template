@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useReadContract } from "wagmi";
 import { useRouter } from "next/router";
-import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
-import { MultisigPluginAbi } from "../artifacts/MultisigPlugin.sol";
+import { PUB_CHAIN, PUB_OPT_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import { OptimisticMultisigPluginAbi } from "../artifacts/OptimisticMultisigPlugin";
 import { useTransactionManager } from "@/hooks/useTransactionManager";
 
 export function useProposalExecute(proposalId: string) {
@@ -14,8 +14,8 @@ export function useProposalExecute(proposalId: string) {
     isError: isCanVoteError,
     isLoading: isCanVoteLoading,
   } = useReadContract({
-    address: PUB_MULTISIG_PLUGIN_ADDRESS,
-    abi: MultisigPluginAbi,
+    address: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
+    abi: OptimisticMultisigPluginAbi,
     chainId: PUB_CHAIN.id,
     functionName: "canExecute",
     args: [BigInt(proposalId)],
@@ -43,8 +43,8 @@ export function useProposalExecute(proposalId: string) {
 
     writeContract({
       chainId: PUB_CHAIN.id,
-      abi: MultisigPluginAbi,
-      address: PUB_MULTISIG_PLUGIN_ADDRESS,
+      abi: OptimisticMultisigPluginAbi,
+      address: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
       functionName: "execute",
       args: [BigInt(proposalId)],
     });

@@ -1,8 +1,8 @@
-import { type useProposal } from "@/plugins/multisig/hooks/useProposal";
-import ProposalHeader from "@/plugins/multisig/components/proposal/header";
+import { type useProposal } from "@/plugins/opt-multisig/hooks/useProposal";
+import ProposalHeader from "@/plugins/opt-multisig/components/proposal/header";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useProposalApprove } from "@/plugins/multisig/hooks/useProposalApprove";
-import { useProposalExecute } from "@/plugins/multisig/hooks/useProposalExecute";
+import { useProposalApprove } from "@/plugins/opt-multisig/hooks/useProposalApprove";
+import { useProposalExecute } from "@/plugins/opt-multisig/hooks/useProposalExecute";
 import { BodySection } from "@/components/proposal/proposalBodySection";
 import { ProposalVoting } from "@/components/proposalVoting";
 import { type ITransformedStage, type IVote, ProposalStages } from "@/utils/types";
@@ -60,7 +60,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       details: {
         censusBlock: Number(proposal?.parameters.snapshotBlock),
         startDate: "",
-        endDate: dayjs(Number(proposal?.parameters.endDate) * 1000).toString(),
+        endDate: dayjs(Number(proposal?.parameters.expirationDate) * 1000).toString(),
         strategy: "Approval threshold",
         options: "Approve",
       },
@@ -86,7 +86,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
             <BodySection body={proposal.description || "No description was provided"} />
             <ProposalVoting
               stages={proposalStage}
-              description="The onchain multisig flow allows its members to create proposals that if approved, can be executed by the DAO."
+              description="The onchain multisig flow allows its members to create proposals that, if approved, will be moved to the Optimistic Proposal stage."
             />
             <ProposalActions actions={proposal.actions} />
           </div>

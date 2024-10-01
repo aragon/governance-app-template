@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getAbiItem } from "viem";
 import { TokenVotingAbi } from "../artifacts/TokenVoting.sol";
-import { Proposal, VoteCastEvent, VoteCastResponse } from "../utils/types";
+import { Proposal, VoteCastEvent } from "../utils/types";
 import { usePublicClient } from "wagmi";
 import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 
@@ -15,7 +15,7 @@ export function useProposalVoteList(proposalId: number, proposal: Proposal | nul
     if (!proposal?.parameters?.snapshotBlock) return;
     else if (!publicClient) return;
 
-    const logs: VoteCastResponse[] = (await publicClient.getLogs({
+    const logs = await publicClient.getLogs({
       address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
       event: event,
       args: {
@@ -23,7 +23,7 @@ export function useProposalVoteList(proposalId: number, proposal: Proposal | nul
       },
       fromBlock: proposal.parameters.snapshotBlock,
       toBlock: "latest", // TODO: Make this variable between 'latest' and proposal last block
-    })) as any;
+    });
 
     const newLogs = logs.flatMap((log) => log.args);
     if (newLogs.length > proposalLogs.length) setLogs(newLogs);

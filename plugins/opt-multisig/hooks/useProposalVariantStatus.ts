@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { EmergencyProposal } from "@/plugins/emergency-multisig/utils/types";
+import { MultisigProposal } from "@/plugins/opt-multisig/utils/types";
 import { ProposalStatus } from "@aragon/ods";
 
-export const useProposalVariantStatus = (proposal: EmergencyProposal) => {
+export const useProposalVariantStatus = (proposal: MultisigProposal) => {
   const [status, setStatus] = useState({ variant: "", label: "" });
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export const useProposalVariantStatus = (proposal: EmergencyProposal) => {
   return status;
 };
 
-export const useProposalStatus = (proposal: EmergencyProposal) => {
+export const useProposalStatus = (proposal: MultisigProposal) => {
   const [status, setStatus] = useState<ProposalStatus>();
 
   useEffect(() => {

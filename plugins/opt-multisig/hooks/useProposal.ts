@@ -1,19 +1,18 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { getAbiItem } from "viem";
-import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin.sol";
+import { OptimisticMultisigPluginAbi } from "@/plugins/opt-multisig/artifacts/OptimisticMultisigPlugin";
 import { RawAction, ProposalMetadata } from "@/utils/types";
 import {
   MultisigProposal,
   MultisigProposalParameters,
   MultisigProposalResultType,
-} from "@/plugins/multisig/utils/types";
-import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+} from "@/plugins/opt-multisig/utils/types";
+import { PUB_CHAIN, PUB_OPT_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
-import { useProposalCreatedLogs } from "./useProposalCreatedLogs";
 
 const ProposalCreatedEvent = getAbiItem({
-  abi: MultisigPluginAbi,
+  abi: OptimisticMultisigPluginAbi,
   name: "ProposalCreated",
 });
 
@@ -41,13 +40,12 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     fetchStatus: proposalFetchStatus,
     refetch: proposalRefetch,
   } = useReadContract({
-    address: PUB_MULTISIG_PLUGIN_ADDRESS,
-    abi: MultisigPluginAbi,
+    address: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
+    abi: OptimisticMultisigPluginAbi,
     functionName: "getProposal",
     args: [BigInt(proposalId)],
     chainId: PUB_CHAIN.id,
   });
-  const creationEvent = useProposalCreatedLogs(proposalId);
 
   const proposalData = decodeProposalResultData(proposalResult);
 
@@ -60,7 +58,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     data: metadataContent,
     isLoading: metadataLoading,
     error: metadataError,
-  } = useMetadata<ProposalMetadata>(creationEvent?.metadata);
+  } = useMetadata<ProposalMetadata>(proposalData?.metadataUri);
 
   const proposal = arrangeProposalData(proposalData, proposalCreationEvent, metadataContent);
 
@@ -69,7 +67,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
     publicClient
       .getLogs({
-        address: PUB_MULTISIG_PLUGIN_ADDRESS,
+        address: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
         event: ProposalCreatedEvent,
         args: { proposalId: BigInt(proposalId) },
         fromBlock: proposalData.parameters.snapshotBlock,
@@ -110,8 +108,8 @@ function decodeProposalResultData(data?: MultisigProposalResultType) {
     executed: data[0] as boolean,
     approvals: data[1] as number,
     parameters: data[2] as MultisigProposalParameters,
-    actions: data[3] as Array<RawAction>,
-    allowFailureMap: data[4],
+    metadataUri: data[3] as string,
+    actions: data[4] as Array<RawAction>,
   };
 }
 
@@ -126,10 +124,9 @@ function arrangeProposalData(
     actions: proposalData.actions,
     executed: proposalData.executed,
     parameters: {
+      expirationDate: proposalData.parameters.expirationDate,
       snapshotBlock: proposalData.parameters.snapshotBlock,
       minApprovals: proposalData.parameters.minApprovals,
-      startDate: proposalData.parameters.startDate,
-      endDate: proposalData.parameters.endDate,
     },
     approvals: proposalData.approvals,
     allowFailureMap: BigInt(0),

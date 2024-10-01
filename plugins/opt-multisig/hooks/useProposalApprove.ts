@@ -1,7 +1,7 @@
 import { useProposal } from "./useProposal";
 import { useUserCanApprove } from "./useUserCanApprove";
-import { MultisigPluginAbi } from "../artifacts/MultisigPlugin.sol";
-import { PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import { OptimisticMultisigPluginAbi } from "../artifacts/OptimisticMultisigPlugin";
+import { PUB_OPT_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useProposalApprovals } from "./useProposalApprovals";
 import { useRouter } from "next/router";
 import { useTransactionManager } from "@/hooks/useTransactionManager";
@@ -11,7 +11,7 @@ export function useProposalApprove(proposalId: string) {
 
   const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
   const { canApprove, refetch: refetchCanApprove } = useUserCanApprove(proposalId);
-  const approvals = useProposalApprovals(PUB_MULTISIG_PLUGIN_ADDRESS, proposalId, proposal);
+  const approvals = useProposalApprovals(PUB_OPT_MULTISIG_PLUGIN_ADDRESS, proposalId, proposal);
 
   const { writeContract, status, isConfirming, isConfirmed } = useTransactionManager({
     onSuccessMessage: "Approval registered",
@@ -29,8 +29,8 @@ export function useProposalApprove(proposalId: string) {
 
   const approveProposal = () => {
     writeContract({
-      abi: MultisigPluginAbi,
-      address: PUB_MULTISIG_PLUGIN_ADDRESS,
+      abi: OptimisticMultisigPluginAbi,
+      address: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
       functionName: "approve",
       args: [BigInt(proposalId), true],
     });

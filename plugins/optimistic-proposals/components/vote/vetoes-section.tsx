@@ -28,10 +28,12 @@ const VetoCard = function ({ veto }: { veto: VetoCastEvent }) {
     <Card className="p-3">
       <div className="space-between flex flex-row">
         <div className="flex flex-grow">
-          <Blockies className="rounded-3xl" size={9} seed={veto?.voter} />
+          <Blockies className="rounded-3xl" size={9} seed={veto?.voter || ""} />
           <div className="px-2">
             <AddressText>{veto?.voter}</AddressText>
-            <p className="text-sm text-neutral-600">{compactNumber(formatUnits(veto.votingPower, 18))} votes</p>
+            <p className="text-sm text-neutral-600">
+              {compactNumber(formatUnits(veto.votingPower || BigInt(0), 18))} votes
+            </p>
           </div>
         </div>
       </div>

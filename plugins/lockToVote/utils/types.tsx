@@ -31,7 +31,7 @@ export type VoteCastResponse = {
 };
 
 export type VetoCastEvent = {
-  voter: Address;
-  proposalId: bigint;
-  votingPower: bigint;
+  voter?: Address;
+  proposalId?: bigint;
+  votingPower?: bigint;
 };

@@ -1,7 +1,7 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { useEffect } from "react";
-import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
-import { MultisigPluginAbi } from "../artifacts/MultisigPlugin.sol";
+import { PUB_CHAIN, PUB_OPT_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import { OptimisticMultisigPluginAbi } from "../artifacts/OptimisticMultisigPlugin";
 
 export function useUserCanApprove(proposalId: string | bigint | number) {
   const { address } = useAccount();
@@ -9,8 +9,8 @@ export function useUserCanApprove(proposalId: string | bigint | number) {
 
   const { data: canApprove, refetch } = useReadContract({
     chainId: PUB_CHAIN.id,
-    address: PUB_MULTISIG_PLUGIN_ADDRESS,
-    abi: MultisigPluginAbi,
+    address: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
+    abi: OptimisticMultisigPluginAbi,
     functionName: "canApprove",
     args: [BigInt(proposalId), address!],
     query: {

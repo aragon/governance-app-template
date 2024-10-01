@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Address, getAbiItem } from "viem";
 import { usePublicClient } from "wagmi";
-import { ApprovedEvent, ApprovedEventResponse, EmergencyProposal } from "../utils/types";
+import { ApprovedEvent, EmergencyProposal } from "../utils/types";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
 import { PUB_CHAIN } from "@/constants";
 
@@ -17,7 +17,7 @@ export function useProposalApprovals(pluginAddress: Address, proposalId: string,
   async function getLogs() {
     if (!publicClient || !proposal?.parameters?.snapshotBlock) return;
 
-    const logs: ApprovedEventResponse[] = (await publicClient.getLogs({
+    const logs = await publicClient.getLogs({
       address: pluginAddress,
       event: event,
       args: {
@@ -25,7 +25,7 @@ export function useProposalApprovals(pluginAddress: Address, proposalId: string,
       },
       fromBlock: proposal.parameters.snapshotBlock,
       toBlock: "latest", // TODO: Make this variable between 'latest' and proposal last block
-    })) as any;
+    });
 
     const newLogs = logs.flatMap((log) => log.args);
     if (newLogs.length > proposalLogs.length) setLogs(newLogs);

@@ -1,6 +1,6 @@
 import { AvatarIcon, Breadcrumbs, Heading, IBreadcrumbsLink, IconType, ProposalStatus, TagVariant } from "@aragon/ods";
-import { MultisigProposal } from "@/plugins/multisig/utils/types";
-import { useProposalStatus } from "@/plugins/multisig/hooks/useProposalVariantStatus";
+import { MultisigProposal } from "@/plugins/opt-multisig/utils/types";
+import { useProposalStatus } from "@/plugins/opt-multisig/hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 import { HeaderSection } from "@/components/layout/header-section";
 import { Publisher } from "@/components/publisher";
@@ -18,7 +18,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal })
   const proposalStatus = useProposalStatus(proposal);
   const tagVariant = getTagVariantFromStatus(proposalStatus);
   const breadcrumbs: IBreadcrumbsLink[] = [{ label: "Proposals", href: "#/" }, { label: proposalId.toString() }];
-  const expired = Number(proposal.parameters.endDate) * 1000 <= Date.now();
+  const expired = Number(proposal.parameters.expirationDate) * 1000 <= Date.now();
 
   return (
     <div className="flex w-full justify-center bg-neutral-0">
@@ -59,7 +59,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal })
                 </ElseIf>
                 <Else>
                   <span className="text-neutral-800">
-                    {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.endDate) * 1000))}
+                    {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.expirationDate) * 1000))}
                   </span>
                   <span className="text-neutral-500">left until expiration</span>
                 </Else>

@@ -1,25 +1,25 @@
 import { useState, useEffect } from "react";
 import { Address, getAbiItem } from "viem";
-import { LockToVetoPluginAbi } from "../artifacts/LockToVetoPlugin.sol";
-import { Proposal, VetoCastEvent } from "../utils/types";
 import { usePublicClient } from "wagmi";
+import { MultisigProposal, ApprovedEvent } from "../utils/types";
+import { OptimisticMultisigPluginAbi } from "../artifacts/OptimisticMultisigPlugin";
 import { PUB_CHAIN } from "@/constants";
 
 const event = getAbiItem({
-  abi: LockToVetoPluginAbi,
-  name: "VetoCast",
+  abi: OptimisticMultisigPluginAbi,
+  name: "Approved",
 });
 
-export function useProposalVetoes(pluginAddress: Address, proposalId: number, proposal: Proposal | null) {
+export function useProposalApprovals(pluginAddress: Address, proposalId: string, proposal: MultisigProposal | null) {
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
-  const [proposalLogs, setLogs] = useState<VetoCastEvent[]>([]);
+  const [proposalLogs, setLogs] = useState<ApprovedEvent[]>([]);
 
   async function getLogs() {
     if (!publicClient || !proposal?.parameters?.snapshotBlock) return;
 
     const logs = await publicClient.getLogs({
       address: pluginAddress,
-      event,
+      event: event,
       args: {
         proposalId: BigInt(proposalId),
       },

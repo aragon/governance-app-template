@@ -1,12 +1,12 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { type ReactNode, useEffect } from "react";
-import ProposalCard from "@/plugins/multisig/components/proposal";
-import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin.sol";
+import ProposalCard from "@/plugins/opt-multisig/components/proposal";
+import { OptimisticMultisigPluginAbi } from "@/plugins/opt-multisig/artifacts/OptimisticMultisigPlugin";
 import { Button, DataList, IconType, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
-import { useCanCreateProposal } from "@/plugins/multisig/hooks/useCanCreateProposal";
+import { useCanCreateProposal } from "@/plugins/opt-multisig/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
-import { PUB_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
+import { PUB_OPT_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { MainSection } from "@/components/layout/main-section";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { MissingContentView } from "@/components/MissingContentView";
@@ -27,8 +27,8 @@ export default function Proposals() {
     isFetching: isFetchingNextPage,
     refetch,
   } = useReadContract({
-    address: PUB_MULTISIG_PLUGIN_ADDRESS,
-    abi: MultisigPluginAbi,
+    address: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
+    abi: OptimisticMultisigPluginAbi,
     functionName: "proposalCount",
     chainId: PUB_CHAIN.id,
   });

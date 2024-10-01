@@ -36,6 +36,8 @@ export function useProposalCreatedLogs(proposalId: string) {
         args: {
           proposalId: BigInt(proposalId),
         },
+        fromBlock: BigInt(0),
+        toBlock: "latest",
       })
       .then((logs) => {
         if (!logs.length) return;

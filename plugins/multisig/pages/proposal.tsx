@@ -86,7 +86,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
             <BodySection body={proposal.description || "No description was provided"} />
             <ProposalVoting
               stages={proposalStage}
-              description="The onchain multisig flow allows its members to create proposals that, if approved, will be moved to the Optimistic Proposal stage."
+              description="The onchain multisig flow allows its members to create proposals that if approved, can be executed by the DAO."
             />
             <ProposalActions actions={proposal.actions} />
           </div>

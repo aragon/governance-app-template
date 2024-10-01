@@ -7,7 +7,7 @@ import {
   PUB_APP_NAME,
   PUB_CHAIN,
   PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-  PUB_MULTISIG_PLUGIN_ADDRESS,
+  PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
   PUB_PROJECT_URL,
 } from "@/constants";
 import { uploadToPinata } from "@/utils/ipfs";
@@ -86,7 +86,7 @@ export function useCreateProposal() {
       createProposalWrite({
         chainId: PUB_CHAIN.id,
         abi: OptimisticMultisigPluginAbi,
-        address: PUB_MULTISIG_PLUGIN_ADDRESS,
+        address: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
         functionName: "createProposal",
         args: [toHex(ipfsPin), actions, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, false],
       });

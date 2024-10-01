@@ -8,7 +8,7 @@ import {
   MultisigProposalParameters,
   MultisigProposalResultType,
 } from "@/plugins/opt-multisig/utils/types";
-import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_CHAIN, PUB_OPT_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 
 const ProposalCreatedEvent = getAbiItem({
@@ -40,7 +40,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     fetchStatus: proposalFetchStatus,
     refetch: proposalRefetch,
   } = useReadContract({
-    address: PUB_MULTISIG_PLUGIN_ADDRESS,
+    address: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
     abi: OptimisticMultisigPluginAbi,
     functionName: "getProposal",
     args: [BigInt(proposalId)],
@@ -67,7 +67,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
     publicClient
       .getLogs({
-        address: PUB_MULTISIG_PLUGIN_ADDRESS,
+        address: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
         event: ProposalCreatedEvent,
         args: { proposalId: BigInt(proposalId) },
         fromBlock: proposalData.parameters.snapshotBlock,

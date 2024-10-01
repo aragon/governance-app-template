@@ -6,7 +6,7 @@ import { Button, DataList, IconType, ProposalDataListItemSkeleton, type DataList
 import { useCanCreateProposal } from "@/plugins/opt-multisig/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
-import { PUB_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
+import { PUB_OPT_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { MainSection } from "@/components/layout/main-section";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { MissingContentView } from "@/components/MissingContentView";
@@ -27,7 +27,7 @@ export default function Proposals() {
     isFetching: isFetchingNextPage,
     refetch,
   } = useReadContract({
-    address: PUB_MULTISIG_PLUGIN_ADDRESS,
+    address: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
     abi: OptimisticMultisigPluginAbi,
     functionName: "proposalCount",
     chainId: PUB_CHAIN.id,

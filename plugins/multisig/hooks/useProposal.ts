@@ -10,6 +10,7 @@ import {
 } from "@/plugins/multisig/utils/types";
 import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
+import { useProposalCreatedLogs } from "./useProposalCreatedLogs";
 
 const ProposalCreatedEvent = getAbiItem({
   abi: MultisigPluginAbi,
@@ -46,6 +47,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     args: [BigInt(proposalId)],
     chainId: PUB_CHAIN.id,
   });
+  const creationEvent = useProposalCreatedLogs(proposalId);
 
   const proposalData = decodeProposalResultData(proposalResult);
 
@@ -58,7 +60,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     data: metadataContent,
     isLoading: metadataLoading,
     error: metadataError,
-  } = useMetadata<ProposalMetadata>(proposalData?.metadataUri);
+  } = useMetadata<ProposalMetadata>(creationEvent?.metadata);
 
   const proposal = arrangeProposalData(proposalData, proposalCreationEvent, metadataContent);
 

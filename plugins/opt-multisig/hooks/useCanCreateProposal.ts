@@ -1,5 +1,5 @@
 import { useAccount, useReadContract } from "wagmi";
-import { PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_OPT_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { OptimisticMultisigPluginAbi } from "../artifacts/OptimisticMultisigPlugin";
 
 export function useCanCreateProposal() {
@@ -11,7 +11,7 @@ export function useCanCreateProposal() {
     refetch,
   } = useReadContract({
     abi: OptimisticMultisigPluginAbi,
-    address: PUB_MULTISIG_PLUGIN_ADDRESS,
+    address: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
     functionName: "isMember",
     args: [address!],
 

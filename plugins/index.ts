@@ -5,6 +5,7 @@ import {
   PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
   PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
   PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
+  PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
 } from "@/constants";
 import { IconType } from "@aragon/ods";
 
@@ -53,7 +54,7 @@ export const plugins: PluginItem[] = [
     folderName: "opt-multisig",
     title: "Multisig (Optimistic)",
     // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
-    pluginAddress: PUB_MULTISIG_PLUGIN_ADDRESS,
+    pluginAddress: PUB_OPT_MULTISIG_PLUGIN_ADDRESS,
   },
   {
     id: "emergency",

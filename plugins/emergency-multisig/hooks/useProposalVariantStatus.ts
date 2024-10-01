@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { MultisigProposal } from "@/plugins/multisig/utils/types";
+import { EmergencyProposal } from "@/plugins/emergency-multisig/utils/types";
 import { ProposalStatus } from "@aragon/ods";
 
-export const useProposalVariantStatus = (proposal: MultisigProposal) => {
+export const useProposalVariantStatus = (proposal: EmergencyProposal) => {
   const [status, setStatus] = useState({ variant: "", label: "" });
 
   useEffect(() => {
@@ -10,7 +10,7 @@ export const useProposalVariantStatus = (proposal: MultisigProposal) => {
 
     if (proposal?.executed) {
       setStatus({ variant: "primary", label: "Executed" });
-    } else if (Math.floor(Date.now() / 1000) >= proposal.parameters.endDate) {
+    } else if (Math.floor(Date.now() / 1000) >= proposal.parameters.expirationDate) {
       if (proposal.approvals < proposal.parameters.minApprovals) {
         setStatus({ variant: "critical", label: "Defeated" });
       } else {
@@ -26,7 +26,7 @@ export const useProposalVariantStatus = (proposal: MultisigProposal) => {
   return status;
 };
 
-export const useProposalStatus = (proposal: MultisigProposal) => {
+export const useProposalStatus = (proposal: EmergencyProposal) => {
   const [status, setStatus] = useState<ProposalStatus>();
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export const useProposalStatus = (proposal: MultisigProposal) => {
 
     if (proposal?.executed) {
       setStatus(ProposalStatus.EXECUTED);
-    } else if (Math.floor(Date.now() / 1000) >= proposal.parameters.endDate) {
+    } else if (Math.floor(Date.now() / 1000) >= proposal.parameters.expirationDate) {
       if (proposal.approvals < proposal.parameters.minApprovals) {
         setStatus(ProposalStatus.REJECTED);
       } else {

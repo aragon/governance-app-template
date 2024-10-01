@@ -64,8 +64,8 @@ export default function ProposalCard(props: ProposalInputs) {
       href={`#/proposals/${props.proposalId}`}
       voted={hasApproved}
       date={
-        [ProposalStatus.ACTIVE, ProposalStatus.ACCEPTED].includes(proposalStatus!) && proposal.parameters.expirationDate
-          ? Number(proposal.parameters.expirationDate) * 1000
+        [ProposalStatus.ACTIVE, ProposalStatus.ACCEPTED].includes(proposalStatus!) && proposal.parameters.endDate
+          ? Number(proposal.parameters.endDate) * 1000
           : undefined
       }
       result={{

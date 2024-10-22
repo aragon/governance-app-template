@@ -8,15 +8,15 @@ This project is a versatile host UI including common tools, services and a set o
 
 This section displays all the proposals which need to be ratified by the community of token holders. Proposals follow an optimistic governance flow. They created by the Council and token holders have the chance to veto them for a certain amount of time.
 
-This flow attempts to find a good balance between efficiency, agility, prevent spam or attacks and decentralization. 
+This flow attempts to find a good balance between efficiency, agility, prevent spam or attacks and decentralization.
 
 ### Multisig Council
 
-This section features a multisig plugin which is only visible to the Council members. It allows to create, approve and eventually relay proposals to the community section described above. 
+This section features a multisig plugin which is only visible to the Council members. It allows to create, approve and eventually relay proposals to the community section described above.
 
 ### Security Council
 
-This section is also a multisig plugin, with the difference that a super majority of the Security Council can approve and execute proposals that are time critical. This plugin may be disabled in future iterations of the DAO but for the time being, it allows respond to potential security threats in a much quicker way. 
+This section is also a multisig plugin, with the difference that a super majority of the Security Council can approve and execute proposals that are time critical. This plugin may be disabled in future iterations of the DAO but for the time being, it allows respond to potential security threats in a much quicker way.
 
 The metadata and the actions of the proposal are encrypted until the proposal has been executed. See [Encryption and decryption flows](#encryption-and-decryption-flows) below.
 
@@ -63,8 +63,8 @@ Before you start, make sure you have Bun installed on your machine. If not, hop 
 Once you're set with Bun, clone this repository to your local machine:
 
 ```bash
-git clone https://github.com/aragon/governance-app-template.git
-cd governance-app-template
+git clone https://github.com/aragon/gov-app-template.git
+cd gov-app-template
 ```
 
 To get the development server running, simply execute:
@@ -95,7 +95,7 @@ Got ideas on how to make this template even better? We're all ears! Whether it's
 ### You can configure your repository to pull changes from this repository with:
 
 ```bash
-git remote add upstream git@github.com:aragon/governance-app-template.git
+git remote add upstream git@github.com:aragon/gov-app-template.git
 git remote set-url --push upstream DISABLE
 ```
 
